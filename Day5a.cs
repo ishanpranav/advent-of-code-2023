@@ -34,7 +34,7 @@ internal static partial class Program
         return 0;
     }
 
-    private static void TransformSeeds(Function function, List<long> seeds)
+    private static void Realize(Function function, List<long> seeds)
     {
         function.SortRanges();
 
@@ -75,7 +75,7 @@ internal static partial class Program
             switch (tokens.Length)
             {
                 case 2:
-                    TransformSeeds(current, seeds);
+                    Realize(current, seeds);
                     break;
 
                 case 3:
@@ -87,7 +87,7 @@ internal static partial class Program
             }
         }
 
-        TransformSeeds(current, seeds);
+        Realize(current, seeds);
 
         min = seeds.Min();
 

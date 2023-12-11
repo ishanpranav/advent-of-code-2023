@@ -14,7 +14,7 @@
 
 typedef char* String;
 
-bool read(FILE* stream, long long* result)
+static bool read(FILE* stream, long long* result)
 {
     char buffer[BUFFER_SIZE];
 

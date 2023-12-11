@@ -182,13 +182,13 @@ ListEnumerator list_get_enumerator(List instance)
     result.begin = instance->items;
     result.end = result.begin + instance->count;
 
-    return result; 
+    return result;
 }
 
-static void transform(Function function, List seeds)
+static void realize(Function function, List seeds)
 {
     function_sort_ranges(function);
-    
+
     ListEnumerator enumerator = list_get_enumerator(seeds);
 
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
@@ -245,7 +245,7 @@ int main(int count, String args[])
     {
         if (strchr(buffer, ':'))
         {
-            transform(&current, &seeds);
+            realize(&current, &seeds);
 
             continue;
         }
@@ -255,21 +255,50 @@ int main(int count, String args[])
             continue;
         }
 
-        Range range =
+        char* token = strtok(buffer, DELIMITERS);
+
+        if (!token)
         {
-            .destinationOffset = atoll(strtok(buffer, DELIMITERS)),
-            .sourceOffset = atoll(strtok(NULL, DELIMITERS)),
-            .length = atoll(strtok(NULL, DELIMITERS))
-        };
+            fclose(stream);
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        Range range;
+
+        range.destinationOffset = atoll(token);
+        token = strtok(NULL, DELIMITERS);
+
+        if (!token)
+        {
+            fclose(stream);
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        range.sourceOffset = atoll(token);
+        token = strtok(NULL, DELIMITERS);
+
+        if (!token)
+        {
+            fclose(stream);
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        range.length = atoll(token);
 
         function_add_range(&current, range);
     }
 
-    transform(&current, &seeds);
+    realize(&current, &seeds);
 
     long long min = LLONG_MAX;
     ListEnumerator enumerator = list_get_enumerator(&seeds);
-
+S
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
     {
         long long value = *p;
