@@ -4,4 +4,4 @@ This is a collection of solutions to the [Advent of Code 2023](https://adventofc
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
 ## Acknowledgements
-Some problems were solved with help from Iris Lim, and others based on the implementations in [this](https://github.com/Hudinid/AdventOfCode2023) repository by Brian Hu.
+Some of the most challenging problems in this repository were solved with help from Iris Lim. Others are based on the implementations in [this](https://github.com/Hudinid/AdventOfCode2023) repository by Brian Hu.
