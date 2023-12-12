@@ -187,6 +187,40 @@ static void realize(Function function, List seeds)
     function_clear_ranges(function);
 }
 
+static bool read(Function function, char buffer[])
+{
+    char* token = strtok(buffer, DELIMITERS);
+
+    if (!token)
+    {
+        return false;
+    }
+
+    Range range;
+
+    range.destinationOffset = atoll(token);
+    token = strtok(NULL, DELIMITERS);
+
+    if (!token)
+    {
+        return false;
+    }
+
+    range.sourceOffset = atoll(token);
+    token = strtok(NULL, DELIMITERS);
+
+    if (!token)
+    {
+        return false;
+    }
+
+    range.length = atoll(token);
+
+    function_add_range(function, range);
+
+    return true;
+}
+
 int main(int count, String args[])
 {
     if (count != 2)
@@ -216,21 +250,25 @@ int main(int count, String args[])
         return 1;
     }
 
+    char* token;
     struct List seeds;
     struct Function current;
 
     list(&seeds);
     function(&current);
 
-    for (char* token = strtok(NULL, DELIMITERS);
-        token && seeds.count < LIST_CAPACITY;
-        token = strtok(NULL, DELIMITERS))
+    while ((token = strtok(NULL, DELIMITERS)))
     {
         list_add(&seeds, atoll(token));
     }
 
     while (fgets(buffer, sizeof buffer, stream))
     {
+        if (buffer[0] == '\n')
+        {
+            continue;
+        }
+
         if (strchr(buffer, ':'))
         {
             realize(&current, &seeds);
@@ -238,48 +276,7 @@ int main(int count, String args[])
             continue;
         }
 
-        if (buffer[0] == '\n')
-        {
-            continue;
-        }
-
-        char* token = strtok(buffer, DELIMITERS);
-
-        if (!token)
-        {
-            fclose(stream);
-            fprintf(stderr, "Error: Format.\n");
-
-            return 1;
-        }
-
-        Range range;
-
-        range.destinationOffset = atoll(token);
-        token = strtok(NULL, DELIMITERS);
-
-        if (!token)
-        {
-            fclose(stream);
-            fprintf(stderr, "Error: Format.\n");
-
-            return 1;
-        }
-
-        range.sourceOffset = atoll(token);
-        token = strtok(NULL, DELIMITERS);
-
-        if (!token)
-        {
-            fclose(stream);
-            fprintf(stderr, "Error: Format.\n");
-
-            return 1;
-        }
-
-        range.length = atoll(token);
-
-        function_add_range(&current, range);
+        read(&current, buffer);
     }
 
     realize(&current, &seeds);
