@@ -8,7 +8,7 @@ Some of the more difficult problems were implemented in a higher-level programmi
 
 I am adhering to the following constraints to ensure high code quality.
 
-- Final solutions must be implemented in the progamming language following the C99 standard
+- Final solutions must be implemented in the C sprogamming language following the C99 standard
 - All solutions must be standalone files with no user-defined headers and no external dependencies beyond the C standard library (`libc`) and the C mathematics library (`libm`). The first and second problems for a given day must be implemented separately.
 - Dynamic memory allocation is prohibited (i.e., no calls to `malloc`, `calloc`, `realloc`, `aligned_alloc`, or `free`)
 - All data structures defined must be documented. The first and second problems for a given day may share the same data structures and algorithms, but the second problem may only add to (and never remove from) the public API of the first.
