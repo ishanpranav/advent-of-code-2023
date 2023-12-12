@@ -2,6 +2,9 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
+// This is the reference (high-level) implementation.
+// Please see /day5.c for the final solution.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
