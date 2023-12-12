@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 256
+#define DELIMITERS ";, "
 
 typedef char* String;
 
@@ -32,14 +33,13 @@ int main(int count, String args[])
 
     char buffer[BUFFER_SIZE];
     long sum = 0;
-    String delimiters = ";, ";
     clock_t start = clock();
 
     while (fgets(buffer, sizeof buffer, stream))
     {
         char* start = strchr(buffer, ':');
 
-        if (!start || !strtok(start, delimiters))
+        if (!start || !strtok(start, DELIMITERS))
         {
             fclose(stream);
             fprintf(stderr, "Error: Format.\n");
@@ -53,7 +53,7 @@ int main(int count, String args[])
         int b = 0;
         int lastNumber = 0;
 
-        while ((token = strtok(NULL, delimiters)))
+        while ((token = strtok(NULL, DELIMITERS)))
         {
             if (!lastNumber)
             {

@@ -11,10 +11,11 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 128
+#define DECIMAL_SET_CAPACITY 99
 
 struct DecimalSet
 {
-    bool set[99];
+    bool set[DECIMAL_SET_CAPACITY];
 };
 
 typedef char* String;
@@ -77,18 +78,24 @@ int main(int count, String args[])
             return 1;
         }
 
+        char first;
+        char second;
         long score = 0;
         char* next = strchr(buffer, '|');
         struct DecimalSet winningNumbers = { 0 };
 
-        for (char* p = begin + 2; p < next && p[0]; p += 3)
+        for (char* p = begin + 2;
+            p < next && (first = p[0]) && (second = p[1]);
+            p += 3)
         {
-            decimal_set_add(&winningNumbers, p[0], p[1]);
+            decimal_set_add(&winningNumbers, first, second);
         }
 
-        for (char* p = next + 2; p < end && p[0]; p += 3)
+        for (char* p = next + 2;
+            p < end && (first = p[0]) && (second = p[1]);
+            p += 3)
         {
-            if (!decimal_set_contains(&winningNumbers, p[0], p[1]))
+            if (!decimal_set_contains(&winningNumbers, first, second))
             {
                 continue;
             }
