@@ -140,13 +140,8 @@ internal sealed class Function
                 lo = i + 1;
             }
         }
-
-        if (hi > 0)
-        {
-            return hi;
-        }
-
-        return 0;
+        
+        return hi;
     }
 
     public long Transform(long input)

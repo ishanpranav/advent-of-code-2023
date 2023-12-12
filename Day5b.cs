@@ -2,13 +2,12 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Almost-optimized function composition and simplification approach
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Day5;
@@ -19,7 +18,7 @@ internal static partial class Program
     {
         if (args.Length != 1)
         {
-            Console.WriteLine("Usage: Day5a <path>");
+            Console.WriteLine("Usage: Day5b <path>");
 
             return 1;
         }
@@ -46,18 +45,17 @@ internal static partial class Program
         }
 
         string[] tokens = line.Split(' ');
-        List<Range> seeds = new List<Range>();
+        List<Interval> seeds = new List<Interval>();
 
         for (int i = 1; i < tokens.Length - 1; i += 2)
         {
             long offset = long.Parse(tokens[i], CultureInfo.InvariantCulture);
 
-            Range range = new Range(
+            seeds.Add(new Interval(
                 offset,
-                offset,
-                long.Parse(tokens[i + 1], CultureInfo.InvariantCulture));
-
-            seeds.Add(range);
+                offset + long.Parse(
+                    tokens[i + 1],
+                    CultureInfo.InvariantCulture)));
         }
 
         Function? current = null;
@@ -129,52 +127,49 @@ internal static partial class Program
 
         min = long.MaxValue;
 
-        foreach (Range seed in seeds)
+        if (composite.Ranges.Count > 0)
         {
-            long seedMin = seed.Min;
-            long seedMax = seed.Max;
-
-            foreach (Range range in composite.Ranges)
+            foreach (Interval seed in seeds)
             {
-                if (range.Min < seedMin || seedMax < range.Max)
-                {
-                    continue;
-                }
+                long seedMin = seed.Min;
+                long seedMax = seed.Max;
 
-                long result = Math.Max(range.Min, seedMin) + range.Intercept;
-
-                if (result < min)
+                foreach (Range range in composite.Ranges)
                 {
-                    min = result;
+                    long rangeMin = range.SourceOffset;
+
+                    if (rangeMin < seedMin || seedMax < rangeMin + range.Length)
+                    {
+                        continue;
+                    }
+
+                    long result = Math.Max(rangeMin, seedMin) + range.Intercept;
+
+                    if (result < min)
+                    {
+                        min = result;
+                    }
                 }
             }
         }
 
-        Console.WriteLine(@"\[ f(x) = \begin{cases}");
-
-        foreach (Range range in composite.Ranges)
-        {
-            Console.Write("x");
-            if (range.Intercept != 0)
-            {
-                Console.Write("{0:+#;-#}", range.Intercept);
-            }
-            Console.Write(@"&{0}\leq", range.Min);
-            if (range.Max == long.MaxValue)
-            {
-                Console.Write(@"\infty");
-            }
-            else
-            {
-                Console.Write(" {0}", range.Max);
-            }
-            Console.WriteLine(@"\\");
-        }
-        Console.WriteLine(@"\end{cases}\]");
         stopwatch.Stop();
+        Console.WriteLine("f(x) = ", composite);
 
         elapsed = stopwatch.Elapsed;
     }
+}
+
+internal sealed class Interval
+{
+    public Interval(long min, long max)
+    {
+        Min = min;
+        Max = max;
+    }
+
+    public long Min { get; }
+    public long Max { get; }
 }
 
 internal sealed class Function
@@ -224,7 +219,7 @@ internal sealed class Function
         _ranges.Clear();
 
         Range first = view[0];
-        long min = first.Min;
+        long min = first.SourceOffset;
 
         if (min != 0)
         {
@@ -237,22 +232,24 @@ internal sealed class Function
         {
             Range current = view[i];
             Range previous = view[i - 1];
+            long previousMax = previous.SourceOffset + previous.Length;
+            long currentMin = current.SourceOffset;
+            long difference = currentMin - previousMax;
 
-            long gap = current.Min - previous.Max;
-
-            if (gap > 1)
+            if (difference > 1)
             {
-                _ranges.Add(Range.Identity(previous.Max + 1, current.Max));
+                _ranges.Add(Range.Identity(previousMax + 1, currentMin + current.Length));
             }
 
             _ranges.Add(current);
         }
 
         Range last = _ranges[_ranges.Count - 1];
+        long lastMax = last.SourceOffset + last.Length;
 
-        if (last.Max < long.MaxValue)
+        if (lastMax < long.MaxValue)
         {
-            _ranges.Add(Range.Identity(last.Max + 1, long.MaxValue));
+            _ranges.Add(Range.Identity(lastMax + 1, long.MaxValue));
         }
     }
 
@@ -264,17 +261,19 @@ internal sealed class Function
         {
             foreach (Range b in g._ranges)
             {
-                long bMin = b.Min - a.Intercept;
-                long bMax = b.Max - a.Intercept;
+                long aMin = a.SourceOffset;
+                long aMax = aMin + a.Length;
+                long bMin = b.SourceOffset - a.Intercept;
+                long bMax = bMin + b.Length;
 
-                if (a.Max < bMin || bMax < a.Min)
+                if (aMax <= bMin || bMax <= aMin)
                 {
                     continue;
                 }
 
                 result.AddRange(Range.FromInterval(
-                    Math.Max(a.Min, bMin),
-                    Math.Min(a.Max, bMax),
+                    Math.Max(aMin, bMin),
+                    Math.Min(aMax, bMax),
                     a.Intercept + b.Intercept));
             }
         }
@@ -285,57 +284,6 @@ internal sealed class Function
     public void ClearRanges()
     {
         _ranges.Clear();
-    }
-
-    public long Transform(long input)
-    {
-        if (_ranges.Count == 0)
-        {
-            return input;
-        }
-
-        Range range = _ranges[BinarySearch(input)];
-        long offset = range.SourceOffset;
-
-        if (input >= offset && input < offset + range.Length)
-        {
-            return input - offset + range.DestinationOffset;
-        }
-
-        return input;
-    }
-
-    private int BinarySearch(long value)
-    {
-        int lo = 0;
-        int hi = _ranges.Count - 1;
-
-        while (lo <= hi)
-        {
-            int i = lo + ((hi - lo) / 2);
-            long other = _ranges[i].SourceOffset;
-
-            if (other == value)
-            {
-                return i;
-            }
-
-            if (other > value)
-            {
-                hi = i - 1;
-            }
-            else
-            {
-                lo = i + 1;
-            }
-        }
-
-        if (hi > 0)
-        {
-            return hi;
-        }
-
-        return 0;
     }
 
     public override string ToString()
@@ -357,22 +305,6 @@ internal sealed class Range : IComparable<Range>
     public long SourceOffset { get; }
     public long Length { get; }
 
-    public long Min
-    {
-        get
-        {
-            return SourceOffset;
-        }
-    }
-
-    public long Max
-    {
-        get
-        {
-            return SourceOffset + Length;
-        }
-    }
-
     public long Intercept
     {
         get
@@ -389,21 +321,6 @@ internal sealed class Range : IComparable<Range>
         }
 
         return SourceOffset.CompareTo(other.SourceOffset);
-    }
-
-    public override string ToString()
-    {
-        if (Max == long.MaxValue)
-        {
-            return $"x in [{Min}, \u221e)";
-        }
-
-        if (Intercept == 0)
-        {
-            return $"x in [{Min}, {Max})";
-        }
-
-        return $"x {Intercept:+ #;- #} in [{Min}, {Max})";
     }
 
     public static Range FromInterval(long min, long max, long intercept)

@@ -110,58 +110,6 @@ void function_clear_ranges(Function instance)
     instance->count = 0;
 }
 
-static Range* function_binary_search(Function instance, long long value)
-{
-    Range* begin = instance->ranges;
-    Range* lo = instance->ranges;
-    Range* hi = lo + instance->count - 1;
-
-    while (lo <= hi)
-    {
-        Range* current = lo + ((hi - lo) / 2);
-        long long other = current->sourceOffset;
-
-        if (other == value)
-        {
-            return current;
-        }
-
-        if (other > value)
-        {
-            hi = current - 1;
-        }
-        else
-        {
-            lo = current + 1;
-        }
-    }
-
-    if (hi > begin)
-    {
-        return hi;
-    }
-
-    return begin;
-}
-
-long long function_transform(Function instance, long long input)
-{
-    if (instance->count == 0)
-    {
-        return input;
-    }
-
-    Range* range = function_binary_search(instance, input);
-    long long offset = range->sourceOffset;
-
-    if (input >= offset && input < offset + range->length)
-    {
-        return input - offset + range->destinationOffset;
-    }
-
-    return input;
-}
-
 void list(List instance)
 {
     instance->count = 0;
@@ -185,6 +133,34 @@ ListEnumerator list_get_enumerator(List instance)
     return result;
 }
 
+static Range* search(Function function, long long value)
+{
+    Range* lo = function->ranges;
+    Range* hi = lo + function->count - 1;
+
+    while (lo <= hi)
+    {
+        Range* current = lo + ((hi - lo) / 2);
+        long long other = current->sourceOffset;
+
+        if (other == value)
+        {
+            return current;
+        }
+
+        if (other > value)
+        {
+            hi = current - 1;
+        }
+        else
+        {
+            lo = current + 1;
+        }
+    }
+
+    return hi;
+}
+
 static void realize(Function function, List seeds)
 {
     function_sort_ranges(function);
@@ -193,7 +169,19 @@ static void realize(Function function, List seeds)
 
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
     {
-        *p = function_transform(function, *p);
+        if (function->count == 0)
+        {
+            continue;
+        }
+
+        long long input = *p;
+        Range* range = search(function, input);
+        long long offset = range->sourceOffset;
+
+        if (input >= offset && input < offset + range->length)
+        {
+            *p = input - offset + range->destinationOffset;
+        }
     }
 
     function_clear_ranges(function);
