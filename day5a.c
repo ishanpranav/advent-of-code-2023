@@ -110,7 +110,7 @@ void function_clear_ranges(Function instance)
     instance->count = 0;
 }
 
-Range* function_binary_search(Function instance, long long value)
+static Range* function_binary_search(Function instance, long long value)
 {
     Range* begin = instance->ranges;
     Range* lo = instance->ranges;
@@ -298,7 +298,7 @@ int main(int count, String args[])
 
     long long min = LLONG_MAX;
     ListEnumerator enumerator = list_get_enumerator(&seeds);
-S
+
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
     {
         long long value = *p;
