@@ -2,18 +2,13 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Brute-force with binary search
-// Time complexity: O(n * m * log(p)) where
-//      n is the number of seeds,
-//      m is the number of functions, and
-//      p is the number of ranges in the largest map.
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Day5;
 
@@ -23,27 +18,17 @@ internal static partial class Program
     {
         if (args.Length != 1)
         {
-            Console.WriteLine("Usage: Day5a <path>");
+            Console.WriteLine("Usage: Day5b <path>");
 
             return 1;
         }
+
+        Console.OutputEncoding = Encoding.Unicode;
 
         Run(args[0], out long min, out TimeSpan elapsed);
         Console.WriteLine("{0} : {1}", min, elapsed.TotalSeconds);
 
         return 0;
-    }
-
-    private static void Realize(Function function, List<long> seeds)
-    {
-        function.SortRanges();
-
-        for (int i = 0; i < seeds.Count; i++)
-        {
-            seeds[i] = function.Transform(seeds[i]);
-        }
-
-        function.ClearRanges();
     }
 
     private static void Run(string path, out long min, out TimeSpan elapsed)
@@ -60,13 +45,21 @@ internal static partial class Program
         }
 
         string[] tokens = line.Split(' ');
-        Function current = new Function();
-        List<long> seeds = new List<long>();
+        List<Interval> seeds = new List<Interval>();
 
-        for (int i = 1; i < tokens.Length; i++)
+        for (int i = 1; i < tokens.Length - 1; i += 2)
         {
-            seeds.Add(long.Parse(tokens[i], CultureInfo.InvariantCulture));
+            long offset = long.Parse(tokens[i], CultureInfo.InvariantCulture);
+
+            seeds.Add(new Interval(
+                offset,
+                offset + long.Parse(
+                    tokens[i + 1],
+                    CultureInfo.InvariantCulture)));
         }
+
+        Function? current = null;
+        Function? composite = null;
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -75,10 +68,40 @@ internal static partial class Program
             switch (tokens.Length)
             {
                 case 2:
-                    Realize(current, seeds);
+                    if (current == null)
+                    {
+                        current = new Function();
+
+                        break;
+                    }
+
+                    if (current.Count == 0)
+                    {
+                        break;
+                    }
+
+                    current.FillRanges();
+
+                    if (composite == null)
+                    {
+                        composite = current;
+                        current = new Function();
+
+                        break;
+                    }
+
+                    composite = Function.Compose(composite, current);
+
+                    current.ClearRanges();
+
                     break;
 
                 case 3:
+                    if (current == null)
+                    {
+                        throw new FormatException();
+                    }
+
                     current.AddRange(new Range(
                         long.Parse(tokens[0], CultureInfo.InvariantCulture),
                         long.Parse(tokens[1], CultureInfo.InvariantCulture),
@@ -87,9 +110,47 @@ internal static partial class Program
             }
         }
 
-        Realize(current, seeds);
+        if (composite == null)
+        {
+            throw new FormatException();
+        }
 
-        min = seeds.Min();
+        if (current != null && current.Count > 0)
+        {
+            current.FillRanges();
+
+            composite = Function.Compose(composite, current);
+
+            current.ClearRanges();
+        }
+
+        min = long.MaxValue;
+
+        if (composite.Ranges.Count > 0)
+        {
+            foreach (Interval seed in seeds)
+            {
+                long seedMin = seed.Min;
+                long seedMax = seed.Max;
+
+                foreach (Range range in composite.Ranges)
+                {
+                    long rangeMin = range.SourceOffset;
+
+                    if (rangeMin < seedMin || seedMax < rangeMin + range.Length)
+                    {
+                        continue;
+                    }
+
+                    long result = Math.Max(rangeMin, seedMin) - range.SourceOffset + range.DestinationOffset;
+
+                    if (result < min)
+                    {
+                        min = result;
+                    }
+                }
+            }
+        }
 
         stopwatch.Stop();
 
@@ -97,9 +158,37 @@ internal static partial class Program
     }
 }
 
+internal sealed class Interval
+{
+    public Interval(long min, long max)
+    {
+        Min = min;
+        Max = max;
+    }
+
+    public long Min { get; }
+    public long Max { get; }
+}
+
 internal sealed class Function
 {
     private readonly List<Range> _ranges = new List<Range>();
+
+    public int Count
+    {
+        get
+        {
+            return _ranges.Count;
+        }
+    }
+
+    public IReadOnlyCollection<Range> Ranges
+    {
+        get
+        {
+            return _ranges;
+        }
+    }
 
     public void AddRange(Range item)
     {
@@ -111,55 +200,89 @@ internal sealed class Function
         _ranges.Sort();
     }
 
+    public void FillRanges()
+    {
+        if (_ranges.Count == 0)
+        {
+            _ranges.Add(new Range(0, 0, long.MaxValue));
+
+            return;
+        }
+
+        SortRanges();
+
+        Range[] view = new Range[_ranges.Count];
+
+        _ranges.CopyTo(view);
+        _ranges.Clear();
+
+        Range first = view[0];
+        long min = first.SourceOffset;
+
+        if (min != 0)
+        {
+            _ranges.Add(Range.Identity(min: 0, min));
+        }
+
+        _ranges.Add(first);
+
+        for (int i = 1; i < view.Length; i++)
+        {
+            Range current = view[i];
+            Range previous = view[i - 1];
+            long previousMax = previous.SourceOffset + previous.Length;
+            long currentMin = current.SourceOffset;
+            long difference = currentMin - previousMax;
+
+            if (difference > 1)
+            {
+                _ranges.Add(Range.Identity(previousMax + 1, currentMin + current.Length));
+            }
+
+            _ranges.Add(current);
+        }
+
+        Range last = _ranges[_ranges.Count - 1];
+        long lastMax = last.SourceOffset + last.Length;
+
+        if (lastMax < long.MaxValue)
+        {
+            _ranges.Add(Range.Identity(lastMax + 1, long.MaxValue));
+        }
+    }
+
     public void ClearRanges()
     {
         _ranges.Clear();
     }
 
-    private int BinarySearch(long value)
+    public static Function Compose(Function f, Function g)
     {
-        int lo = 0;
-        int hi = _ranges.Count - 1;
+        Function result = new Function();
 
-        while (lo <= hi)
+        foreach (Range a in f._ranges)
         {
-            int i = lo + ((hi - lo) / 2);
-            long other = _ranges[i].SourceOffset;
+            foreach (Range b in g._ranges)
+            {
+                long aMin = a.SourceOffset;
+                long aMax = aMin + a.Length;
+                long bMin = b.SourceOffset + a.SourceOffset - a.DestinationOffset;
+                long bMax = bMin + b.Length;
 
-            if (other == value)
-            {
-                return i;
-            }
+                if (aMax <= bMin || bMax <= aMin)
+                {
+                    continue;
+                }
 
-            if (other > value)
-            {
-                hi = i - 1;
-            }
-            else
-            {
-                lo = i + 1;
+                result.AddRange(Range.FromInterval(
+                    Math.Max(aMin, bMin),
+                    Math.Min(aMax, bMax),
+                    a.DestinationOffset + b.DestinationOffset
+                    - a.SourceOffset - b.SourceOffset));
             }
         }
-        
-        return hi;
-    }
 
-    public long Transform(long input)
-    {
-        if (_ranges.Count == 0)
-        {
-            return input;
-        }
-
-        Range range = _ranges[BinarySearch(input)];
-        long offset = range.SourceOffset;
-
-        if (input >= offset && input < offset + range.Length)
-        {
-            return input - offset + range.DestinationOffset;
-        }
-
-        return input;
+        return result;
     }
 }
 
@@ -186,8 +309,13 @@ internal sealed class Range : IComparable<Range>
         return SourceOffset.CompareTo(other.SourceOffset);
     }
 
-    public override string ToString()
+    public static Range FromInterval(long min, long max, long intercept)
     {
-        return $"({DestinationOffset}, {SourceOffset}, {Length})";
+        return new Range(min + intercept, min, max - min);
+    }
+
+    public static Range Identity(long min, long max)
+    {
+        return FromInterval(min, max, intercept: 0);
     }
 }

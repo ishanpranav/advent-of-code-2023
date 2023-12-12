@@ -12,7 +12,7 @@ using System.Text;
 
 namespace Day5;
 
-internal static partial class Program
+internal static class Program
 {
     private static int Main(string[] args)
     {
@@ -60,7 +60,6 @@ internal static partial class Program
 
         Function? current = null;
         Function? composite = null;
-        List<Function> functions = new List<Function>();
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -143,7 +142,7 @@ internal static partial class Program
                         continue;
                     }
 
-                    long result = Math.Max(rangeMin, seedMin) + range.Intercept;
+                    long result = Math.Max(rangeMin, seedMin) - range.SourceOffset + range.DestinationOffset;
 
                     if (result < min)
                     {
@@ -154,7 +153,6 @@ internal static partial class Program
         }
 
         stopwatch.Stop();
-        Console.WriteLine("f(x) = ", composite);
 
         elapsed = stopwatch.Elapsed;
     }
@@ -253,6 +251,11 @@ internal sealed class Function
         }
     }
 
+    public void ClearRanges()
+    {
+        _ranges.Clear();
+    }
+
     public static Function Compose(Function f, Function g)
     {
         Function result = new Function();
@@ -263,7 +266,7 @@ internal sealed class Function
             {
                 long aMin = a.SourceOffset;
                 long aMax = aMin + a.Length;
-                long bMin = b.SourceOffset - a.Intercept;
+                long bMin = b.SourceOffset + a.SourceOffset - a.DestinationOffset;
                 long bMax = bMin + b.Length;
 
                 if (aMax <= bMin || bMax <= aMin)
@@ -274,16 +277,12 @@ internal sealed class Function
                 result.AddRange(Range.FromInterval(
                     Math.Max(aMin, bMin),
                     Math.Min(aMax, bMax),
-                    a.Intercept + b.Intercept));
+                    a.DestinationOffset + b.DestinationOffset
+                    - a.SourceOffset - b.SourceOffset));
             }
         }
 
         return result;
-    }
-
-    public void ClearRanges()
-    {
-        _ranges.Clear();
     }
 
     public override string ToString()
@@ -304,14 +303,6 @@ internal sealed class Range : IComparable<Range>
     public long DestinationOffset { get; }
     public long SourceOffset { get; }
     public long Length { get; }
-
-    public long Intercept
-    {
-        get
-        {
-            return DestinationOffset - SourceOffset;
-        }
-    }
 
     public int CompareTo(Range? other)
     {
