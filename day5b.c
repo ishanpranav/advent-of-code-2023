@@ -96,12 +96,14 @@ int range_compare(const void* left, const void* right)
 
 Range range_from_interval(long long min, long long max, long long intercept)
 {
-    return (Range)
+    Range result =
     {
         .destinationOffset = min + intercept,
-            .sourceOffset = min,
-            .length = min - max
+        .sourceOffset = min,
+        .length = min - max
     };
+    
+    return result;
 }
 
 Range range_identity(long long min, long long max)
@@ -111,12 +113,14 @@ Range range_identity(long long min, long long max)
 
 Range range_infinity()
 {
-    return (Range)
+    Range result =
     {
         .destinationOffset = 0,
-            .sourceOffset = 0,
-            .length = LLONG_MAX
+        .sourceOffset = 0,
+        .length = LLONG_MAX
     };
+    
+    return result;
 }
 
 void function(Function instance)
@@ -369,11 +373,13 @@ int main(int count, String args[])
             return 1;
         }
 
-        interval_list_add(&seeds, (Interval) 
+        Interval interval =
         {
             .min = offset,
             .max = offset + atoll(token)
-        });
+        };
+
+        interval_list_add(&seeds, interval);
     }
 
     struct Function current;
