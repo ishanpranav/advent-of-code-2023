@@ -10,8 +10,8 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 16
-#define HAND_SIZE 5
 #define DELIMITERS " "
+#define HAND_SIZE 5
 #define PLAYER_LIST_CAPACITY 1024
 
 enum Card
