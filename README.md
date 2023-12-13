@@ -1,6 +1,6 @@
 # Advent of Code 2023
 
-This is a collection of solutions to the [Advent of Code 2023](https://adventofcode.com/2023) programming problems implemented in the C programming languages. I have done my best to minimize time complexity while keeping the average running time on the order of 1 ms.
+This is a collection of solutions to the [Advent of Code 2023](https://adventofcode.com/2023) programming problems implemented in the C programming language. I have done my best to minimize time complexity while keeping the average running time on the order of 0.0001 s (0.1 ms).
 
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
