@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 16
+#define HAND_SIZE 5
 #define DELIMITERS " "
 #define PLAYER_LIST_CAPACITY 1024
 
@@ -52,7 +53,7 @@ enum HandType
 
 struct Player
 {
-    enum Card cards[5];
+    enum Card cards[HAND_SIZE];
     enum HandType handType;
     int bid;
 };
@@ -115,7 +116,7 @@ int player_compare(const void* left, const void* right)
         return handDifference;
     }
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < HAND_SIZE; i++)
     {
         int cardDifference = rightPlayer->cards[i] - leftPlayer->cards[i];
 
@@ -233,7 +234,7 @@ int main(int count, String args[])
         Player player;
         struct Hand hand = { 0 };
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < HAND_SIZE; i++)
         {
             Card drawn = card(token[i]);
 
