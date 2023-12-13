@@ -271,14 +271,14 @@ int main(int count, String args[])
 
     player_list_sort(&players);
 
-    long total = 0;
+    long sum = 0;
 
     for (int i = 0; i < players.count; i++)
     {
-        total += (players.count - i) * players.items[i].bid;
+        sum += (players.count - i) * players.items[i].bid;
     }
 
-    printf("%ld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;
