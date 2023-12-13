@@ -11,7 +11,6 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 128
-#define CARDS_CAPACITY 256
 #define DECIMAL_SET_CAPACITY 99
 
 struct DecimalSet
@@ -48,7 +47,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day4b <path>\n");
+        printf("Usage: day4a <path>\n");
 
         return 1;
     }
@@ -62,16 +61,9 @@ int main(int count, String args[])
         return 1;
     }
 
-    int card = 0;
+    long sum = 0;
     char buffer[BUFFER_SIZE];
-    long cards[CARDS_CAPACITY] = { 0 };
-    char* end = buffer + BUFFER_SIZE;
     clock_t start = clock();
-
-    for (int i = 0; i < CARDS_CAPACITY; i++)
-    {
-        cards[i] = 1;
-    }
 
     while (fgets(buffer, sizeof buffer, stream))
     {
@@ -87,40 +79,45 @@ int main(int count, String args[])
 
         char first;
         char second;
-        int matches = 0;
+        long score = 0;
         char* next = strchr(buffer, '|');
         struct DecimalSet winningNumbers = { 0 };
 
-        for (char* p = begin + 2; 
-             p < next && (first = p[0]) && (second = p[1]);
-             p += 3)
+        if (!next)
+        {
+            fclose(stream);
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        for (char* p = begin + 2;
+            p < next && (first = p[0]) && (second = p[1]);
+            p += 3)
         {
             decimal_set_add(&winningNumbers, first, second);
         }
 
         for (char* p = next + 2;
-             p < end && (first = p[0]) && (second = p[1]);
-             p += 3)
+            (first = p[0]) && (second = p[1]);
+            p += 3)
         {
-            if (decimal_set_contains(&winningNumbers, first, second))
+            if (!decimal_set_contains(&winningNumbers, first, second))
             {
-                matches++;
+                continue;
+            }
+
+            if (score)
+            {
+                score *= 2;
+            }
+            else
+            {
+                score = 1;
             }
         }
 
-        for (int i = 1; i <= matches; i++)
-        {
-            cards[card + i] += cards[card];
-        }
-
-        card++;
-    }
-
-    long sum = 0;
-
-    for (int i = 0; i < card; i++)
-    {
-        sum += cards[i];
+        sum += score;
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);

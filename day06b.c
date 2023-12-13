@@ -59,9 +59,9 @@ int main(int count, String args[])
         return 1;
     }
 
-    clock_t start = clock();
     long long t;
     long long dx;
+    clock_t start = clock();
 
     if (!read(stream, &t) || !read(stream, &dx))
     {

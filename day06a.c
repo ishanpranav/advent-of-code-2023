@@ -41,10 +41,11 @@ int main(int count, String args[])
         return 1;
     }
 
+    String token;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream))
+    if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
     {
         fclose(stream);
         fprintf(stderr, "Error: Format.\n");
@@ -55,14 +56,10 @@ int main(int count, String args[])
     int pointCount = 0;
     struct Point points[POINTS_CAPACITY];
 
-    strtok(buffer, DELIMITERS);
-
-    String token = strtok(NULL, DELIMITERS);
-
-    for (pointCount = 0; pointCount < POINTS_CAPACITY && token; pointCount++)
+    while ((token = strtok(NULL, DELIMITERS)))
     {
         points[pointCount].time = atoi(token);
-        token = strtok(NULL, DELIMITERS);
+        pointCount++;
     }
 
     if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
@@ -73,21 +70,27 @@ int main(int count, String args[])
         return 1;
     }
 
-    token = strtok(NULL, DELIMITERS);
-
-    for (int i = 0; i < pointCount && token; i++)
+    for (int i = 0; i < pointCount; i++)
     {
-        points[i].distance = atoi(token);
         token = strtok(NULL, DELIMITERS);
+
+        if (!token)
+        {
+            fclose(stream);
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        points[i].distance = atoi(token);
     }
 
     long product = 1;
 
     for (int i = 0; i < pointCount; i++)
     {
-        Point point = points[i];
-        int t = point.time;
-        int dx = point.distance;
+        int t = points[i].time;
+        int dx = points[i].distance;
 
         product *= ceil((t + sqrt(t * t - 4 * dx)) / 2)
             - floor((t - sqrt(t * t - 4 * dx)) / 2)

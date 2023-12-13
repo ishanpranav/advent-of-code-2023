@@ -189,7 +189,7 @@ static void realize(Function function, List seeds)
 
 static bool read(Function function, char buffer[])
 {
-    char* token = strtok(buffer, DELIMITERS);
+    String token = strtok(buffer, DELIMITERS);
 
     if (!token)
     {
@@ -250,7 +250,7 @@ int main(int count, String args[])
         return 1;
     }
 
-    char* token;
+    String token;
     struct List seeds;
     struct Function current;
 

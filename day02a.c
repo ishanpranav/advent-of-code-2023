@@ -85,7 +85,7 @@ int main(int count, String args[])
             return 1;
         }
 
-        char* token;
+        String token;
         int lastNumber = 0;
         PossibleResult lastPossibleResult = POSSIBLE_RESULT_POSSIBLE;
 

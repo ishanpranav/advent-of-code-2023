@@ -47,7 +47,7 @@ int main(int count, String args[])
             return 1;
         }
 
-        char* token;
+        String token;
         int r = 0;
         int g = 0;
         int b = 0;
