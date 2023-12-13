@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Optimized implementation based on W.C.'s algorithm
+// Custom implementation
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -34,7 +34,8 @@ enum Card
 struct Hand
 {
     int count;
-    int buckets[CARD_NONE];
+    int maxFrequency;
+    int frequencies[CARD_NONE];
 };
 
 enum HandType
@@ -47,12 +48,6 @@ enum HandType
     HAND_TYPE_FOUR_OF_A_KIND,
     HAND_TYPE_FIVE_OF_A_KIND,
     HAND_TYPE_NONE
-};
-
-struct HandEnumerator
-{
-    int* current;
-    int* end;
 };
 
 struct Player
@@ -124,7 +119,7 @@ int player_compare(const void* left, const void* right)
     {
         int cardDifference = rightPlayer->cards[i] - leftPlayer->cards[i];
 
-        if (cardDifference) 
+        if (cardDifference)
         {
             return cardDifference;
         }
@@ -157,12 +152,20 @@ void player_list_sort(PlayerList instance)
 
 void hand_add(Hand instance, Card item)
 {
-    if (!instance->buckets[item])
+    int frequency = instance->frequencies[item];
+
+    if (!frequency)
     {
         instance->count++;
     }
 
-    instance->buckets[item]++;
+    frequency++;
+    instance->frequencies[item] = frequency;
+
+    if (frequency > instance->maxFrequency)
+    {
+        instance->maxFrequency = frequency;
+    }
 }
 
 HandType hand_get_type(Hand instance)
@@ -171,33 +174,19 @@ HandType hand_get_type(Hand instance)
     {
     case 1: return HAND_TYPE_FIVE_OF_A_KIND;
     case 2:
-    {
-        for (int i = CARD_TWO; i < CARD_NONE; i++)
+        switch (instance->maxFrequency)
         {
-            switch (instance->buckets[i])
-            {
-            case 1:
-            case 4:
-                return HAND_TYPE_FOUR_OF_A_KIND;
-            case 2:
-            case 3:
-                return HAND_TYPE_FULL_HOUSE;
-            }
+        case 3: return HAND_TYPE_FULL_HOUSE;
+        case 4: return HAND_TYPE_FOUR_OF_A_KIND;
         }
-    }
-    break;
+        break;
     case 3:
-    {
-        for (int i = CARD_TWO; i < CARD_NONE; i++)
+        switch (instance->maxFrequency)
         {
-            switch (instance->buckets[i])
-            {
-            case 2: return HAND_TYPE_TWO_PAIR;
-            case 3: return HAND_TYPE_THREE_OF_A_KIND;
-            }
+        case 2: return HAND_TYPE_TWO_PAIR;
+        case 3: return HAND_TYPE_THREE_OF_A_KIND;
         }
-    }
-    break;
+        break;
     case 4: return HAND_TYPE_ONE_PAIR;
     case 5: return HAND_TYPE_HIGH_CARD;
     }
@@ -246,17 +235,7 @@ int main(int count, String args[])
 
         for (int i = 0; i < 5; i++)
         {
-            char current = token[i];
-
-            if (!current)
-            {
-                fclose(stream);
-                fprintf(stderr, "Error: Format.\n");
-
-                return 1;
-            }
-
-            Card drawn = card(current);
+            Card drawn = card(token[i]);
 
             if (drawn == CARD_NONE)
             {
