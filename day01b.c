@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Optimized version of B.H.'s code
+// Optimized implementation based on B.H.'s algorithm
 
 #include <ctype.h>
 #include <stdio.h>

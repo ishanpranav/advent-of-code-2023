@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Based on W.C.'s algorithm
+// Optimized implementation based on W.C.'s algorithm
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -72,7 +72,6 @@ typedef char* String;
 typedef enum Card Card;
 typedef struct Hand* Hand;
 typedef enum HandType HandType;
-typedef struct HandEnumerator HandEnumerator;
 typedef struct Player Player;
 typedef struct PlayerList* PlayerList;
 
@@ -164,17 +163,6 @@ void hand_add(Hand instance, Card item)
     }
 
     instance->buckets[item]++;
-}
-
-HandEnumerator hand_get_enumerator(Hand instance)
-{
-    HandEnumerator result =
-    {
-        .current = instance->buckets - 1,
-        .end = instance->buckets + 13
-    };
-
-    return result;
 }
 
 HandType hand_get_type(Hand instance)
