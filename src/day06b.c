@@ -45,7 +45,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day6b <path>\n");
+        printf("Usage: day06b <path>\n");
 
         return 1;
     }

@@ -225,7 +225,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day5a <path>\n");
+        printf("Usage: day05a <path>\n");
 
         return 1;
     }

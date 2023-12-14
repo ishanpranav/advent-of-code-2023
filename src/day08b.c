@@ -196,7 +196,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day8b <path>\n");
+        printf("Usage: day08b <path>\n");
 
         return 1;
     }

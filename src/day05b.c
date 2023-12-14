@@ -329,7 +329,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day5b <path>\n");
+        printf("Usage: day05b <path>\n");
 
         return 1;
     }

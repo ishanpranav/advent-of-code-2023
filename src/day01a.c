@@ -25,7 +25,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day1a <path>\n");
+        printf("Usage: day01a <path>\n");
 
         return 1;
     }
