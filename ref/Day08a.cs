@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Day7;
@@ -41,13 +40,13 @@ internal static partial class Program
 
         string? directions = reader.ReadLine();
 
-        if (directions == null || reader.ReadLine() ==  null)
+        if (directions == null || reader.ReadLine() == null)
         {
             throw new FormatException();
         }
 
         string? line;
-        Dictionary<Node, (Node left, Node right)> graph = new Dictionary<Node, (Node, Node)>();
+        Dictionary<Vertex, (Vertex left, Vertex right)> graph = new Dictionary<Vertex, (Vertex, Vertex)>();
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -56,17 +55,17 @@ internal static partial class Program
                 throw new FormatException();
             }
 
-            Node node = new Node(line[0], line[1], line[2]);
-            Node left = new Node(line[7], line[8], line[9]);
-            Node right = new Node(line[12], line[13], line[14]);
+            Vertex node = new Vertex(line[0], line[1], line[2]);
+            Vertex left = new Vertex(line[7], line[8], line[9]);
+            Vertex right = new Vertex(line[12], line[13], line[14]);
 
             graph.Add(node, (left, right));
         }
 
         total = 0;
 
-        Node current = new Node('A', 'A', 'A');
-        Node end = new Node('Z', 'Z', 'Z');
+        Vertex current = new Vertex('A', 'A', 'A');
+        Vertex end = new Vertex('Z', 'Z', 'Z');
         int direction = 0;
 
         while (current != end)
@@ -95,13 +94,13 @@ internal static partial class Program
     }
 }
 
-internal readonly struct Node : IEquatable<Node>
+internal readonly struct Vertex : IEquatable<Vertex>
 {
     private readonly char _a;
     private readonly char _b;
     private readonly char _c;
 
-    public Node(char a, char b, char c)
+    public Vertex(char a, char b, char c)
     {
         _a = a;
         _b = b;
@@ -113,7 +112,7 @@ internal readonly struct Node : IEquatable<Node>
         return $"{_a}{_b}{_c}";
     }
 
-    public bool Equals(Node other)
+    public bool Equals(Vertex other)
     {
         return _a == other._a &&
             _b == other._b &&
@@ -121,8 +120,8 @@ internal readonly struct Node : IEquatable<Node>
     }
 
     public override bool Equals(object? obj)
-    { 
-        return obj is Node other && Equals(other);
+    {
+        return obj is Vertex other && Equals(other);
     }
 
     public override int GetHashCode()
@@ -130,12 +129,12 @@ internal readonly struct Node : IEquatable<Node>
         return ToString().GetHashCode();
     }
 
-    public static bool operator ==(Node left, Node right)
+    public static bool operator ==(Vertex left, Vertex right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(Node left, Node right)
+    public static bool operator !=(Vertex left, Vertex right)
     {
         return !(left == right);
     }
