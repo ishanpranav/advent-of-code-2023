@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Day7;
@@ -47,7 +46,7 @@ internal static partial class Program
         }
 
         string? line;
-        Dictionary<Node, (Node left, Node right)> graph = new Dictionary<Node, (Node, Node)>();
+        Dictionary<string, (string left, string right)> graph = new Dictionary<string, (string, string)>();
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -56,17 +55,17 @@ internal static partial class Program
                 throw new FormatException();
             }
 
-            Node node = new Node(line.AsSpan(start: 0, length: 3));
-            Node left = new Node(line.AsSpan(start: 7, length: 3));
-            Node right = new Node(line.AsSpan(start: 12, length: 3));
+            string node = line.Substring( 0, length: 3);
+            string left = line.Substring( 7, length: 3);
+            string right = line.Substring( 12, length: 3);
 
             graph.Add(node, (left, right));
         }
 
         total = 0;
 
-        Node current = new Node("AAA");
-        Node end = new Node("ZZZ");
+        string current = "AAA";
+        string end = "ZZZ";
         int direction = 0;
 
         while (current != end)
@@ -92,56 +91,5 @@ internal static partial class Program
         stopwatch.Stop();
 
         elapsed = stopwatch.Elapsed;
-    }
-}
-
-internal readonly struct Node : IEquatable<Node>
-{
-    private const int CharBits = 16;
-
-    private readonly ulong _id;
-
-    public Node(ReadOnlySpan<char> value)
-    {
-        _id = ((ulong)value[0] << (CharBits * 2)) 
-            | ((ulong)value[1] << CharBits) 
-            | value[2];
-    }
-
-    public override string ToString()
-    {
-        const ulong ByteMask = (1 << CharBits) - 1;
-
-        return new string(new char[]
-        {
-            (char)((_id >> (CharBits * 2)) & ByteMask),
-            (char)((_id >> CharBits) & ByteMask),
-            (char)(_id & ByteMask)
-        });
-    }
-
-    public bool Equals(Node other)
-    {
-        return _id == other._id;
-    }
-
-    public override bool Equals(object? obj)
-    { 
-        return obj is Node other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        return _id.GetHashCode();
-    }
-
-    public static bool operator ==(Node left, Node right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(Node left, Node right)
-    {
-        return !(left == right);
     }
 }
