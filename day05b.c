@@ -204,7 +204,7 @@ void function_fill_ranges(Function instance)
     }
 }
 
-static long long lower(long long a, long long b)
+long long lower(long long a, long long b)
 {
     if (a < b)
     {
@@ -214,7 +214,7 @@ static long long lower(long long a, long long b)
     return b;
 }
 
-static long long higher(long long a, long long b)
+long long higher(long long a, long long b)
 {
     if (a > b)
     {

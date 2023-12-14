@@ -2,8 +2,9 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Custom implementation
+// LCM approach
 // Graph: use base-36 encoding to index into a hashtable
+// LCM: use Euclid's algorithm
 
 // The best case is ~47%-fragmented memory but takes less time and complexity
 // than a dynamic hash table
@@ -17,8 +18,9 @@
 #define DIRECTIONS_CAPACITY 512
 #define DIRECTION_LEFT 'L'
 #define DIRECTION_RIGHT 'R'
+#define LIST_CAPACITY 1024
 #define VERTEX_OFFSET -13330
-#define VERTEX_FIRST 0
+#define VERTEX_STOP_MOD 25
 #define VERTEX_LAST 33325
 
 struct VertexPair
@@ -32,10 +34,24 @@ struct Graph
     struct VertexPair vertices[VERTEX_LAST + 1];
 };
 
+struct List
+{
+    int items[LIST_CAPACITY];
+    int count;
+};
+
+struct ListEnumerator
+{
+    int* begin;
+    int* end;
+};
+
 typedef char* String;
 typedef int Vertex;
 typedef char Direction;
 typedef struct Graph* Graph;
+typedef struct List* List;
+typedef struct ListEnumerator ListEnumerator;
 typedef bool (*Predicate)(Vertex vertex);
 
 void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
@@ -45,9 +61,9 @@ void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
 }
 
 int graph_walk(
-    Graph instance, 
-    Vertex start, 
-    Direction directions[], 
+    Graph instance,
+    Vertex start,
+    Direction directions[],
     Predicate predicate)
 {
     int result = 0;
@@ -76,6 +92,47 @@ int graph_walk(
     return result;
 }
 
+void list(List instance)
+{
+    instance->count = 0;
+}
+
+void list_add(List instance, Vertex item)
+{
+    int count = instance->count;
+
+    instance->items[count] = item;
+    instance->count = count + 1;
+}
+
+ListEnumerator list_get_enumerator(List instance)
+{
+    ListEnumerator result;
+
+    result.begin = instance->items;
+    result.end = result.begin + instance->count;
+
+    return result;
+}
+
+long long gcd(long long a, long long b)
+{
+    while (b > 0)
+    {
+        long long r = a % b;
+
+        a = b;
+        b = r;
+    }
+
+    return a;
+}
+
+long long lcm(long long a, long long b)
+{
+    return (a / gcd(a, b)) * b;
+}
+
 static bool parse(char buffer[], char window[], Vertex* result)
 {
     memcpy(window, buffer, 3);
@@ -94,7 +151,7 @@ static bool parse(char buffer[], char window[], Vertex* result)
     return true;
 }
 
-static bool read(FILE* stream, Graph graph)
+static bool read(FILE* stream, Graph graph, List starts)
 {
     int total = 0;
     char buffer[BUFFER_SIZE];
@@ -119,6 +176,11 @@ static bool read(FILE* stream, Graph graph)
             return false;
         }
 
+        if (buffer[2] == 'A')
+        {
+            list_add(starts, vertex);
+        }
+
         graph_add(graph, vertex, left, right);
     }
 
@@ -127,14 +189,14 @@ static bool read(FILE* stream, Graph graph)
 
 static bool stop(Vertex vertex)
 {
-    return vertex == VERTEX_LAST;
+    return vertex % 36 == VERTEX_STOP_MOD;
 }
 
 int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day8a <path>\n");
+        printf("Usage: day8b <path>\n");
 
         return 1;
     }
@@ -150,10 +212,13 @@ int main(int count, String args[])
     }
 
     struct Graph graph;
+    struct List starts;
     Direction directions[DIRECTIONS_CAPACITY];
 
+    list(&starts);
+
     if (!fgets(directions, DIRECTIONS_CAPACITY, stream) ||
-        !read(stream, &graph))
+        !read(stream, &graph, &starts))
     {
         fclose(stream);
         fprintf(stderr, "Error: Format.\n");
@@ -161,9 +226,18 @@ int main(int count, String args[])
         return 1;
     }
 
-    printf("%d : %lf\n",
-        graph_walk(&graph, VERTEX_FIRST, directions, stop),
-        (double)(clock() - start) / CLOCKS_PER_SEC);
+    ListEnumerator enumerator = list_get_enumerator(&starts);
+    Vertex* p = enumerator.begin;
+    long long result = graph_walk(&graph, *p, directions, stop);
+
+    for (p++; p < enumerator.end; p++)
+    {
+        long long walk = graph_walk(&graph, *p, directions, stop);
+
+        result = lcm(result, walk);
+    }
+
+    printf("%lld : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;
