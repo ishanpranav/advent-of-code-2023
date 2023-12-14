@@ -65,8 +65,8 @@ struct BPlayerList
 
 typedef char* String;
 typedef enum BCard BCard;
-typedef struct BHand* BHand;
 typedef enum HandType HandType;
+typedef struct BHand* BHand;
 typedef struct BPlayer BPlayer;
 typedef struct BPlayerList* BPlayerList;
 
