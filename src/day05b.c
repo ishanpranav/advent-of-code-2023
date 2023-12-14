@@ -13,7 +13,7 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 #define DELIMITERS " "
-#define INTERVAL_LIST_CAPACITY 16
+#define INTERVAL_LIST_CAPACITY 32
 #define RANGES_CAPACITY 512
 
 struct Range
