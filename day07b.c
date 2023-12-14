@@ -150,11 +150,6 @@ void b_player_list_sort(BPlayerList instance)
         b_player_compare);
 }
 
-// when you add an item,
-//  is it better than the mode? then it is the mode
-// are jokers the mode? don't play your jokers
-// play your jokers... do you have any? if so, add them to the mode and take out the jokers
-
 void b_hand_add(BHand instance, BCard item)
 {
     int frequency = instance->frequencies[item];
@@ -168,13 +163,8 @@ void b_hand_add(BHand instance, BCard item)
     instance->frequencies[item] = frequency;
 }
 
-void b_hand_play_jokers(BHand instance)
-{
-}
-
 HandType b_hand_get_type(BHand instance)
 {
-    int jokers = instance->frequencies[B_CARD_JOKER];
     BCard mode = B_CARD_TWO;
 
     for (BCard card = B_CARD_THREE; card < B_CARD_NONE; card++)
@@ -185,6 +175,8 @@ HandType b_hand_get_type(BHand instance)
         }
     }
 
+    int jokers = instance->frequencies[B_CARD_JOKER];
+
     if (jokers && jokers < HAND_SIZE) 
     {
         instance->count--;
@@ -192,7 +184,6 @@ HandType b_hand_get_type(BHand instance)
         instance->frequencies[mode] += jokers;
     }
 
-    printf("with count = %d and mode = %d and mode freq = %d: ", instance->count, mode, instance->frequencies[mode]);
     switch (instance->count)
     {
     case 1: return HAND_TYPE_FIVE_OF_A_KIND;
@@ -269,17 +260,12 @@ int main(int count, String args[])
             }
 
             b_hand_add(&current, drawn);
-            printf("%c", token[i]);
 
             player.cards[i] = drawn;
         }
 
-        printf(" ");
-        b_hand_play_jokers(&current);
-
         HandType handType = b_hand_get_type(&current);
 
-        printf("%d\n", handType);
         token = strtok(NULL, DELIMITERS);
 
         if (!token || handType == HAND_TYPE_NONE)
@@ -303,14 +289,6 @@ int main(int count, String args[])
     for (int i = 0; i < players.count; i++)
     {
         sum += (players.count - i) * players.items[i].bid;
-
-        printf("%d\n",
-            players.items[i].bid,
-            players.items[i].cards[0],
-            players.items[i].cards[1],
-            players.items[i].cards[2],
-            players.items[i].cards[3],
-            players.items[i].cards[4]);
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
