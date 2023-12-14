@@ -204,7 +204,7 @@ void function_fill_ranges(Function instance)
     }
 }
 
-long long lower(long long a, long long b)
+long long math_min(long long a, long long b)
 {
     if (a < b)
     {
@@ -214,7 +214,7 @@ long long lower(long long a, long long b)
     return b;
 }
 
-long long higher(long long a, long long b)
+long long math_max(long long a, long long b)
 {
     if (a > b)
     {
@@ -260,8 +260,8 @@ void function_compose(Function instance, Function other)
             }
 
             function_add_range(instance, range_from_interval(
-                higher(aMin, bMin),
-                lower(aMax, bMax),
+                math_max(aMin, bMin),
+                math_min(aMax, bMax),
                 a->destinationOffset + b->destinationOffset -
                 a->sourceOffset - b->sourceOffset));
         }
@@ -461,7 +461,7 @@ int main(int count, String args[])
                 continue;
             }
 
-            long long result = higher(rangeMin, seedMin)
+            long long result = math_max(rangeMin, seedMin)
                 + range->destinationOffset
                 - range->sourceOffset;
 
