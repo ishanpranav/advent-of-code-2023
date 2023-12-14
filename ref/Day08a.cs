@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Day7;
@@ -46,7 +47,7 @@ internal static partial class Program
         }
 
         string? line;
-        Dictionary<string, (string left, string right)> graph = new Dictionary<string, (string, string)>();
+        Dictionary<Node, (Node left, Node right)> graph = new Dictionary<Node, (Node, Node)>();
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -55,17 +56,17 @@ internal static partial class Program
                 throw new FormatException();
             }
 
-            string node = line.Substring( 0, length: 3);
-            string left = line.Substring( 7, length: 3);
-            string right = line.Substring( 12, length: 3);
+            Node node = new Node(line[0], line[1], line[2]);
+            Node left = new Node(line[7], line[8], line[9]);
+            Node right = new Node(line[12], line[13], line[14]);
 
             graph.Add(node, (left, right));
         }
 
         total = 0;
 
-        string current = "AAA";
-        string end = "ZZZ";
+        Node current = new Node('A', 'A', 'A');
+        Node end = new Node('Z', 'Z', 'Z');
         int direction = 0;
 
         while (current != end)
@@ -91,5 +92,51 @@ internal static partial class Program
         stopwatch.Stop();
 
         elapsed = stopwatch.Elapsed;
+    }
+}
+
+internal readonly struct Node : IEquatable<Node>
+{
+    private readonly char _a;
+    private readonly char _b;
+    private readonly char _c;
+
+    public Node(char a, char b, char c)
+    {
+        _a = a;
+        _b = b;
+        _c = c;
+    }
+
+    public override string ToString()
+    {
+        return $"{_a}{_b}{_c}";
+    }
+
+    public bool Equals(Node other)
+    {
+        return _a == other._a &&
+            _b == other._b &&
+            _c == other._c;
+    }
+
+    public override bool Equals(object? obj)
+    { 
+        return obj is Node other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return ToString().GetHashCode();
+    }
+
+    public static bool operator ==(Node left, Node right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Node left, Node right)
+    {
+        return !(left == right);
     }
 }
