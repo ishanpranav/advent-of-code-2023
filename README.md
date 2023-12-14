@@ -22,4 +22,4 @@ I am adhering to the following constraints to ensure high code quality.
 
 ## Acknowledgements
 
-Some of the most challenging problems in this repository were solved with help from Iris Lim. Others are based on the implementations in [this](https://github.com/Hudinid/AdventOfCode2023) repository by Brian Hu and [this](https://github.com/snoopboopsnoop/advent-of-code-2023) repository by Walter Cheng. Please see the relevant file headers for more details.
+Some of the most challenging problems in this repository were solved with help from Iris Lim. Others are based on the implementations in [this](https://github.com/Hudinid/AdventOfCode2023) repository by Brian Hu. Please see the relevant file headers for more details.
