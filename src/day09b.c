@@ -65,6 +65,11 @@ long series_lagrange_next(Series instance)
     return series_lagrange_extrapolate(instance, instance->n);
 }
 
+long series_lagrange_previous(Series instance)
+{
+    return series_lagrange_extrapolate(instance, -1);
+}
+
 int main(int count, String args[])
 {
     if (count != 2)
@@ -109,7 +114,7 @@ int main(int count, String args[])
         }
         while ((token = strtok(NULL, DELIMITERS)));
 
-        sum += series_lagrange_next(&terms);
+        sum += series_lagrange_previous(&terms);
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
