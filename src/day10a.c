@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_STACK_CAPACITY 4
 #define DIMENSION 141
 
 struct Coordinate
@@ -19,13 +18,13 @@ struct Coordinate
 
 struct CoordinateStack
 {
-    struct Coordinate items[COORDINATE_STACK_CAPACITY];
-    int count;
+    struct Coordinate item;
+    bool empty;
 };
 
 struct Matrix
 {
-    struct Coordinate start;
+    struct Coordinate origin;
     int rows;
     int columns;
     char items[(DIMENSION - 1) * (DIMENSION - 1)];
@@ -39,28 +38,24 @@ typedef struct Matrix* Matrix;
 
 void coordinate_stack(CoordinateStack instance)
 {
-    instance->count = 0;
+    instance->empty = true;
 }
 
 void coordinate_stack_push(CoordinateStack instance, Coordinate item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
+    instance->item = item;
+    instance->empty = false;
 }
 
 bool coordinate_stack_try_pop(CoordinateStack instance, Coordinate* result)
 {
-    if (!instance->count)
+    if (instance->empty)
     {
         return false;
     }
 
-    int index = instance->count - 1;
-
-    *result = instance->items[index];
-    instance->count = index;
+    *result = instance->item;
+    instance->empty = true;
 
     return true;
 }
@@ -73,7 +68,7 @@ void matrix(Matrix instance, int n)
         .j = -1
     };
 
-    instance->start = empty;
+    instance->origin = empty;
     instance->rows = 0;
     instance->columns = n;
 }
@@ -220,18 +215,18 @@ int main(int count, String args[])
 
         if (token)
         {
-            Coordinate start =
+            Coordinate origin =
             {
                 .i = a.rows - 1,
                 .j = token - buffer
             };
 
-            a.start = start;
+            a.origin = origin;
         }
     }
     while (fgets(buffer, sizeof buffer, stream));
 
-    if (!a.rows || a.start.i < 0 || a.start.j < 0)
+    if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
     {
         fclose(stream);
         fprintf(stderr, "Error: Format.\n");
@@ -239,59 +234,65 @@ int main(int count, String args[])
         return 1;
     }
 
-    int total = 0;
-    Coordinate result;
+    int total = 1;
+    Coordinate current = a.origin;
     struct CoordinateStack stack;
 
     coordinate_stack(&stack);
-    coordinate_stack_push(&stack, a.start);
 
-    while (coordinate_stack_try_pop(&stack, &result))
+    if (scan_hi(&a, &stack, current) ||
+        scan_lo(&a, &stack, current) ||
+        scan_left(&a, &stack, current) ||
+        scan_right(&a, &stack, current))
+    {
+    }
+
+    while (coordinate_stack_try_pop(&stack, &current))
     {
         total++;
 
-        char current = matrix_get(&a, result);
-
-        switch (current)
+        switch (matrix_get(&a, current))
         {
-        case 'S':
-            if (scan_hi(&a, &stack, result) ||
-                scan_lo(&a, &stack, result) ||
-                scan_left(&a, &stack, result) ||
-                scan_right(&a, &stack, result)) { }
-            break;
-
         case '|':
-            if (scan_hi(&a, &stack, result) || scan_lo(&a, &stack, result)) { }
+            if (scan_hi(&a, &stack, current) || scan_lo(&a, &stack, current))
+            {
+            }
             break;
 
         case '-':
-            if (scan_left(&a, &stack, result) ||
-                scan_right(&a, &stack, result)) { }
+            if (scan_left(&a, &stack, current) ||
+                scan_right(&a, &stack, current))
+            {
+            }
             break;
 
         case 'J':
-            if (scan_hi(&a, &stack, result) ||
-                scan_left(&a, &stack, result)) { }
+            if (scan_hi(&a, &stack, current) ||
+                scan_left(&a, &stack, current))
+            {
+            }
             break;
 
         case 'L':
-            if (scan_hi(&a, &stack, result) ||
-                scan_right(&a, &stack, result)) { }
+            if (scan_hi(&a, &stack, current) || scan_right(&a, &stack, current)) 
+            {
+            }
             break;
 
         case '7':
-            if (scan_lo(&a, &stack, result) ||
-                scan_left(&a, &stack, result)) { }
+            if (scan_lo(&a, &stack, current) || scan_left(&a, &stack, current))
+            {
+            }
             break;
 
         case 'F':
-            if (scan_lo(&a, &stack, result) ||
-                scan_right(&a, &stack, result)) { }
+            if (scan_lo(&a, &stack, current) || scan_right(&a, &stack, current))
+            {
+            }
             break;
         }
 
-        matrix_set(&a, result, 0);
+        matrix_set(&a, current, 0);
     }
 
     printf("%d : %lf\n", total / 2, (double)(clock() - start) / CLOCKS_PER_SEC);
