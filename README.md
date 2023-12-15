@@ -5,7 +5,7 @@ This is a collection of solutions to the [Advent of Code 2023](https://adventofc
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
 ## Summary
-|Day|Problem|Domain|Result|Notes|
+|Day|Problem|Domain|Result|Implementation|
 |:-:|:-----:|:----:|:----:|:-------|
 | 1 |[Trebuchet?!](src/day01b.c)|Strings|Sum|Scan left-to-right, primitive [trie](https://en.wikipedia.org/wiki/Trie)
 | 2 |[Cube Conundrum](src/day02b.c)|Strings|Sum||
