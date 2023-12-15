@@ -34,27 +34,6 @@ int main(int count, String args[])
 
     while (fgets(buffer, sizeof buffer, stream))
     {
-        String token = strtok(buffer, DELIMITERS);
-
-        if (!token)
-        {
-            fclose(stream);
-            fprintf(stderr, "Error: Format.\n");
-
-            return 1;
-        }
-
-        struct Series terms;
-
-        series(&terms);
-
-        do
-        {
-            series_add(&terms, atol(token));
-        }
-        while ((token = strtok(NULL, DELIMITERS)));
-
-        sum += series_lagrange_previous(&terms);
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
