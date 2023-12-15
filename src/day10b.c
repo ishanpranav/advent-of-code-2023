@@ -196,6 +196,30 @@ static bool scan(Matrix a, Coordinate* previous, Coordinate current)
     }
 }
 
+int math_shoelace_formula_area(CoordinateList polygon)
+{
+    int result = 0;
+    int lastIndex = polygon->count - 1;
+    Coordinate first = polygon->items[0];
+
+    for (int i = 0; i < lastIndex; i++)
+    {
+        Coordinate current = polygon->items[i];
+        Coordinate next = polygon->items[i + 1];
+
+        result += (current.i + next.i) * (current.j - next.j);
+    }
+
+    Coordinate last = polygon->items[lastIndex];
+
+    return (result + (last.i + first.i) * (last.j - first.j)) / 2;
+}
+
+int math_pick_theorem_i(int a, int b)
+{
+    return a - (b / 2) + 1;
+}
+
 int main(int count, String args[])
 {
     if (count != 2)
@@ -297,23 +321,9 @@ int main(int count, String args[])
         matrix_set(&a, current, 0);
     }
 
-    int total = 0;
-    int lastIndex = path.count - 1;
-
-    for (int i = 0; i < lastIndex; i++)
-    {
-        Coordinate current = path.items[i];
-        Coordinate next = path.items[i + 1];
-
-        total += (current.i + next.i) * (current.j - next.j);
-    }
-
-    Coordinate last = path.items[lastIndex];
-
-    total += (last.i + a.origin.i) * (last.j - a.origin.j);
-    total = ((total - path.count) / 2) + 1;
-
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("%d : %lf\n", 
+        math_pick_theorem_i(math_shoelace_formula_area(&path), path.count),
+        (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;
