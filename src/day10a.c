@@ -37,17 +37,6 @@ typedef struct Coordinate Coordinate;
 typedef struct CoordinateStack* CoordinateStack;
 typedef struct Matrix* Matrix;
 
-Coordinate coordinate_empty()
-{
-    struct Coordinate result =
-    {
-        .i = -1,
-        .j = -1
-    };
-
-    return result;
-}
-
 void coordinate_stack(CoordinateStack instance)
 {
     instance->count = 0;
@@ -78,7 +67,13 @@ bool coordinate_stack_try_pop(CoordinateStack instance, Coordinate* result)
 
 void matrix(Matrix instance)
 {
-    instance->start = coordinate_empty();
+    Coordinate empty =
+    {
+        .i = -1,
+        .j = -1
+    };
+    
+    instance->start = empty;
     instance->rows = 0;
 }
 
