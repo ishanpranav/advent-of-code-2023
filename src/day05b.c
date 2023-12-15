@@ -52,6 +52,7 @@ struct IntervalListEnumerator
     struct Interval* end;
 };
 
+typedef void* Object;
 typedef char* String;
 typedef struct Range Range;
 typedef struct Function* Function;
@@ -60,7 +61,7 @@ typedef struct Interval Interval;
 typedef struct IntervalList* IntervalList;
 typedef struct IntervalListEnumerator IntervalListEnumerator;
 
-int range_compare(const void* left, const void* right)
+int range_compare(const Object left, const Object right)
 {
     if (!left && !right)
     {
@@ -101,25 +102,13 @@ Range range_from_interval(long long min, long long max, long long intercept)
         .sourceOffset = min,
         .length = min - max
     };
-    
+
     return result;
 }
 
 Range range_identity(long long min, long long max)
 {
     return range_from_interval(min, max, 0);
-}
-
-Range range_infinity()
-{
-    Range result =
-    {
-        .destinationOffset = 0,
-        .sourceOffset = 0,
-        .length = LLONG_MAX
-    };
-    
-    return result;
 }
 
 void function(Function instance)
@@ -155,7 +144,7 @@ void function_fill_ranges(Function instance)
 
     if (!count)
     {
-        function_add_range(instance, range_infinity());
+        function_add_range(instance, range_identity(0, LLONG_MAX));
 
         return;
     }

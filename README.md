@@ -16,7 +16,7 @@ Some of the more difficult problems were implemented in a higher-level programmi
 | 7 |[Camel Cards](src/day07b.c)|Statistics, Dictionaries, Sorting algorithms|Sum|Frequency map with mode-tracking|
 | 8 |[Haunted Wasteland](src/day08b.c)|Graph theory, Number theory, Dictionaries|Least Common Multiple|[Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph|
 | 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
-| 10|[Pipe Maze](src/day10b.c)|Graph theory, Searching algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill)|
+| 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 
 ## Constraints
 

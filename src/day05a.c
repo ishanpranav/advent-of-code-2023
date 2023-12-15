@@ -40,13 +40,14 @@ struct ListEnumerator
     long long* end;
 };
 
+typedef void* Object;
 typedef char* String;
 typedef struct Range Range;
 typedef struct Function* Function;
 typedef struct List* List;
 typedef struct ListEnumerator ListEnumerator;
 
-int range_compare(const void* left, const void* right)
+int range_compare(const Object left, const Object right)
 {
     if (!left && !right)
     {

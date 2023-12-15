@@ -64,6 +64,7 @@ struct PlayerList
     int count;
 };
 
+typedef void* Object;
 typedef char* String;
 typedef enum Card Card;
 typedef enum HandType HandType;
@@ -90,7 +91,7 @@ Card card(char symbol)
     return CARD_NONE;
 }
 
-int player_compare(const void* left, const void* right)
+int player_compare(const Object left, const Object right)
 {
     if (!left && !right)
     {
