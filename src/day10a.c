@@ -17,7 +17,7 @@ struct Coordinate
     int j;
 };
 
-struct CoordinateQueue
+struct CoordinateStack
 {
     struct Coordinate items[COORDINATE_QUEUE_CAPACITY];
     int count;
@@ -34,7 +34,7 @@ struct Matrix
 typedef char* String;
 typedef char* Row;
 typedef struct Coordinate Coordinate;
-typedef struct CoordinateQueue* CoordinateQueue;
+typedef struct CoordinateStack* CoordinateStack;
 typedef struct Matrix* Matrix;
 
 Coordinate coordinate_empty()
@@ -48,12 +48,12 @@ Coordinate coordinate_empty()
     return result;
 }
 
-void coordinate_queue(CoordinateQueue instance)
+void coordinate_stack(CoordinateStack instance)
 {
     instance->count = 0;
 }
 
-void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate item)
+void coordinate_stack_push(CoordinateStack instance, Coordinate item)
 {
     int count = instance->count;
 
@@ -61,7 +61,7 @@ void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate item)
     instance->count = count + 1;
 }
 
-bool coordinate_queue_try_dequeue(CoordinateQueue instance, Coordinate* result)
+bool coordinate_stack_try_pop(CoordinateStack instance, Coordinate* result)
 {
     if (!instance->count)
     {
@@ -101,7 +101,7 @@ Row matrix_add_row(Matrix instance)
     return instance->items + (instance->columns * m);
 }
 
-static void scan_hi(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
+static void scan_hi(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.i--;
 
@@ -112,12 +112,12 @@ static void scan_hi(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
     case '|':
     case '7':
     case 'F':
-        coordinate_queue_enqueue(queue, coordinate);
+        coordinate_stack_push(stack, coordinate);
         break;
     }
 }
 
-static void scan_lo(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
+static void scan_lo(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.i++;
 
@@ -128,12 +128,12 @@ static void scan_lo(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
     case '|':
     case 'L':
     case 'J':
-        coordinate_queue_enqueue(queue, coordinate);
+        coordinate_stack_push(stack, coordinate);
         break;
     }
 }
 
-static void scan_left(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
+static void scan_left(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.j--;
 
@@ -144,12 +144,12 @@ static void scan_left(Matrix matrix, CoordinateQueue queue, Coordinate coordinat
     case '-':
     case 'L':
     case 'F':
-        coordinate_queue_enqueue(queue, coordinate);
+        coordinate_stack_push(stack, coordinate);
         break;
     }
 }
 
-static void scan_right(Matrix matrix, CoordinateQueue queue, Coordinate coordinate)
+static void scan_right(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.j++;
 
@@ -160,7 +160,7 @@ static void scan_right(Matrix matrix, CoordinateQueue queue, Coordinate coordina
     case '-':
     case 'J':
     case '7':
-        coordinate_queue_enqueue(queue, coordinate);
+        coordinate_stack_push(stack, coordinate);
         break;
     }
 }
@@ -238,12 +238,12 @@ int main(int count, String args[])
 
     int total = 0;
     Coordinate result;
-    struct CoordinateQueue queue = { 0 };
+    struct CoordinateStack stack = { 0 };
 
-    coordinate_queue(&queue);
-    coordinate_queue_enqueue(&queue, a.start);
+    coordinate_stack(&stack);
+    coordinate_stack_push(&stack, a.start);
 
-    while (coordinate_queue_try_dequeue(&queue, &result))
+    while (coordinate_stack_try_pop(&stack, &result))
     {
         total++;
 
@@ -252,40 +252,40 @@ int main(int count, String args[])
         switch (current)
         {
         case 'S':
-            scan_hi(&a, &queue, result);
-            scan_lo(&a, &queue, result);
-            scan_left(&a, &queue, result);
-            scan_right(&a, &queue, result);
+            scan_hi(&a, &stack, result);
+            scan_lo(&a, &stack, result);
+            scan_left(&a, &stack, result);
+            scan_right(&a, &stack, result);
             break;
 
         case '|':
-            scan_hi(&a, &queue, result);
-            scan_lo(&a, &queue, result);
+            scan_hi(&a, &stack, result);
+            scan_lo(&a, &stack, result);
             break;
 
         case '-':
-            scan_left(&a, &queue, result);
-            scan_right(&a, &queue, result);
+            scan_left(&a, &stack, result);
+            scan_right(&a, &stack, result);
             break;
 
         case 'J':
-            scan_hi(&a, &queue, result);
-            scan_left(&a, &queue, result);
+            scan_hi(&a, &stack, result);
+            scan_left(&a, &stack, result);
             break;
 
         case 'L':
-            scan_hi(&a, &queue, result);
-            scan_right(&a, &queue, result);
+            scan_hi(&a, &stack, result);
+            scan_right(&a, &stack, result);
             break;
 
         case '7':
-            scan_lo(&a, &queue, result);
-            scan_left(&a, &queue, result);
+            scan_lo(&a, &stack, result);
+            scan_left(&a, &stack, result);
             break;
 
         case 'F':
-            scan_lo(&a, &queue, result);
-            scan_right(&a, &queue, result);
+            scan_lo(&a, &stack, result);
+            scan_right(&a, &stack, result);
             break;
         }
 
