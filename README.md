@@ -7,7 +7,7 @@ Some of the more difficult problems were implemented in a higher-level programmi
 ## Summary
 |Day|Problem|Domain|Result|Implementation|
 |:-:|:-----:|:----:|:----:|:-------|
-| 1 |[Trebuchet?!](src/day01b.c)|Strings|Sum|Primitive [trie](https://en.wikipedia.org/wiki/Trie)
+| 1 |[Trebuchet?!](src/day01b.c)|Strings, Tries|Sum|Primitive [trie](https://en.wikipedia.org/wiki/Trie)
 | 2 |[Cube Conundrum](src/day02b.c)|Strings|Sum||
 | 3 |[Gear Ratios](src/day03b.c)|Dynamic programming|Sum|Sliding window technique|
 | 4 |[Scratchcards](src/day04b.c)|Hash sets|Sum||
