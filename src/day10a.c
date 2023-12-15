@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_QUEUE_CAPACITY 4
+#define COORDINATE_STACK_CAPACITY 4
 #define DIMENSION 141
 
 struct Coordinate
@@ -19,7 +19,7 @@ struct Coordinate
 
 struct CoordinateStack
 {
-    struct Coordinate items[COORDINATE_QUEUE_CAPACITY];
+    struct Coordinate items[COORDINATE_STACK_CAPACITY];
     int count;
 };
 
