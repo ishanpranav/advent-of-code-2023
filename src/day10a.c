@@ -65,16 +65,17 @@ bool coordinate_stack_try_pop(CoordinateStack instance, Coordinate* result)
     return true;
 }
 
-void matrix(Matrix instance)
+void matrix(Matrix instance, int n)
 {
     Coordinate empty =
     {
         .i = -1,
         .j = -1
     };
-    
+
     instance->start = empty;
     instance->rows = 0;
+    instance->columns = n;
 }
 
 char matrix_get(Matrix instance, Coordinate coordinate)
@@ -178,7 +179,6 @@ int main(int count, String args[])
         return 1;
     }
 
-    struct Matrix a;
     char buffer[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
@@ -200,9 +200,9 @@ int main(int count, String args[])
         return 1;
     }
 
-    matrix(&a);
+    struct Matrix a;
 
-    a.columns = n;
+    matrix(&a, n);
 
     do
     {
