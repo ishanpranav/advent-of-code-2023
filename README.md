@@ -11,11 +11,12 @@ Some of the more difficult problems were implemented in a higher-level programmi
 | 2 |[Cube Conundrum](src/day02b.c)|Strings|Sum||
 | 3 |[Gear Ratios](src/day03b.c)|Dynamic programming|Sum|Sliding window technique|
 | 4 |[Scratchcards](src/day04b.c)|Hash sets|Sum||
-| 5 |[If You Give A Seed A Fertilizer](src/day05b.c)|Functions|Minimum|Function composition, System of linear equations|
+| 5 |[If You Give A Seed A Fertilizer](src/day05b.c)|Functions, Sorting algorithms|Minimum|Function composition, System of linear equations|
 | 6 |[Wait For It](src/day06b.c)|Physics, Algebra|Product|[Quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula)|
-| 7 |[Camel Cards](src/day07b.c)|Statistics, Dictionaries|Sum|Frequency map with mode-tracking|
+| 7 |[Camel Cards](src/day07b.c)|Statistics, Dictionaries, Sorting algorithms|Sum|Frequency map with mode-tracking|
 | 8 |[Haunted Wasteland](src/day08b.c)|Graph theory, Number theory, Dictionaries|Least Common Multiple|[Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph|
 | 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
+| 10|[Pipe Maze](src/day10b.c)|Graph theory, Searching algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill)|
 
 ## Constraints
 

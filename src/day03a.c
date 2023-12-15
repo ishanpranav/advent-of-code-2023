@@ -55,13 +55,12 @@ static bool realize_xy(String a, String b, int index, int offset)
 
 static void aggregate(String a, String b, long* sum, Validator validator)
 {
+    char current;
     int offset = -1;
     int number = 0;
 
-    for (int i = 0; i < DIMENSION; i++)
+    for (int i = 0; i < DIMENSION && (current = a[i]); i++)
     {
-        char current = a[i];
-
         if (isdigit(current))
         {
             if (offset == -1)
@@ -107,7 +106,7 @@ int main(int count, String args[])
         return 1;
     }
 
-    char hi[DIMENSION + 1];
+    char hi[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
     if (!fgets(hi, sizeof hi, stream))
@@ -119,7 +118,7 @@ int main(int count, String args[])
     }
 
     long sum = 0;
-    char lo[DIMENSION + 1];
+    char lo[DIMENSION + 1] = { 0 };
 
     while (fgets(lo, sizeof lo, stream))
     {

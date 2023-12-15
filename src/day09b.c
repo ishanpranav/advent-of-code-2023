@@ -16,7 +16,7 @@
 struct Series
 {
     long terms[TERMS_CAPACITY];
-    int n;
+    int count;
 };
 
 typedef char* String;
@@ -24,21 +24,21 @@ typedef struct Series* Series;
 
 void series(Series instance)
 {
-    instance->n = 0;
+    instance->count = 0;
 }
 
 void series_add(Series instance, long term)
 {
-    int n = instance->n;
+    int n = instance->count;
 
     instance->terms[n] = term;
-    instance->n = n + 1;
+    instance->count = n + 1;
 }
 
 long series_lagrange_extrapolate(Series instance, int k)
 {
     double sum = 0;
-    long n = instance->n;
+    long n = instance->count;
 
     for (int j = 0; j < n; j++)
     {
@@ -62,7 +62,7 @@ long series_lagrange_extrapolate(Series instance, int k)
 
 long series_lagrange_next(Series instance)
 {
-    return series_lagrange_extrapolate(instance, instance->n);
+    return series_lagrange_extrapolate(instance, instance->count);
 }
 
 long series_lagrange_previous(Series instance)

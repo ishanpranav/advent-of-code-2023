@@ -147,9 +147,11 @@ int window_lo_right(Window instance)
 
 static void aggregate(String hi, String mid, String lo, Case cases[], long* sum)
 {
-    for (int i = 0; i < DIMENSION; i++)
+    char current;
+
+    for (int i = 0; i < DIMENSION && (current = mid[i]); i++)
     {
-        if (mid[i] != '*')
+        if (current != '*')
         {
             continue;
         }
@@ -221,8 +223,8 @@ int main(int count, String args[])
     }
 
     char hi[DIMENSION + 1] = { 0 };
-    char mid[DIMENSION + 1];
-    char lo[DIMENSION + 1];
+    char mid[DIMENSION + 1] = { 0 };
+    char lo[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
     if (!fgets(mid, sizeof mid, stream) ||
