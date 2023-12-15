@@ -233,7 +233,7 @@ int main(int count, String args[])
 
     int total = 0;
     Coordinate result;
-    struct CoordinateStack stack = { 0 };
+    struct CoordinateStack stack;
 
     coordinate_stack(&stack);
     coordinate_stack_push(&stack, a.start);
