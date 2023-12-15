@@ -97,7 +97,7 @@ Row matrix_add_row(Matrix instance)
     return instance->items + (instance->columns * m);
 }
 
-static void scan_hi(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
+static bool scan_hi(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.i--;
 
@@ -109,11 +109,13 @@ static void scan_hi(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
     case '7':
     case 'F':
         coordinate_stack_push(stack, coordinate);
-        break;
+        return true;
     }
+
+    return false;
 }
 
-static void scan_lo(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
+static bool scan_lo(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.i++;
 
@@ -125,11 +127,13 @@ static void scan_lo(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
     case 'L':
     case 'J':
         coordinate_stack_push(stack, coordinate);
-        break;
+        return true;
     }
+
+    return false;
 }
 
-static void scan_left(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
+static bool scan_left(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.j--;
 
@@ -141,11 +145,13 @@ static void scan_left(Matrix matrix, CoordinateStack stack, Coordinate coordinat
     case 'L':
     case 'F':
         coordinate_stack_push(stack, coordinate);
-        break;
+        return true;
     }
+
+    return false;
 }
 
-static void scan_right(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
+static bool scan_right(Matrix matrix, CoordinateStack stack, Coordinate coordinate)
 {
     coordinate.j++;
 
@@ -157,8 +163,10 @@ static void scan_right(Matrix matrix, CoordinateStack stack, Coordinate coordina
     case 'J':
     case '7':
         coordinate_stack_push(stack, coordinate);
-        break;
+        return true;
     }
+
+    return false;
 }
 
 int main(int count, String args[])
@@ -247,40 +255,39 @@ int main(int count, String args[])
         switch (current)
         {
         case 'S':
-            scan_hi(&a, &stack, result);
-            scan_lo(&a, &stack, result);
-            scan_left(&a, &stack, result);
-            scan_right(&a, &stack, result);
+            if (scan_hi(&a, &stack, result) ||
+                scan_lo(&a, &stack, result) ||
+                scan_left(&a, &stack, result) ||
+                scan_right(&a, &stack, result)) { }
             break;
 
         case '|':
-            scan_hi(&a, &stack, result);
-            scan_lo(&a, &stack, result);
+            if (scan_hi(&a, &stack, result) || scan_lo(&a, &stack, result)) { }
             break;
 
         case '-':
-            scan_left(&a, &stack, result);
-            scan_right(&a, &stack, result);
+            if (scan_left(&a, &stack, result) ||
+                scan_right(&a, &stack, result)) { }
             break;
 
         case 'J':
-            scan_hi(&a, &stack, result);
-            scan_left(&a, &stack, result);
+            if (scan_hi(&a, &stack, result) ||
+                scan_left(&a, &stack, result)) { }
             break;
 
         case 'L':
-            scan_hi(&a, &stack, result);
-            scan_right(&a, &stack, result);
+            if (scan_hi(&a, &stack, result) ||
+                scan_right(&a, &stack, result)) { }
             break;
 
         case '7':
-            scan_lo(&a, &stack, result);
-            scan_left(&a, &stack, result);
+            if (scan_lo(&a, &stack, result) ||
+                scan_left(&a, &stack, result)) { }
             break;
 
         case 'F':
-            scan_lo(&a, &stack, result);
-            scan_right(&a, &stack, result);
+            if (scan_lo(&a, &stack, result) ||
+                scan_right(&a, &stack, result)) { }
             break;
         }
 
