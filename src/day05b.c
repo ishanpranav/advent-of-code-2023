@@ -2,8 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Compressed piecewise mapping implementation using split ranges
-// With help from I.L.
+// If You Give A Seed A Fertilizer Part 2
 
 #include <limits.h>
 #include <stdio.h>

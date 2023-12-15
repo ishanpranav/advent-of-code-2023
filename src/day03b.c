@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Custom optimized implementation
+// Gear Ratios Part 2
 
 #include <ctype.h>
 #include <stdbool.h>

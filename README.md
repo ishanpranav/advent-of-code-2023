@@ -4,6 +4,19 @@ This is a collection of solutions to the [Advent of Code 2023](https://adventofc
 
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
+## Summary
+|Day|Problem|Domain|Result|Notes|
+|:-:|:-----:|:----:|:----:|:-------|
+| 1 |[Trebuchet?!](src/day01b.c)|Strings|Sum|Scan left-to-right, primitive [trie](https://en.wikipedia.org/wiki/Trie)
+| 2 |[Cube Conundrum](src/day02b.c)|Strings|Sum||
+| 3 |[Gear Ratios](src/day03b.c)|Dynamic programming|Sum|Sliding window technique|
+| 4 |[Scratchcards](src/day04b.c)|Hash sets|Sum||
+| 5 |[If You Give A Seed A Fertilizer](src/day05b.c)|Functions|Minimum|Function composition, System of linear equations|
+| 6 |[Wait For It](src/day06b.c)|Physics, Algebra|Product|[Quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula)|
+| 7 |[Camel Cards](src/day07b.c)|Statistics, Dictionaries|Sum|Frequency map with mode-tracking|
+| 8 |[Haunted Wasteland](src/day08b.c)|Graph theory, Number theory, Dictionaries|Least Common Multiple|[Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph|
+| 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
+
 ## Constraints
 
 I am adhering to the following constraints to ensure high code quality.
@@ -19,7 +32,3 @@ I am adhering to the following constraints to ensure high code quality.
   - Write to the standard output stream (i.e., call `printf`)
   - Write to the standard error stream (i.e., call `fprintf` with `stderr` as the first argument)
   - Terminate the program
-
-## Acknowledgements
-
-Some of the most challenging problems in this repository were solved with help from Iris Lim. Others are based on the implementations in [this](https://github.com/Hudinid/AdventOfCode2023) repository by Brian Hu. Please see the relevant file headers for more details.

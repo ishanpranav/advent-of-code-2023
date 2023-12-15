@@ -2,11 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Brute-force with binary search
-// Time complexity: O(n * m * log(p)) where
-//      n is the number of seeds,
-//      m is the number of functions, and
-//      p is the number of ranges in the largest map.
+// If You Give A Seed A Fertilizer Part 1
 
 #include <limits.h>
 #include <stdio.h>

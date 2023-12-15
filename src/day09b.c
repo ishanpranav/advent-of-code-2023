@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Custom implementation using Lagrange interpolation
+// Mirage Maintenance Part 2
 
 #include <math.h>
 #include <stdio.h>

@@ -2,12 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// LCM approach
-// Graph: use base-36 encoding to index into a hashtable
-// LCM: use Euclid's algorithm
-
-// The best case is ~47%-fragmented memory but takes less time and complexity
-// than a dynamic hash table
+// Haunted Wasteland Part 2
 
 #include <stdbool.h>
 #include <stdio.h>

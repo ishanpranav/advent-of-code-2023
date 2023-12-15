@@ -2,8 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Optimized using precalculated quadratic equation
-// Time complexity: O(1)
+// Wait For It Part 2
 
 #include <math.h>
 #include <ctype.h>

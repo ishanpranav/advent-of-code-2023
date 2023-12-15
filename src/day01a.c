@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Based on B.H.'s algorithm
+// Trebuchet?! Part 1
 
 #include <ctype.h>
 #include <stdio.h>

@@ -2,11 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Custom implementation
-// Graph: use base-36 encoding to index into a hashtable
-
-// The best case is ~47%-fragmented memory but takes less time and complexity
-// than a dynamic hash table
+// Haunted Wasteland Part 1
 
 #include <stdbool.h>
 #include <stdio.h>

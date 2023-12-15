@@ -2,8 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Optimized using precalculated quadratic equation
-// Time complexity: O(n) where n is the number of points
+// Wait For It Part 1
 
 #include <math.h>
 #include <stdio.h>

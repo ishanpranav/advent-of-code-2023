@@ -2,7 +2,7 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// Custom implementation
+// Camel Cards Part 2
 
 #include <stdbool.h>
 #include <stdio.h>
