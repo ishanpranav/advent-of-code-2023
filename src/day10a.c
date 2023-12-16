@@ -232,7 +232,7 @@ int main(int count, String args[])
             a.origin = origin;
         }
     }
-    while (fgets(buffer, sizeof buffer, stream));
+    while (fgets(buffer, n + 2, stream));
 
     if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
     {

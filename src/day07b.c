@@ -61,7 +61,7 @@ struct BPlayerList
     int count;
 };
 
-typedef void* Object;
+typedef const void* Object;
 typedef char* String;
 typedef enum BCard BCard;
 typedef enum HandType HandType;
@@ -88,7 +88,7 @@ BCard b_card(char symbol)
     return B_CARD_NONE;
 }
 
-int b_player_compare(const Object left, const Object right)
+int b_player_compare(Object left, Object right)
 {
     if (!left && !right)
     {

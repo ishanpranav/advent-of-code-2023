@@ -146,7 +146,6 @@ static bool parse(char buffer[], char window[], Vertex* result)
 
 static bool read(FILE* stream, Graph graph, List starts)
 {
-    int total = 0;
     char buffer[BUFFER_SIZE];
 
     if (!fgets(buffer, sizeof buffer, stream))
