@@ -19,7 +19,7 @@ internal static partial class Program
     {
         if (args.Length != 1)
         {
-            Console.WriteLine("Usage: Day8a <path>");
+            Console.WriteLine("Usage: Day08a <path>");
 
             return 1;
         }

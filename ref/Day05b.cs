@@ -3,7 +3,7 @@
 // Licensed under the MIT License.
 
 // This is the reference (high-level) implementation.
-// Please see /day5.c for the final solution.
+// Please see /src/day05b.c for the final solution.
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ internal static class Program
     {
         if (args.Length != 1)
         {
-            Console.WriteLine("Usage: Day5b <path>");
+            Console.WriteLine("Usage: Day05b <path>");
 
             return 1;
         }

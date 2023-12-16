@@ -50,7 +50,7 @@ struct IntervalListEnumerator
     struct Interval* end;
 };
 
-typedef void* Object;
+typedef const void* Object;
 typedef char* String;
 typedef struct Range Range;
 typedef struct Function* Function;
@@ -59,7 +59,7 @@ typedef struct Interval Interval;
 typedef struct IntervalList* IntervalList;
 typedef struct IntervalListEnumerator IntervalListEnumerator;
 
-int range_compare(const Object left, const Object right)
+int range_compare(Object left, Object right)
 {
     if (!left && !right)
     {
@@ -98,7 +98,7 @@ Range range_from_interval(long long min, long long max, long long intercept)
     {
         .destinationOffset = min + intercept,
         .sourceOffset = min,
-        .length = min - max
+        .length = max - min
     };
 
     return result;
@@ -142,7 +142,14 @@ void function_fill_ranges(Function instance)
 
     if (!count)
     {
-        function_add_range(instance, range_identity(0, LLONG_MAX));
+        Range infinity =
+        {
+            .sourceOffset = 0,
+            .destinationOffset = 0,
+            .length = LLONG_MAX
+        };
+
+        function_add_range(instance, infinity);
 
         return;
     }
@@ -150,7 +157,7 @@ void function_fill_ranges(Function instance)
     Range view[RANGES_CAPACITY];
 
     function_sort_ranges(instance);
-    memcpy(view, instance, count * sizeof(struct Range));
+    memcpy(view, instance->ranges, count * sizeof(struct Range));
     function_clear_ranges(instance);
 
     Range* first = view;
@@ -159,14 +166,14 @@ void function_fill_ranges(Function instance)
 
     if (min)
     {
-        function_add_range(instance, range_identity(0, min));
+        function_add_range(instance, range_identity(LLONG_MIN, min));
     }
 
     function_add_range(instance, *first);
 
     for (Range* current = first + 1; current <= last; current++)
     {
-        Range* previous = current + 1;
+        Range* previous = current - 1;
 
         long long previousMax = previous->sourceOffset + previous->length;
         long long currentMin = current->sourceOffset;
@@ -224,12 +231,13 @@ void function_compose(Function instance, Function other)
 {
     int count = instance->count;
     Range view[RANGES_CAPACITY];
+    Range* last = view + count - 1;
     FunctionEnumerator domain = function_get_enumerator(other);
 
     memcpy(view, instance->ranges, count * sizeof(struct Range));
     function_clear_ranges(instance);
 
-    for (Range* a = view; a < view + count; a++)
+    for (Range* a = view; a <= last; a++)
     {
         for (Range* b = domain.begin; b < domain.end; b++)
         {
@@ -279,7 +287,7 @@ IntervalListEnumerator interval_list_get_enumerator(IntervalList instance)
 
 static bool read(Function function, char buffer[])
 {
-    char* token = strtok(buffer, DELIMITERS);
+    String token = strtok(buffer, DELIMITERS);
 
     if (!token)
     {
@@ -311,6 +319,17 @@ static bool read(Function function, char buffer[])
     return true;
 }
 
+void printff(Function f) {
+    FunctionEnumerator domain2 = function_get_enumerator(f);
+
+    for (Range* r = domain2.begin; r < domain2.end; r++) {
+        printf("x + %lld, %lld <= x < %lld\n",
+            r->destinationOffset - r->sourceOffset,
+            r->sourceOffset,
+            r->sourceOffset + r->length);
+    }
+}
+
 int main(int count, String args[])
 {
     if (count != 2)
@@ -340,7 +359,7 @@ int main(int count, String args[])
         return 1;
     }
 
-    char* token;
+    String token;
     struct IntervalList seeds;
 
     interval_list(&seeds);
@@ -380,6 +399,10 @@ int main(int count, String args[])
         {
             continue;
         }
+
+        printff(&composite);
+        fflush(NULL);
+        //scanf("%d");
 
         if (strchr(buffer, ':'))
         {
@@ -457,6 +480,7 @@ int main(int count, String args[])
             }
         }
     }
+
 
     printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);

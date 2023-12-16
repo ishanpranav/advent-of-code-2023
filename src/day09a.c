@@ -55,7 +55,7 @@ long series_lagrange_extrapolate(Series instance, int k)
         sum += product;
     }
 
-    return round(sum);
+    return lround(sum);
 }
 
 long series_lagrange_next(Series instance)
