@@ -319,17 +319,6 @@ static bool read(Function function, char buffer[])
     return true;
 }
 
-void printff(Function f) {
-    FunctionEnumerator domain2 = function_get_enumerator(f);
-
-    for (Range* r = domain2.begin; r < domain2.end; r++) {
-        printf("x + %lld, %lld <= x < %lld\n",
-            r->destinationOffset - r->sourceOffset,
-            r->sourceOffset,
-            r->sourceOffset + r->length);
-    }
-}
-
 int main(int count, String args[])
 {
     if (count != 2)
@@ -399,10 +388,6 @@ int main(int count, String args[])
         {
             continue;
         }
-
-        printff(&composite);
-        fflush(NULL);
-        //scanf("%d");
 
         if (strchr(buffer, ':'))
         {
