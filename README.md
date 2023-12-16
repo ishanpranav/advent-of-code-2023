@@ -17,17 +17,19 @@ Some of the more difficult problems were implemented in a higher-level programmi
 | 8 |[Haunted Wasteland](src/day08b.c)|Graph theory, Number theory, Dictionaries|Least Common Multiple|[Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph|
 | 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
+| 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 
 ## Constraints
 
 I am adhering to the following constraints to ensure high code quality.
 
-- Final solutions must be implemented in the C programming language following the C99 standard
+- Final solutions must be implemented in the C programming language following the C99 standard.
 - All solutions must be standalone files with no user-defined headers and no external dependencies beyond the C standard library (`libc`) and the C mathematics library (`libm`). The first and second problems for a given day must be implemented separately.
 - Dynamic memory allocation is prohibited (i.e., no calls to `malloc`, `calloc`, `realloc`, `aligned_alloc`, or `free`).
 - Bounds checking is not required for data structures whose capacity is defined by a macro.
 - The first and second problems for a given day may share the same data structures and algorithms, but the second problem may only add to (and never remove from) the public API of the first.
-- When calling a function from the C standard library, the return value must always be checked, except for the return values from the following functions:
+- The return values of all C standard library functions must be checked, except for those returned from the following:
+  - `fprintf`
   - `printf`
 - Only the `main` entry point can do the following:
   - Write to the standard output stream (i.e., call `printf`)

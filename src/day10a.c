@@ -1,5 +1,3 @@
-// Author: Ishan Pranav
-// Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
 // Pipe Maze Part 1
@@ -80,7 +78,7 @@ static bool scan_hi(Matrix matrix, Coordinate* previous, Coordinate current)
         *previous = current;
 
         return true;
-    
+
     default: return false;
     }
 }
@@ -99,7 +97,7 @@ static bool scan_lo(Matrix matrix, Coordinate* previous, Coordinate current)
         *previous = current;
 
         return true;
-    
+
     default: return false;
     }
 }
@@ -118,7 +116,7 @@ static bool scan_left(Matrix matrix, Coordinate* previous, Coordinate current)
         *previous = current;
 
         return true;
-    
+
     default: return false;
     }
 }
@@ -137,7 +135,7 @@ static bool scan_right(Matrix matrix, Coordinate* previous, Coordinate current)
         *previous = current;
 
         return true;
-    
+
     default: return false;
     }
 }
@@ -146,8 +144,8 @@ static bool scan(Matrix a, Coordinate* previous, Coordinate current)
 {
     switch (matrix_get(a, current))
     {
-    case '|': return 
-        scan_hi(a, previous, current) || 
+    case '|': return
+        scan_hi(a, previous, current) ||
         scan_lo(a, previous, current);
 
     case '-': return
@@ -259,12 +257,12 @@ int main(int count, String args[])
     }
 
     int total = 1;
-    
+
     while (previous.i >= 0 && previous.j >= 0)
     {
         current = previous;
         total++;
-        
+
         if (!scan(&a, &previous, current))
         {
             previous = coordinate_empty();
@@ -273,7 +271,9 @@ int main(int count, String args[])
         matrix_set(&a, current, 0);
     }
 
-    printf("%d : %lf\n", total / 2, (double)(clock() - start) / CLOCKS_PER_SEC);
+    total /= 2;
+
+    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;

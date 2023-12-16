@@ -1,5 +1,3 @@
-// Author: Ishan Pranav
-// Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
 // Pipe Maze Part 2
@@ -321,9 +319,11 @@ int main(int count, String args[])
         matrix_set(&a, current, 0);
     }
 
-    printf("%d : %lf\n", 
-        math_pick_theorem_i(math_shoelace_formula_area(&path), path.count),
-        (double)(clock() - start) / CLOCKS_PER_SEC);
+    int total = math_pick_theorem_i(
+        math_shoelace_formula_area(&path), 
+        path.count);
+
+    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;

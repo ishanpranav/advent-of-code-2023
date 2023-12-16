@@ -1,5 +1,3 @@
-// Author: Ishan Pranav
-// Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
 // Mirage Maintenance Part 2

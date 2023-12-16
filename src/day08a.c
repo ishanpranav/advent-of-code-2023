@@ -1,5 +1,3 @@
-// Author: Ishan Pranav
-// Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
 // Haunted Wasteland Part 1
@@ -157,9 +155,9 @@ int main(int count, String args[])
         return 1;
     }
 
-    printf("%d : %lf\n",
-        graph_walk(&graph, VERTEX_FIRST, directions, stop),
-        (double)(clock() - start) / CLOCKS_PER_SEC);
+    int result = graph_walk(&graph, VERTEX_FIRST, directions, stop);
+
+    printf("%d : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;
