@@ -2,7 +2,6 @@
 
 // Cosmic Expansion Part 2
 
-#include <limits.h>
 #include <stdio.h>
 #include <time.h>
 #define DIMENSION 141
@@ -58,8 +57,8 @@ int main(int count, String args[])
 
     int n = 0;
     int galaxies = 0;
-    int minI = INT_MAX;
-    int minJ = INT_MAX;
+    int minI = DIMENSION;
+    int minJ = DIMENSION;
     int maxI = 0;
     int maxJ = 0;
     long long x[DIMENSION] = { 0 };

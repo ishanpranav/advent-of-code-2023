@@ -4,6 +4,25 @@ This is a collection of solutions to the [Advent of Code 2023](https://adventofc
 
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
+## Usage
+These programs are cross-platform, having been tested on Windows and Linux operating systems.
+
+**Important:** Do not use Windows-style line endings (`CR LF`, i.e. `\r\n`). Only use Unix-style line endings (`CR`, i.e. `\n`).
+
+**Important:** I have tested each program on the example test cases and two puzzle input files - not a large sample size! I have avoided assumptions about the input, sometimes even at the cost of performance. However, to avoid memory allocation, all buffers have fixed sizes. Ensure that all buffers (see `#define` statements) have sufficient capacity before running. Not doing so could result in a stack smashing, segmentation fault, or worse.
+
+### GCC
+```sh
+gcc src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -pedantic
+
+./day01a in.txt
+```
+### LLVM
+```sh
+clang src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -Wno-deprecated-declarations -pedantic
+
+day01a in.txt
+```
 ## Summary
 |Day|Problem|Domain|Result|Implementation|
 |:-:|:-----:|:----:|:----:|:-------|
@@ -18,6 +37,8 @@ Some of the more difficult problems were implemented in a higher-level programmi
 | 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
+| 12|[Hot Springs](src/day12b.c)|Regular expressions, Finite state machines|Sum||
+| 13|[Point of Incidence](src/day13b.c)||Sum||
 
 ## Constraints
 
