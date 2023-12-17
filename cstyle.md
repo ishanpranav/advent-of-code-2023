@@ -20,7 +20,7 @@
 except during empty initialization or during array initialization when all array
 items are placed on a single line.
 - Always use braces with control structures, even when optional.
-- Separate functions and controls structures by exactly one blank line.
+- Separate functions and control structures by exactly one blank line.
 
 ## Spacing
 
@@ -36,14 +36,14 @@ members.
 - Use `lowercase` for static functions.
 - Use `camelCase` for local variables, struct fields, and function arguments.
 
-Always use descriptive names. Abbreviated names are forbidden except for the
-following reserved use cases. If a value is arbitrary, use the corresponding
+Always use descriptive names. Abbreviated names are forbidden except in the
+following approved use cases. If a value is arbitrary, use the corresponding
 abbreviation based on its type. If several values are abitrary, begin with the
 corresponding type-based abbreviation and continue alphabetically. If doing so
 is impractical, use numeric suffixes instead.
 
-|Letter|Approved uses|
-|:----:|-------------|
+|Letter|Appropriate use|
+|:----:|:------------|
 |`a`   |arbitrary object|
 |`b`   |blue color component|
 |`d`   |change|
@@ -51,12 +51,12 @@ is impractical, use numeric suffixes instead.
 |`hi`  |larger pointer, point above, upper buffer|
 |`i`   |abitrary counter, matrix index in an arbitrary dimension|
 |`k`   |term number|
+|`lo`  |smaller pointer, point below, lower buffer|
 |`m`   |matrix size in an arbitrary dimension|
 |`n`   |count|
 |`p`   |arbitrary pointer|
 |`r`   |red color component|
-|`x`   |position, vector in an arbitrary dimension, position in an arbitrary dimension|
-|`lo`  |smaller pointer, point below, lower buffer|
+|`x`   |vector in an arbitrary dimension, position in an arbitrary dimension|
 
 ## Type definitions
 
@@ -65,6 +65,8 @@ is impractical, use numeric suffixes instead.
 semantics (classes).
 - Never use type definitions for structs with pass-by-value semantics, not even
 to obscure pointers.
+
+Do not use user-defined type definitions within struct definitions themselves.
 
 ### Reference semantics
 
