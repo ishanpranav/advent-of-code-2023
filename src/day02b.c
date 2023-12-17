@@ -62,28 +62,28 @@ int main(int count, String args[])
 
             switch (token[0])
             {
-            case 'r':
-                if (lastNumber > r)
-                {
-                    r = lastNumber;
-                }
-                break;
-            case 'g':
-                if (lastNumber > g)
-                {
-                    g = lastNumber;
-                }
-                break;
-            case 'b':
-                if (lastNumber > b)
-                {
-                    b = lastNumber;
-                }
-                break;
-            default:
-                fclose(stream);
-                fprintf(stderr, "Error: Format.\n");
-                return 1;
+                case 'r':
+                    if (lastNumber > r)
+                    {
+                        r = lastNumber;
+                    }
+                    break;
+                case 'g':
+                    if (lastNumber > g)
+                    {
+                        g = lastNumber;
+                    }
+                    break;
+                case 'b':
+                    if (lastNumber > b)
+                    {
+                        b = lastNumber;
+                    }
+                    break;
+                default:
+                    fclose(stream);
+                    fprintf(stderr, "Error: Format.\n");
+                    return 1;
             }
 
             lastNumber = 0;

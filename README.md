@@ -5,6 +5,7 @@ This is a collection of solutions to the [Advent of Code 2023](https://adventofc
 Some of the more difficult problems were implemented in a higher-level programming language before being converted to C. The equivalent code is included here as a reference.
 
 ## Usage
+
 These programs are cross-platform, having been tested on Windows and Linux operating systems.
 
 **Important:** Do not use Windows-style line endings (`CR LF`, i.e. `\r\n`). Only use Unix-style line endings (`LF`, i.e. `\n`).
@@ -12,18 +13,23 @@ These programs are cross-platform, having been tested on Windows and Linux opera
 **Important:** I have tested each program on the example test cases and two puzzle input files - not a large sample size! I have avoided assumptions about the input, sometimes even at the cost of performance. However, to avoid memory allocation, all buffers have fixed sizes. Ensure that all buffers (see `#define` statements) have sufficient capacity before running. Not doing so could result in a stack smashing, segmentation fault, or worse.
 
 ### GCC
+
 ```sh
 gcc src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -pedantic
 
 ./day01a in.txt
 ```
+
 ### LLVM
+
 ```sh
 clang src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -Wno-deprecated-declarations -pedantic
 
 day01a in.txt
 ```
+
 ## Summary
+
 |Day|Problem|Domain|Result|Implementation|
 |:-:|:-----:|:----:|:----:|:-------|
 | 1 |[Trebuchet?!](src/day01b.c)|Strings, Tries|Sum|Primitive [trie](https://en.wikipedia.org/wiki/Trie)
@@ -44,6 +50,7 @@ day01a in.txt
 
 I am adhering to the following constraints to ensure high code quality.
 
+- Adhere to the [project style guide](cstyle.md).
 - Final solutions must be implemented in the C programming language following the C99 standard.
 - All solutions must be standalone files with no user-defined headers and no external dependencies beyond the C standard library (`libc`) and the C mathematics library (`libm`). The first and second problems for a given day must be implemented separately.
 - Dynamic memory allocation is prohibited (i.e., no calls to `malloc`, `calloc`, `realloc`, `aligned_alloc`, or `free`).

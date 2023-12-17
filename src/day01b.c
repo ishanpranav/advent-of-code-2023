@@ -22,44 +22,44 @@ static int parse(String value)
 
     switch (first)
     {
-    case 'f':
-        if (strstr(value + 1, "our") == value + 1)
-        {
-            return 4;
-        }
+        case 'f':
+            if (strstr(value + 1, "our") == value + 1)
+            {
+                return 4;
+            }
 
-        if (strstr(value + 1, "ive") == value + 1)
-        {
-            return 5;
-        }
+            if (strstr(value + 1, "ive") == value + 1)
+            {
+                return 5;
+            }
 
-        return 0;
+            return 0;
 
-    case 's':
-        if (strstr(value + 1, "ix") == value + 1)
-        {
-            return 6;
-        }
+        case 's':
+            if (strstr(value + 1, "ix") == value + 1)
+            {
+                return 6;
+            }
 
-        if (strstr(value + 1, "even") == value + 1)
-        {
-            return 7;
-        }
+            if (strstr(value + 1, "even") == value + 1)
+            {
+                return 7;
+            }
 
-        return 0;
+            return 0;
 
-    case 't':
-        if (strstr(value + 1, "wo") == value + 1)
-        {
-            return 2;
-        }
+        case 't':
+            if (strstr(value + 1, "wo") == value + 1)
+            {
+                return 2;
+            }
 
-        if (strstr(value + 1, "hree") == value + 1)
-        {
-            return 3;
-        }
+            if (strstr(value + 1, "hree") == value + 1)
+            {
+                return 3;
+            }
 
-        return 0;
+            return 0;
     }
 
     if (strstr(value, "one") == value)

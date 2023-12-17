@@ -94,14 +94,14 @@ static bool scan_hi(Matrix matrix, Coordinate* previous, Coordinate current)
 
     switch (other)
     {
-    case '|':
-    case '7':
-    case 'F':
-        *previous = current;
+        case '|':
+        case '7':
+        case 'F':
+            *previous = current;
 
-        return true;
+            return true;
 
-    default: return false;
+        default: return false;
     }
 }
 
@@ -113,14 +113,14 @@ static bool scan_lo(Matrix matrix, Coordinate* previous, Coordinate current)
 
     switch (other)
     {
-    case '|':
-    case 'L':
-    case 'J':
-        *previous = current;
+        case '|':
+        case 'L':
+        case 'J':
+            *previous = current;
 
-        return true;
+            return true;
 
-    default: return false;
+        default: return false;
     }
 }
 
@@ -132,14 +132,14 @@ static bool scan_left(Matrix matrix, Coordinate* previous, Coordinate current)
 
     switch (other)
     {
-    case '-':
-    case 'L':
-    case 'F':
-        *previous = current;
+        case '-':
+        case 'L':
+        case 'F':
+            *previous = current;
 
-        return true;
+            return true;
 
-    default: return false;
+        default: return false;
     }
 }
 
@@ -151,14 +151,14 @@ static bool scan_right(Matrix matrix, Coordinate* previous, Coordinate current)
 
     switch (other)
     {
-    case '-':
-    case 'J':
-    case '7':
-        *previous = current;
+        case '-':
+        case 'J':
+        case '7':
+            *previous = current;
 
-        return true;
+            return true;
 
-    default: return false;
+        default: return false;
     }
 }
 
@@ -166,31 +166,31 @@ static bool scan(Matrix a, Coordinate* previous, Coordinate current)
 {
     switch (matrix_get(a, current))
     {
-    case '|': return
-        scan_hi(a, previous, current) ||
-        scan_lo(a, previous, current);
+        case '|': return
+            scan_hi(a, previous, current) ||
+            scan_lo(a, previous, current);
 
-    case '-': return
-        scan_left(a, previous, current) ||
-        scan_right(a, previous, current);
+        case '-': return
+            scan_left(a, previous, current) ||
+            scan_right(a, previous, current);
 
-    case 'J': return
-        scan_hi(a, previous, current) ||
-        scan_left(a, previous, current);
+        case 'J': return
+            scan_hi(a, previous, current) ||
+            scan_left(a, previous, current);
 
-    case 'L': return
-        scan_hi(a, previous, current) ||
-        scan_right(a, previous, current);
+        case 'L': return
+            scan_hi(a, previous, current) ||
+            scan_right(a, previous, current);
 
-    case '7': return
-        scan_lo(a, previous, current) ||
-        scan_left(a, previous, current);
+        case '7': return
+            scan_lo(a, previous, current) ||
+            scan_left(a, previous, current);
 
-    case 'F': return
-        scan_lo(a, previous, current) ||
-        scan_right(a, previous, current);
+        case 'F': return
+            scan_lo(a, previous, current) ||
+            scan_right(a, previous, current);
 
-    default: return false;
+        default: return false;
     }
 }
 
@@ -320,7 +320,7 @@ int main(int count, String args[])
     }
 
     int total = math_pick_theorem_i(
-        math_shoelace_formula_area(&path), 
+        math_shoelace_formula_area(&path),
         path.count);
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);

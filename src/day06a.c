@@ -18,7 +18,6 @@ struct Point
 };
 
 typedef char* String;
-typedef struct Point Point;
 
 int main(int count, String args[])
 {

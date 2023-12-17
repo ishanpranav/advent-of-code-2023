@@ -40,10 +40,8 @@ struct ListEnumerator
 
 typedef const void* Object;
 typedef char* String;
-typedef struct Range Range;
 typedef struct Function* Function;
 typedef struct List* List;
-typedef struct ListEnumerator ListEnumerator;
 
 int range_compare(Object left, Object right)
 {
@@ -62,8 +60,8 @@ int range_compare(Object left, Object right)
         return 1;
     }
 
-    long long leftOffset = ((const Range*)left)->sourceOffset;
-    long long rightOffset = ((const Range*)right)->sourceOffset;
+    long long leftOffset = ((const struct Range*)left)->sourceOffset;
+    long long rightOffset = ((const struct Range*)right)->sourceOffset;
 
     if (leftOffset < rightOffset)
     {
@@ -83,7 +81,7 @@ void function(Function instance)
     instance->count = 0;
 }
 
-void function_add_range(Function instance, Range item)
+void function_add_range(Function instance, struct Range item)
 {
     int count = instance->count;
 
@@ -118,24 +116,20 @@ void list_add(List instance, long long item)
     instance->count = count + 1;
 }
 
-ListEnumerator list_get_enumerator(List instance)
+void list_get_enumerator(List instance, struct ListEnumerator* result)
 {
-    ListEnumerator result;
-
-    result.begin = instance->items;
-    result.end = result.begin + instance->count;
-
-    return result;
+    result->begin = instance->items;
+    result->end = result->begin + instance->count;
 }
 
-static Range* search(Function function, long long value)
+static struct Range* search(Function function, long long value)
 {
-    Range* lo = function->ranges;
-    Range* hi = lo + function->count - 1;
+    struct Range* lo = function->ranges;
+    struct Range* hi = lo + function->count - 1;
 
     while (lo <= hi)
     {
-        Range* current = lo + ((hi - lo) / 2);
+        struct Range* current = lo + ((hi - lo) / 2);
         long long other = current->sourceOffset;
 
         if (other == value)
@@ -158,9 +152,10 @@ static Range* search(Function function, long long value)
 
 static void realize(Function function, List seeds)
 {
+    struct ListEnumerator enumerator;
+    
     function_sort_ranges(function);
-
-    ListEnumerator enumerator = list_get_enumerator(seeds);
+    list_get_enumerator(seeds, &enumerator);
 
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
     {
@@ -170,7 +165,7 @@ static void realize(Function function, List seeds)
         }
 
         long long input = *p;
-        Range* range = search(function, input);
+        struct Range* range = search(function, input);
         long long offset = range->sourceOffset;
 
         if (input >= offset && input < offset + range->length)
@@ -191,7 +186,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    Range range;
+    struct Range range;
 
     range.destinationOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
@@ -277,7 +272,9 @@ int main(int count, String args[])
     realize(&current, &seeds);
 
     long long min = LLONG_MAX;
-    ListEnumerator enumerator = list_get_enumerator(&seeds);
+    struct ListEnumerator enumerator;
+    
+    list_get_enumerator(&seeds, &enumerator);
 
     for (long long* p = enumerator.begin; p < enumerator.end; p++)
     {

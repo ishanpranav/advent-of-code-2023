@@ -67,7 +67,6 @@ typedef char* String;
 typedef enum Card Card;
 typedef enum HandType HandType;
 typedef struct Hand* Hand;
-typedef struct Player Player;
 typedef struct PlayerList* PlayerList;
 
 Card card(char symbol)
@@ -79,11 +78,11 @@ Card card(char symbol)
 
     switch (symbol)
     {
-    case 'T': return CARD_TEN;
-    case 'J': return CARD_JACK;
-    case 'Q': return CARD_QUEEN;
-    case 'K': return CARD_KING;
-    case 'A': return CARD_ACE;
+        case 'T': return CARD_TEN;
+        case 'J': return CARD_JACK;
+        case 'Q': return CARD_QUEEN;
+        case 'K': return CARD_KING;
+        case 'A': return CARD_ACE;
     }
 
     return CARD_NONE;
@@ -106,8 +105,8 @@ int player_compare(Object left, Object right)
         return 1;
     }
 
-    const Player* leftPlayer = left;
-    const Player* rightPlayer = right;
+    const struct Player* leftPlayer = left;
+    const struct Player* rightPlayer = right;
     int handDifference = rightPlayer->handType - leftPlayer->handType;
 
     if (handDifference)
@@ -133,7 +132,7 @@ void player_list(PlayerList instance)
     instance->count = 0;
 }
 
-void player_list_add(PlayerList instance, Player item)
+void player_list_add(PlayerList instance, struct Player item)
 {
     int count = instance->count;
 
@@ -172,23 +171,23 @@ HandType hand_get_type(Hand instance)
 {
     switch (instance->count)
     {
-    case 1: return HAND_TYPE_FIVE_OF_A_KIND;
-    case 2:
-        switch (instance->maxFrequency)
-        {
-        case 3: return HAND_TYPE_FULL_HOUSE;
-        case 4: return HAND_TYPE_FOUR_OF_A_KIND;
-        }
-        break;
-    case 3:
-        switch (instance->maxFrequency)
-        {
-        case 2: return HAND_TYPE_TWO_PAIR;
-        case 3: return HAND_TYPE_THREE_OF_A_KIND;
-        }
-        break;
-    case 4: return HAND_TYPE_ONE_PAIR;
-    case 5: return HAND_TYPE_HIGH_CARD;
+        case 1: return HAND_TYPE_FIVE_OF_A_KIND;
+        case 2:
+            switch (instance->maxFrequency)
+            {
+                case 3: return HAND_TYPE_FULL_HOUSE;
+                case 4: return HAND_TYPE_FOUR_OF_A_KIND;
+            }
+            break;
+        case 3:
+            switch (instance->maxFrequency)
+            {
+                case 2: return HAND_TYPE_TWO_PAIR;
+                case 3: return HAND_TYPE_THREE_OF_A_KIND;
+            }
+            break;
+        case 4: return HAND_TYPE_ONE_PAIR;
+        case 5: return HAND_TYPE_HIGH_CARD;
     }
 
     return HAND_TYPE_NONE;
@@ -230,7 +229,7 @@ int main(int count, String args[])
             return 1;
         }
 
-        Player player;
+        struct Player player;
         struct Hand hand = { 0 };
 
         for (int i = 0; i < HAND_SIZE; i++)

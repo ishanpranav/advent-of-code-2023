@@ -52,12 +52,8 @@ struct IntervalListEnumerator
 
 typedef const void* Object;
 typedef char* String;
-typedef struct Range Range;
 typedef struct Function* Function;
-typedef struct FunctionEnumerator FunctionEnumerator;
-typedef struct Interval Interval;
 typedef struct IntervalList* IntervalList;
-typedef struct IntervalListEnumerator IntervalListEnumerator;
 
 int range_compare(Object left, Object right)
 {
@@ -76,8 +72,8 @@ int range_compare(Object left, Object right)
         return 1;
     }
 
-    long long leftOffset = ((const Range*)left)->sourceOffset;
-    long long rightOffset = ((const Range*)right)->sourceOffset;
+    long long leftOffset = ((const struct Range*)left)->sourceOffset;
+    long long rightOffset = ((const struct Range*)right)->sourceOffset;
 
     if (leftOffset < rightOffset)
     {
@@ -92,21 +88,20 @@ int range_compare(Object left, Object right)
     return 0;
 }
 
-Range range_from_interval(long long min, long long max, long long intercept)
+void range_from_interval(
+    long long min,
+    long long max,
+    long long intercept,
+    struct Range* result)
 {
-    Range result =
-    {
-        .destinationOffset = min + intercept,
-        .sourceOffset = min,
-        .length = max - min
-    };
-
-    return result;
+    result->destinationOffset = min + intercept;
+    result->sourceOffset = min;
+    result->length = max - min;
 }
 
-Range range_identity(long long min, long long max)
+void range_identity(long long min, long long max, struct Range* result)
 {
-    return range_from_interval(min, max, 0);
+    range_from_interval(min, max, 0, result);
 }
 
 void function(Function instance)
@@ -114,7 +109,7 @@ void function(Function instance)
     instance->count = 0;
 }
 
-void function_add_range(Function instance, Range item)
+void function_add_range(Function instance, struct Range item)
 {
     int count = instance->count;
 
@@ -142,7 +137,7 @@ void function_fill_ranges(Function instance)
 
     if (!count)
     {
-        Range infinity =
+        struct Range infinity =
         {
             .sourceOffset = 0,
             .destinationOffset = 0,
@@ -154,26 +149,29 @@ void function_fill_ranges(Function instance)
         return;
     }
 
-    Range view[RANGES_CAPACITY];
+    struct Range view[RANGES_CAPACITY];
 
     function_sort_ranges(instance);
     memcpy(view, instance->ranges, count * sizeof(struct Range));
     function_clear_ranges(instance);
 
-    Range* first = view;
-    Range* last = view + count - 1;
+    struct Range* first = view;
+    struct Range* last = view + count - 1;
     long long min = first->sourceOffset;
 
     if (min)
     {
-        function_add_range(instance, range_identity(LLONG_MIN, min));
+        struct Range identity;
+
+        range_identity(LLONG_MIN, min, &identity);
+        function_add_range(instance, identity);
     }
 
     function_add_range(instance, *first);
 
-    for (Range* current = first + 1; current <= last; current++)
+    for (struct Range* current = first + 1; current <= last; current++)
     {
-        Range* previous = current - 1;
+        struct Range* previous = current - 1;
 
         long long previousMax = previous->sourceOffset + previous->length;
         long long currentMin = current->sourceOffset;
@@ -181,9 +179,13 @@ void function_fill_ranges(Function instance)
 
         if (difference > 1)
         {
-            function_add_range(
-                instance,
-                range_identity(previousMax + 1, currentMin + current->length));
+            struct Range identity;
+
+            range_identity(
+                previousMax + 1,
+                currentMin + current->length,
+                &identity);
+            function_add_range(instance, identity);
         }
 
         function_add_range(instance, *current);
@@ -193,7 +195,10 @@ void function_fill_ranges(Function instance)
 
     if (lastMax < LLONG_MAX)
     {
-        function_add_range(instance, range_identity(lastMax + 1, LLONG_MAX));
+        struct Range identity;
+
+        range_identity(lastMax + 1, LLONG_MAX, &identity);
+        function_add_range(instance, identity);
     }
 }
 
@@ -217,29 +222,28 @@ long long math_max(long long a, long long b)
     return b;
 }
 
-FunctionEnumerator function_get_enumerator(Function instance)
+void function_get_enumerator(
+    Function instance, 
+    struct FunctionEnumerator* result)
 {
-    FunctionEnumerator result;
-
-    result.begin = instance->ranges;
-    result.end = result.begin + instance->count;
-
-    return result;
+    result->begin = instance->ranges;
+    result->end = result->begin + instance->count;
 }
 
 void function_compose(Function instance, Function other)
 {
     int count = instance->count;
-    Range view[RANGES_CAPACITY];
-    Range* last = view + count - 1;
-    FunctionEnumerator domain = function_get_enumerator(other);
-
+    struct Range view[RANGES_CAPACITY];
+    struct Range* last = view + count - 1;
+    struct FunctionEnumerator image;
+    
+    function_get_enumerator(other, &image);
     memcpy(view, instance->ranges, count * sizeof(struct Range));
     function_clear_ranges(instance);
 
-    for (Range* a = view; a <= last; a++)
+    for (struct Range* a = view; a <= last; a++)
     {
-        for (Range* b = domain.begin; b < domain.end; b++)
+        for (struct Range* b = image.begin; b < image.end; b++)
         {
             long long aMin = a->sourceOffset;
             long long aMax = aMin + a->length;
@@ -253,11 +257,15 @@ void function_compose(Function instance, Function other)
                 continue;
             }
 
-            function_add_range(instance, range_from_interval(
+            struct Range range;
+
+            range_from_interval(
                 math_max(aMin, bMin),
                 math_min(aMax, bMax),
-                a->destinationOffset + b->destinationOffset -
-                a->sourceOffset - b->sourceOffset));
+                a->destinationOffset - a->sourceOffset +
+                b->destinationOffset - b->sourceOffset,
+                &range);
+            function_add_range(instance, range);
         }
     }
 }
@@ -267,7 +275,7 @@ void interval_list(IntervalList instance)
     instance->count = 0;
 }
 
-void interval_list_add(IntervalList instance, Interval item)
+void interval_list_add(IntervalList instance, struct Interval item)
 {
     int count = instance->count;
 
@@ -275,14 +283,12 @@ void interval_list_add(IntervalList instance, Interval item)
     instance->count = count + 1;
 }
 
-IntervalListEnumerator interval_list_get_enumerator(IntervalList instance)
+void interval_list_get_enumerator(
+    IntervalList instance,
+    struct IntervalListEnumerator* result)
 {
-    IntervalListEnumerator result;
-
-    result.begin = instance->items;
-    result.end = result.begin + instance->count;
-
-    return result;
+    result->begin = instance->items;
+    result->end = result->begin + instance->count;
 }
 
 static bool read(Function function, char buffer[])
@@ -294,7 +300,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    Range range;
+    struct Range range;
 
     range.destinationOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
@@ -367,7 +373,7 @@ int main(int count, String args[])
             return 1;
         }
 
-        Interval interval =
+        struct Interval interval =
         {
             .min = offset,
             .max = offset + atoll(token)
@@ -438,15 +444,19 @@ int main(int count, String args[])
     }
 
     long long min = LLONG_MAX;
-    IntervalListEnumerator enumerator = interval_list_get_enumerator(&seeds);
+    struct IntervalListEnumerator domain;
 
-    for (Interval* seed = enumerator.begin; seed < enumerator.end; seed++)
+    interval_list_get_enumerator(&seeds, &domain);
+
+    for (struct Interval* seed = domain.begin; seed < domain.end; seed++)
     {
         long long seedMin = seed->min;
         long long seedMax = seed->max;
-        FunctionEnumerator domain = function_get_enumerator(&composite);
+        struct FunctionEnumerator image;
+        
+        function_get_enumerator(&composite, &image);
 
-        for (Range* range = domain.begin; range < domain.end; range++)
+        for (struct Range* range = image.begin; range < image.end; range++)
         {
             long long rangeMin = range->sourceOffset;
 
@@ -465,7 +475,6 @@ int main(int count, String args[])
             }
         }
     }
-
 
     printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);

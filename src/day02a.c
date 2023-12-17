@@ -22,26 +22,26 @@ static PossibleResult possible(char token, int number)
 {
     switch (token)
     {
-    case 'r':
-        if (number > 12)
-        {
-            return POSSIBLE_RESULT_IMPOSSIBLE;
-        }
-        break;
-    case 'g':
-        if (number > 13)
-        {
-            return POSSIBLE_RESULT_IMPOSSIBLE;
-        }
-        break;
-    case 'b':
-        if (number > 14)
-        {
-            return POSSIBLE_RESULT_IMPOSSIBLE;
-        }
-        break;
-    default:
-        return POSSIBLE_RESULT_FORMAT_EXCEPTION;
+        case 'r':
+            if (number > 12)
+            {
+                return POSSIBLE_RESULT_IMPOSSIBLE;
+            }
+            break;
+        case 'g':
+            if (number > 13)
+            {
+                return POSSIBLE_RESULT_IMPOSSIBLE;
+            }
+            break;
+        case 'b':
+            if (number > 14)
+            {
+                return POSSIBLE_RESULT_IMPOSSIBLE;
+            }
+            break;
+        default:
+            return POSSIBLE_RESULT_FORMAT_EXCEPTION;
     }
 
     return POSSIBLE_RESULT_POSSIBLE;

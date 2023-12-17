@@ -44,7 +44,6 @@ typedef int Vertex;
 typedef char Direction;
 typedef struct Graph* Graph;
 typedef struct List* List;
-typedef struct ListEnumerator ListEnumerator;
 typedef bool (*Predicate)(Vertex vertex);
 
 void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
@@ -66,19 +65,19 @@ int graph_walk(
     {
         switch (*direction)
         {
-        case DIRECTION_LEFT:
-            start = instance->vertices[start].left;
-            direction++;
-            result++;
-            break;
-        case DIRECTION_RIGHT:
-            start = instance->vertices[start].right;
-            direction++;
-            result++;
-            break;
-        default:
-            direction = directions;
-            break;
+            case DIRECTION_LEFT:
+                start = instance->vertices[start].left;
+                direction++;
+                result++;
+                break;
+            case DIRECTION_RIGHT:
+                start = instance->vertices[start].right;
+                direction++;
+                result++;
+                break;
+            default:
+                direction = directions;
+                break;
         }
     }
 
@@ -98,14 +97,10 @@ void list_add(List instance, Vertex item)
     instance->count = count + 1;
 }
 
-ListEnumerator list_get_enumerator(List instance)
+void list_get_enumerator(List instance, struct ListEnumerator* result)
 {
-    ListEnumerator result;
-
-    result.begin = instance->items;
-    result.end = result.begin + instance->count;
-
-    return result;
+    result->begin = instance->items;
+    result->end = result->begin + instance->count;
 }
 
 long long math_gcd(long long a, long long b)
@@ -218,7 +213,10 @@ int main(int count, String args[])
         return 1;
     }
 
-    ListEnumerator enumerator = list_get_enumerator(&starts);
+    struct ListEnumerator enumerator;
+
+    list_get_enumerator(&starts, &enumerator);
+
     Vertex* p = enumerator.begin;
     long long lcm = graph_walk(&graph, *p, directions, stop);
 
