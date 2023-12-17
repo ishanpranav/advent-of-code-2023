@@ -57,6 +57,7 @@ I am adhering to the following constraints to ensure high code quality.
 - Bounds checking is not required for data structures whose capacity is defined by a macro.
 - The first and second problems for a given day may share the same data structures and algorithms, but the second problem may only add to (and never remove from) the public API of the first.
 - The return values of all C standard library functions must be checked, except for those returned from the following:
+  - `fclose` (when the mode is `"r"`)
   - `fprintf`
   - `printf`
 - Only the `main` entry point can do the following:

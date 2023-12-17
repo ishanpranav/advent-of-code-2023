@@ -31,28 +31,22 @@ struct Matrix
 
 typedef char* String;
 typedef char* Row;
-typedef struct Coordinate Coordinate;
 typedef struct CoordinateList* CoordinateList;
 typedef struct Matrix* Matrix;
 
-Coordinate coordinate_empty()
+void coordinate_empty(struct Coordinate* result)
 {
-    Coordinate result =
-    {
-        .i = -1,
-        .j = -1
-    };
-
-    return result;
+    result->i = -1;
+    result->j = -1;
 }
 
-void coordinate_list(CoordinateList instance, Coordinate item)
+void coordinate_list(CoordinateList instance, struct Coordinate item)
 {
     instance->items[0] = item;
     instance->count = 1;
 }
 
-void coordinate_list_add(CoordinateList instance, Coordinate item)
+void coordinate_list_add(CoordinateList instance, struct Coordinate item)
 {
     int count = instance->count;
 
@@ -62,17 +56,18 @@ void coordinate_list_add(CoordinateList instance, Coordinate item)
 
 void matrix(Matrix instance, int n)
 {
-    instance->origin = coordinate_empty();
+    coordinate_empty(&instance->origin);
+
     instance->rows = 0;
     instance->columns = n;
 }
 
-char matrix_get(Matrix instance, Coordinate coordinate)
+char matrix_get(Matrix instance, struct Coordinate coordinate)
 {
     return instance->items[(instance->columns * coordinate.i) + coordinate.j];
 }
 
-void matrix_set(Matrix instance, Coordinate coordinate, char item)
+void matrix_set(Matrix instance, struct Coordinate coordinate, char item)
 {
     instance->items[(instance->columns * coordinate.i) + coordinate.j] = item;
 }
@@ -86,7 +81,10 @@ Row matrix_new_row(Matrix instance)
     return instance->items + (instance->columns * m);
 }
 
-static bool scan_hi(Matrix matrix, Coordinate* previous, Coordinate current)
+static bool scan_hi(
+    Matrix matrix,
+    struct Coordinate* previous, 
+    struct Coordinate current)
 {
     current.i--;
 
@@ -105,7 +103,10 @@ static bool scan_hi(Matrix matrix, Coordinate* previous, Coordinate current)
     }
 }
 
-static bool scan_lo(Matrix matrix, Coordinate* previous, Coordinate current)
+static bool scan_lo(
+    Matrix matrix,
+    struct Coordinate* previous, 
+    struct Coordinate current)
 {
     current.i++;
 
@@ -124,7 +125,10 @@ static bool scan_lo(Matrix matrix, Coordinate* previous, Coordinate current)
     }
 }
 
-static bool scan_left(Matrix matrix, Coordinate* previous, Coordinate current)
+static bool scan_left(
+    Matrix matrix,
+    struct Coordinate* previous, 
+    struct Coordinate current)
 {
     current.j--;
 
@@ -143,7 +147,10 @@ static bool scan_left(Matrix matrix, Coordinate* previous, Coordinate current)
     }
 }
 
-static bool scan_right(Matrix matrix, Coordinate* previous, Coordinate current)
+static bool scan_right(
+    Matrix matrix,
+    struct Coordinate* previous, 
+    struct Coordinate current)
 {
     current.j++;
 
@@ -162,33 +169,36 @@ static bool scan_right(Matrix matrix, Coordinate* previous, Coordinate current)
     }
 }
 
-static bool scan(Matrix a, Coordinate* previous, Coordinate current)
+static bool scan(
+    Matrix matrix,
+    struct Coordinate* previous, 
+    struct Coordinate current)
 {
-    switch (matrix_get(a, current))
+    switch (matrix_get(matrix, current))
     {
         case '|': return
-            scan_hi(a, previous, current) ||
-            scan_lo(a, previous, current);
+            scan_hi(matrix, previous, current) ||
+            scan_lo(matrix, previous, current);
 
         case '-': return
-            scan_left(a, previous, current) ||
-            scan_right(a, previous, current);
+            scan_left(matrix, previous, current) ||
+            scan_right(matrix, previous, current);
 
         case 'J': return
-            scan_hi(a, previous, current) ||
-            scan_left(a, previous, current);
+            scan_hi(matrix, previous, current) ||
+            scan_left(matrix, previous, current);
 
         case 'L': return
-            scan_hi(a, previous, current) ||
-            scan_right(a, previous, current);
+            scan_hi(matrix, previous, current) ||
+            scan_right(matrix, previous, current);
 
         case '7': return
-            scan_lo(a, previous, current) ||
-            scan_left(a, previous, current);
+            scan_lo(matrix, previous, current) ||
+            scan_left(matrix, previous, current);
 
         case 'F': return
-            scan_lo(a, previous, current) ||
-            scan_right(a, previous, current);
+            scan_lo(matrix, previous, current) ||
+            scan_right(matrix, previous, current);
 
         default: return false;
     }
@@ -198,17 +208,17 @@ int math_shoelace_formula_area(CoordinateList polygon)
 {
     int result = 0;
     int lastIndex = polygon->count - 1;
-    Coordinate first = polygon->items[0];
+    struct Coordinate first = polygon->items[0];
 
     for (int i = 0; i < lastIndex; i++)
     {
-        Coordinate current = polygon->items[i];
-        Coordinate next = polygon->items[i + 1];
+        struct Coordinate current = polygon->items[i];
+        struct Coordinate next = polygon->items[i + 1];
 
         result += (current.i + next.i) * (current.j - next.j);
     }
 
-    Coordinate last = polygon->items[lastIndex];
+    struct Coordinate last = polygon->items[lastIndex];
 
     return (result + (last.i + first.i) * (last.j - first.j)) / 2;
 }
@@ -269,13 +279,8 @@ int main(int count, String args[])
 
         if (token)
         {
-            Coordinate origin =
-            {
-                .i = a.rows - 1,
-                .j = token - buffer
-            };
-
-            a.origin = origin;
+            a.origin.i = a.rows - 1,
+            a.origin.j = token - buffer;
         }
     }
     while (fgets(buffer, n + 2, stream));
@@ -289,10 +294,11 @@ int main(int count, String args[])
     }
 
     struct CoordinateList path;
-    Coordinate current = a.origin;
-    Coordinate previous = coordinate_empty();
+    struct Coordinate current = a.origin;
+    struct Coordinate previous;
 
     coordinate_list(&path, a.origin);
+    coordinate_empty(&previous);
 
     if (!scan_hi(&a, &previous, current) &&
         !scan_lo(&a, &previous, current) &&
@@ -313,7 +319,7 @@ int main(int count, String args[])
 
         if (!scan(&a, &previous, current))
         {
-            previous = coordinate_empty();
+            coordinate_empty(&previous);
         }
 
         matrix_set(&a, current, 0);

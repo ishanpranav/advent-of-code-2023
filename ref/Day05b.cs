@@ -287,11 +287,6 @@ internal sealed class Function
 
         return result;
     }
-
-    public override string ToString()
-    {
-        return string.Join(", ", _ranges);
-    }
 }
 
 internal sealed class Range : IComparable<Range>

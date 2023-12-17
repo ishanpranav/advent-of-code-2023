@@ -55,6 +55,22 @@ typedef char* String;
 typedef struct Function* Function;
 typedef struct IntervalList* IntervalList;
 
+void range_from_interval(
+    long long min,
+    long long max,
+    long long intercept,
+    struct Range* result)
+{
+    result->destinationOffset = min + intercept;
+    result->sourceOffset = min;
+    result->length = max - min;
+}
+
+void range_identity(long long min, long long max, struct Range* result)
+{
+    range_from_interval(min, max, 0, result);
+}
+
 int range_compare(Object left, Object right)
 {
     if (!left && !right)
@@ -86,22 +102,6 @@ int range_compare(Object left, Object right)
     }
 
     return 0;
-}
-
-void range_from_interval(
-    long long min,
-    long long max,
-    long long intercept,
-    struct Range* result)
-{
-    result->destinationOffset = min + intercept;
-    result->sourceOffset = min;
-    result->length = max - min;
-}
-
-void range_identity(long long min, long long max, struct Range* result)
-{
-    range_from_interval(min, max, 0, result);
 }
 
 void function(Function instance)

@@ -25,7 +25,8 @@ items are placed on a single line.
 ## Spacing
 
 Defer to the Linux Kernel Coding Style
-[Section 3.1: Spacing](https://www.kernel.org/doc/html/v4.10/process/coding-style.html) for spacing considerations.
+[Section 3.1: Spacing](https://www.kernel.org/doc/html/v4.10/process/coding-style.html)
+for spacing considerations.
 
 ## Naming
 
@@ -43,7 +44,7 @@ corresponding type-based abbreviation and continue alphabetically. If doing so
 is impractical, use numeric suffixes instead.
 
 |Letter|Appropriate use|
-|:----:|:------------|
+|:----:|:--------------|
 |`a`   |arbitrary object|
 |`b`   |blue color component|
 |`d`   |change|
