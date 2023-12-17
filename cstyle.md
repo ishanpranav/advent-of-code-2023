@@ -117,23 +117,41 @@ bool person_try_add_reference(Person instance, Person reference)
 
 ### Value semantics
 
-In the example below, the `Suit` enumeration is an enumeration with
+In the example below, the `Piece` enumeration is an enumeration with
 pass-by-value semantics. A type definition should be used because copying an
 enumeration member is not more expensive than copying a pointer.
 
 ```c
-enum Suit
+enum Piece
 {
-    SUIT_SPADES,
-    SUIT_DIAMONDS,
-    SUIT_CLUBS,
-    SUIT_HEARTS
+    PIECE_KING,
+    PIECE_QUEEN,
+    PIECE_ROOK,
+    PIECE_BISHOP,
+    PIECE_KNIGHT,
+    PIECE_PAWN
 };
+
+typedef enum Piece Piece;
+
+char piece_to_char(Piece value)
+{
+    switch (value)
+    {
+        case PIECE_KING: return 'K';
+        case PIECE_QUEEN: return 'Q';
+        case PIECE_ROOK: return 'R';
+        case PIECE_BISHOP: return 'B';
+        case PIECE_KNIGHT: return 'N';
+        case PIECE_PAWN: return ' ';
+        default: return 0;
+    }
+}
 ```
 
 In this example, the `Point` struct is a simple structure with pass-by-value
 semantics. A type definition should not be used because it obscures the true
-intent of the operations. Also, copying a structure is more expensive than
+intent of the type. Also, copying a structure is more expensive than
 copying a pointer.
 
 ```c
