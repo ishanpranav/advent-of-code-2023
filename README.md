@@ -60,7 +60,7 @@ day01a in.txt
 | 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
-| 12|[Hot Springs](src/day12b.c)|Regular expressions, Finite state machines|Sum||
+| 12|[Hot Springs](src/day12b.c)|Regular expressions, Finite state machines|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
 | 13|[Point of Incidence](src/day13b.c)||Sum||
 
 ## Constraints
