@@ -78,10 +78,10 @@ int main(int count, String args[])
         char first;
         char second;
         long score = 0;
-        char* next = strchr(buffer, '|');
+        char* mid = strchr(buffer, '|');
         struct DecimalSet winningNumbers = { 0 };
 
-        if (!next)
+        if (!mid)
         {
             fclose(stream);
             fprintf(stderr, "Error: Format.\n");
@@ -90,13 +90,13 @@ int main(int count, String args[])
         }
 
         for (char* p = begin + 2;
-            p < next && (first = p[0]) && (second = p[1]);
+            p < mid && (first = p[0]) && (second = p[1]);
             p += 3)
         {
             decimal_set_add(&winningNumbers, first, second);
         }
 
-        for (char* p = next + 2;
+        for (char* p = mid + 2;
             (first = p[0]) && (second = p[1]);
             p += 3)
         {

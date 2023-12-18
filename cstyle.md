@@ -102,15 +102,13 @@ void person(Person instance)
 
 bool person_try_add_reference(Person instance, Person reference)
 {
-    int count = instance->referenceCount;
-
-    if (count == REFERENCES_CAPACITY)
+    if (instance->referenceCount == REFERENCES_CAPACITY)
     {
         return false;
     }
 
-    instance->references[count] = reference;
-    instance->referenceCount = count + 1;
+    instance->references[instance->referenceCount] = reference;
+    instance->referenceCount++;
 
     return true;
 }

@@ -26,12 +26,6 @@ struct Function
     int count;
 };
 
-struct FunctionEnumerator
-{
-    struct Range* begin;
-    struct Range* end;
-};
-
 struct Interval
 {
     long long min;
@@ -42,12 +36,6 @@ struct IntervalList
 {
     struct Interval items[INTERVAL_LIST_CAPACITY];
     int count;
-};
-
-struct IntervalListEnumerator
-{
-    struct Interval* begin;
-    struct Interval* end;
 };
 
 typedef const void* Object;
@@ -111,10 +99,8 @@ void function(Function instance)
 
 void function_add_range(Function instance, struct Range item)
 {
-    int count = instance->count;
-
-    instance->ranges[count] = item;
-    instance->count = count + 1;
+    instance->ranges[instance->count] = item;
+    instance->count++;
 }
 
 void function_sort_ranges(Function instance)
@@ -222,28 +208,19 @@ long long math_max(long long a, long long b)
     return b;
 }
 
-void function_get_enumerator(
-    Function instance, 
-    struct FunctionEnumerator* result)
-{
-    result->begin = instance->ranges;
-    result->end = result->begin + instance->count;
-}
-
 void function_compose(Function instance, Function other)
 {
-    int count = instance->count;
     struct Range view[RANGES_CAPACITY];
-    struct Range* last = view + count - 1;
-    struct FunctionEnumerator image;
-    
-    function_get_enumerator(other, &image);
-    memcpy(view, instance->ranges, count * sizeof(struct Range));
+    struct Range* last = view + instance->count - 1;
+
+    memcpy(view, instance->ranges, instance->count * sizeof(struct Range));
     function_clear_ranges(instance);
 
     for (struct Range* a = view; a <= last; a++)
     {
-        for (struct Range* b = image.begin; b < image.end; b++)
+        for (struct Range* b = other->ranges;
+            b < other->ranges + other->count;
+            b++)
         {
             long long aMin = a->sourceOffset;
             long long aMax = aMin + a->length;
@@ -277,18 +254,8 @@ void interval_list(IntervalList instance)
 
 void interval_list_add(IntervalList instance, struct Interval item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
-}
-
-void interval_list_get_enumerator(
-    IntervalList instance,
-    struct IntervalListEnumerator* result)
-{
-    result->begin = instance->items;
-    result->end = result->begin + instance->count;
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 static bool read(Function function, char buffer[])
@@ -444,19 +411,17 @@ int main(int count, String args[])
     }
 
     long long min = LLONG_MAX;
-    struct IntervalListEnumerator domain;
 
-    interval_list_get_enumerator(&seeds, &domain);
-
-    for (struct Interval* seed = domain.begin; seed < domain.end; seed++)
+    for (struct Interval* seed = seeds.items;
+        seed < seeds.items + seeds.count;
+        seed++)
     {
         long long seedMin = seed->min;
         long long seedMax = seed->max;
-        struct FunctionEnumerator image;
-        
-        function_get_enumerator(&composite, &image);
 
-        for (struct Range* range = image.begin; range < image.end; range++)
+        for (struct Range* range = composite.ranges;
+            range < composite.ranges + composite.count;
+            range++)
         {
             long long rangeMin = range->sourceOffset;
 

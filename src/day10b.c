@@ -48,10 +48,8 @@ void coordinate_list(CoordinateList instance, struct Coordinate item)
 
 void coordinate_list_add(CoordinateList instance, struct Coordinate item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 void matrix(Matrix instance, int n)

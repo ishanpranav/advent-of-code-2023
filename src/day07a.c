@@ -32,9 +32,9 @@ enum Card
 
 struct Hand
 {
+    int frequencies[CARD_NONE];
     int count;
     int maxFrequency;
-    int frequencies[CARD_NONE];
 };
 
 enum HandType
@@ -134,10 +134,8 @@ void player_list(PlayerList instance)
 
 void player_list_add(PlayerList instance, struct Player item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 void player_list_sort(PlayerList instance)

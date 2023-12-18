@@ -32,12 +32,6 @@ struct List
     int count;
 };
 
-struct ListEnumerator
-{
-    long long* begin;
-    long long* end;
-};
-
 typedef const void* Object;
 typedef char* String;
 typedef struct Function* Function;
@@ -83,10 +77,8 @@ void function(Function instance)
 
 void function_add_range(Function instance, struct Range item)
 {
-    int count = instance->count;
-
-    instance->ranges[count] = item;
-    instance->count = count + 1;
+    instance->ranges[instance->count] = item;
+    instance->count++;
 }
 
 void function_sort_ranges(Function instance)
@@ -110,16 +102,8 @@ void list(List instance)
 
 void list_add(List instance, long long item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
-}
-
-void list_get_enumerator(List instance, struct ListEnumerator* result)
-{
-    result->begin = instance->items;
-    result->end = result->begin + instance->count;
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 static struct Range* search(Function function, long long value)
@@ -152,18 +136,15 @@ static struct Range* search(Function function, long long value)
 
 static void realize(Function function, List seeds)
 {
-    struct ListEnumerator enumerator;
-    
-    function_sort_ranges(function);
-    list_get_enumerator(seeds, &enumerator);
-
-    for (long long* p = enumerator.begin; p < enumerator.end; p++)
+    if (function->count == 0)
     {
-        if (function->count == 0)
-        {
-            continue;
-        }
+        return;
+    }
 
+    function_sort_ranges(function);
+
+    for (long long* p = seeds->items; p < seeds->items + seeds->count; p++)
+    {
         long long input = *p;
         struct Range* range = search(function, input);
         long long offset = range->sourceOffset;
@@ -272,11 +253,8 @@ int main(int count, String args[])
     realize(&current, &seeds);
 
     long long min = LLONG_MAX;
-    struct ListEnumerator enumerator;
     
-    list_get_enumerator(&seeds, &enumerator);
-
-    for (long long* p = enumerator.begin; p < enumerator.end; p++)
+    for (long long* p = seeds.items; p < seeds.items + seeds.count; p++)
     {
         long long value = *p;
 

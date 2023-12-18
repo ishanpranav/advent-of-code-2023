@@ -24,8 +24,6 @@ internal static partial class Program
             return 1;
         }
 
-        Console.OutputEncoding = Encoding.Unicode;
-
         Run(args[0], out long min, out TimeSpan elapsed);
         Console.WriteLine("{0} : {1}", min, elapsed.TotalSeconds);
 
@@ -111,7 +109,8 @@ internal static partial class Program
         string? line;
         Stopwatch stopwatch = Stopwatch.StartNew();
         StringBuilder builder = new StringBuilder();
-        Dictionary<int, int> current = new Dictionary<int, int>(), next = new Dictionary<int, int>();
+        Dictionary<int, int> current = new Dictionary<int, int>();
+        Dictionary<int, int> next = new Dictionary<int, int>();
 
         total = 0;
 

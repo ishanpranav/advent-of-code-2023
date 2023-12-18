@@ -24,8 +24,6 @@ internal static partial class Program
             return 1;
         }
 
-        Console.OutputEncoding = Encoding.Unicode;
-
         Run(args[0], out long min, out TimeSpan elapsed);
         Console.WriteLine("{0} : {1}", min, elapsed.TotalSeconds);
 

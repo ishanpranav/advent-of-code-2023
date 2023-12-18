@@ -33,12 +33,6 @@ struct List
     int count;
 };
 
-struct ListEnumerator
-{
-    int* begin;
-    int* end;
-};
-
 typedef char* String;
 typedef int Vertex;
 typedef char Direction;
@@ -91,16 +85,8 @@ void list(List instance)
 
 void list_add(List instance, Vertex item)
 {
-    int count = instance->count;
-
-    instance->items[count] = item;
-    instance->count = count + 1;
-}
-
-void list_get_enumerator(List instance, struct ListEnumerator* result)
-{
-    result->begin = instance->items;
-    result->end = result->begin + instance->count;
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 long long math_gcd(long long a, long long b)
@@ -213,18 +199,12 @@ int main(int count, String args[])
         return 1;
     }
 
-    struct ListEnumerator enumerator;
+    Vertex* first = starts.items;
+    long long lcm = graph_walk(&graph, *first, directions, stop);
 
-    list_get_enumerator(&starts, &enumerator);
-
-    Vertex* p = enumerator.begin;
-    long long lcm = graph_walk(&graph, *p, directions, stop);
-
-    for (p++; p < enumerator.end; p++)
+    for (Vertex* p = first + 1; p < first + starts.count; p++)
     {
-        long long steps = graph_walk(&graph, *p, directions, stop);
-
-        lcm = math_lcm(lcm, steps);
+        lcm = math_lcm(lcm, graph_walk(&graph, *p, directions, stop));
     }
 
     printf("%lld : %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);

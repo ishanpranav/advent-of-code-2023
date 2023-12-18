@@ -27,18 +27,15 @@ void series(Series instance)
 
 void series_add(Series instance, long term)
 {
-    int n = instance->count;
-
-    instance->terms[n] = term;
-    instance->count = n + 1;
+    instance->terms[instance->count] = term;
+    instance->count++;
 }
 
 long series_lagrange_extrapolate(Series instance, int k)
 {
     double sum = 0;
-    long n = instance->count;
 
-    for (int j = 0; j < n; j++)
+    for (int j = 0; j < instance->count; j++)
     {
         double product = instance->terms[j];
 
@@ -47,7 +44,7 @@ long series_lagrange_extrapolate(Series instance, int k)
             product *= (double)(k - i) / (j - i);
         }
 
-        for (int i = j + 1; i < n; i++)
+        for (int i = j + 1; i < instance->count; i++)
         {
             product *= (double)(k - i) / (j - i);
         }
