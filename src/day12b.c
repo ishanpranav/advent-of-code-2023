@@ -36,6 +36,7 @@ struct SpringPattern
 
 typedef char* String;
 typedef char Spring;
+typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct Dictionary* Dictionary;
 typedef struct SpringPattern* SpringPattern;
 
@@ -105,49 +106,47 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
 
     dictionary_clear(&view);
 
-    for (struct DictionaryEntry* p = current->first; p; p = p->next)
+    for (DictionaryEntry entry = current->first; entry; entry = entry->next)
     {
-        dictionary_increment(&view, p->key, p->value);
+        dictionary_increment(&view, entry->key, entry->value);
     }
 
     dictionary_clear(current);
 
-    for (struct DictionaryEntry* p = view.first; p; p = p->next)
+    for (DictionaryEntry entry = view.first; entry; entry = entry->next)
     {
-        long long state = p->key;
-
         switch (symbol)
         {
             case SPRING_UNKNOWN:
-                if (state + 1 < pattern->length)
+                if (entry->key + 1 < pattern->length)
                 {
-                    dictionary_increment(current, state + 1, p->value);
+                    dictionary_increment(current, entry->key + 1, entry->value);
                 }
 
-                if (pattern->symbols[state] == SPRING_OPERATIONAL)
+                if (pattern->symbols[entry->key] == SPRING_OPERATIONAL)
                 {
-                    dictionary_increment(current, state, p->value);
+                    dictionary_increment(current, entry->key, entry->value);
                 }
                 break;
 
             case SPRING_OPERATIONAL:
-                if (state + 1 < pattern->length &&
-                    pattern->symbols[state + 1] == SPRING_OPERATIONAL)
+                if (entry->key + 1 < pattern->length &&
+                    pattern->symbols[entry->key + 1] == SPRING_OPERATIONAL)
                 {
-                    dictionary_increment(current, state + 1, p->value);
+                    dictionary_increment(current, entry->key + 1, entry->value);
                 }
 
-                if (pattern->symbols[state] == SPRING_OPERATIONAL)
+                if (pattern->symbols[entry->key] == SPRING_OPERATIONAL)
                 {
-                    dictionary_increment(current, state, p->value);
+                    dictionary_increment(current, entry->key, entry->value);
                 }
                 break;
 
             case SPRING_DAMAGED:
-                if (state + 1 < pattern->length &&
-                    pattern->symbols[state + 1] == SPRING_DAMAGED)
+                if (entry->key + 1 < pattern->length &&
+                    pattern->symbols[entry->key + 1] == SPRING_DAMAGED)
                 {
-                    dictionary_increment(current, state + 1, p->value);
+                    dictionary_increment(current, entry->key + 1, entry->value);
                 }
                 break;
         }
