@@ -7,7 +7,6 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 64
-#define BUFFER_COUNT 1000
 #define DELIMITERS ","
 #define PATTERN_BUFFER_CAPACITY 256
 #define SHORT_PATTERN_BUFFER_CAPACITY 32
