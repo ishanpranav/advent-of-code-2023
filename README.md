@@ -18,8 +18,7 @@ included here as a reference.
 ## Usage
 
 These programs are cross-platform, having been tested on Windows and Linux
-operating systems. The exception is [day 13](src/day13b.c) which requires a
-compiler-dependent population count functionality.
+operating systems.
 
 **Important:** Do not use Windows-style line endings (`CR LF`, i.e. `\r\n`).
 Only use Unix-style line endings (`LF`, i.e. `\n`).
@@ -63,7 +62,7 @@ day01a in.txt
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
-| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit vector|
+| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit vector, Bit matrix|
 
 ## Constraints
 

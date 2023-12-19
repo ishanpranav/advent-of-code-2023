@@ -12,6 +12,11 @@ typedef char* String;
 typedef unsigned long BitVector;
 typedef unsigned long* BitMatrix;
 
+bool bit_vector_is_pow_2(BitVector instance)
+{
+    return instance > 0 && (instance & (instance - 1)) == 0;
+}
+
 void bit_matrix_clear(BitMatrix instance)
 {
     memset(instance, 0, DIMENSION * sizeof(unsigned long));
@@ -21,19 +26,25 @@ static bool mid(BitMatrix matrix, int index)
 {
     int left = index;
     int right = index + 1;
+    bool smudged = false;
 
     while (left >= 0 && matrix[right])
     {
         if (matrix[left] != matrix[right])
         {
-            return false;
+            if (smudged || !bit_vector_is_pow_2(matrix[left] ^ matrix[right]))
+            {
+                return false;
+            }
+
+            smudged = true;
         }
 
         left--;
         right++;
     }
 
-    return true;
+    return smudged;
 }
 
 static int realize(BitMatrix matrix)
@@ -65,7 +76,7 @@ int main(int count, String args[])
 {
     if (count != 2)
     {
-        printf("Usage: day13a <path>\n");
+        printf("Usage: day13b <path>\n");
 
         return 1;
     }
