@@ -109,9 +109,10 @@ int main(int count, String args[])
             continue;
         }
 
+        int j = 0;
         char current;
 
-        for (int j = 0; (current = buffer[j]); j++)
+        while ((current = buffer[j]))
         {
             switch (current)
             {
@@ -125,6 +126,8 @@ int main(int count, String args[])
                     x[j] <<= 1;
                     break;
             }
+
+            j++;
         }
 
         i++;
