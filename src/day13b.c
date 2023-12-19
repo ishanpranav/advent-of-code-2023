@@ -111,7 +111,7 @@ int main(int count, String args[])
 
         char current;
 
-        for (int j = 0; (current = buffer[j]) && j < DIMENSION; j++)
+        for (int j = 0; (current = buffer[j]); j++)
         {
             switch (current)
             {
