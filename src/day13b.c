@@ -91,7 +91,7 @@ int main(int count, String args[])
     }
 
     int i = 0;
-    int total = 0;
+    long total = 0;
     BitVector x[DIMENSION] = { 0 };
     BitVector y[DIMENSION] = { 0 };
     char buffer[DIMENSION + 2];
@@ -135,7 +135,7 @@ int main(int count, String args[])
 
     total += realize_xy(x, y);
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("%ld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
 
     return 0;

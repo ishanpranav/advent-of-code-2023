@@ -63,6 +63,8 @@ day01a in.txt
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
 | 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit vector, Bit matrix|
+| 14|[Parabolic Reflector Dish](src/day14.c)||Sum||
+| 15|[Lens Library](src/day15.c)|Cryptography, Hash functions, Dictionaries|Sum|Ordered dictionary|
 
 ## Constraints
 
