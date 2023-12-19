@@ -112,9 +112,9 @@ void function_sort_ranges(Function instance)
         range_compare);
 }
 
-void function_clear_ranges(Function instance)
+void function_get_ranges(Function instance, struct Range* result)
 {
-    instance->count = 0;
+    memcpy(result, instance->ranges, instance->count * sizeof(struct Range));
 }
 
 void function_fill_ranges(Function instance)
@@ -138,8 +138,8 @@ void function_fill_ranges(Function instance)
     struct Range view[RANGES_CAPACITY];
 
     function_sort_ranges(instance);
-    memcpy(view, instance->ranges, count * sizeof(struct Range));
-    function_clear_ranges(instance);
+    function_get_ranges(instance, view);
+    function(instance);
 
     struct Range* first = view;
     struct Range* last = view + count - 1;
@@ -213,8 +213,8 @@ void function_compose(Function instance, Function other)
     struct Range view[RANGES_CAPACITY];
     struct Range* last = view + instance->count - 1;
 
-    memcpy(view, instance->ranges, instance->count * sizeof(struct Range));
-    function_clear_ranges(instance);
+    function_get_ranges(instance, view);
+    function(instance);
 
     for (struct Range* a = view; a <= last; a++)
     {
@@ -375,13 +375,13 @@ int main(int count, String args[])
             {
                 composite = current;
 
-                function_clear_ranges(&current);
+                function(&current);
 
                 continue;
             }
 
             function_compose(&composite, &current);
-            function_clear_ranges(&current);
+            function(&current);
 
             continue;
         }
@@ -407,7 +407,7 @@ int main(int count, String args[])
     {
         function_fill_ranges(&current);
         function_compose(&composite, &current);
-        function_clear_ranges(&current);
+        function(&current);
     }
 
     long long min = LLONG_MAX;

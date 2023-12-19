@@ -8,12 +8,12 @@
 #include <time.h>
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
+#define KEY_EMPTY -1
 #define PATTERN_BUFFER_CAPACITY 256
 #define SHORT_PATTERN_BUFFER_CAPACITY 32
 #define SPRING_OPERATIONAL '.'
 #define SPRING_DAMAGED '#'
 #define SPRING_UNKNOWN '?'
-#define KEY_EMPTY -1
 
 struct DictionaryEntry
 {
@@ -40,6 +40,18 @@ typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct Dictionary* Dictionary;
 typedef struct SpringPattern* SpringPattern;
 
+void dictionary(Dictionary instance)
+{
+    instance->first = NULL;
+
+    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    {
+        instance->buckets[i].key = KEY_EMPTY;
+        instance->buckets[i].value = 0;
+        instance->buckets[i].next = NULL;
+    }
+}
+
 void dictionary_increment(Dictionary instance, int key, long long change)
 {
     if (instance->buckets[key].key == KEY_EMPTY)
@@ -54,15 +66,13 @@ void dictionary_increment(Dictionary instance, int key, long long change)
     instance->buckets[key].value += change;
 }
 
-void dictionary_clear(Dictionary instance)
+void dictionary_copy(Dictionary destination, Dictionary source)
 {
-    instance->first = NULL;
-
-    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    dictionary(destination);
+    
+    for (struct DictionaryEntry* p = source->first; p; p = p->next)
     {
-        instance->buckets[i].key = KEY_EMPTY;
-        instance->buckets[i].value = 0;
-        instance->buckets[i].next = NULL;
+        dictionary_increment(destination, p->key, p->value);
     }
 }
 
@@ -104,14 +114,8 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
 {
     struct Dictionary view;
 
-    dictionary_clear(&view);
-
-    for (DictionaryEntry entry = current->first; entry; entry = entry->next)
-    {
-        dictionary_increment(&view, entry->key, entry->value);
-    }
-
-    dictionary_clear(current);
+    dictionary_copy(&view, current);
+    dictionary(current);
 
     for (DictionaryEntry entry = view.first; entry; entry = entry->next)
     {
@@ -223,7 +227,7 @@ int main(int count, String args[])
             spring_pattern_concat(&pattern, &shortPattern);
         }
 
-        dictionary_clear(&current);
+        dictionary(&current);
         dictionary_increment(&current, 0, 1);
 
         for (int i = 0; i < 4; i++)

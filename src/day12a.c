@@ -38,6 +38,18 @@ typedef char Spring;
 typedef struct Dictionary* Dictionary;
 typedef struct SpringPattern* SpringPattern;
 
+void dictionary(Dictionary instance)
+{
+    instance->first = NULL;
+
+    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    {
+        instance->buckets[i].key = KEY_EMPTY;
+        instance->buckets[i].value = 0;
+        instance->buckets[i].next = NULL;
+    }
+}
+
 void dictionary_increment(Dictionary instance, int key, int change)
 {
     if (instance->buckets[key].key == KEY_EMPTY)
@@ -52,15 +64,13 @@ void dictionary_increment(Dictionary instance, int key, int change)
     instance->buckets[key].value += change;
 }
 
-void dictionary_clear(Dictionary instance)
+void dictionary_copy(Dictionary destination, Dictionary source)
 {
-    instance->first = NULL;
-
-    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    dictionary(destination);
+    
+    for (struct DictionaryEntry* p = source->first; p; p = p->next)
     {
-        instance->buckets[i].key = KEY_EMPTY;
-        instance->buckets[i].value = 0;
-        instance->buckets[i].next = NULL;
+        dictionary_increment(destination, p->key, p->value);
     }
 }
 
@@ -87,14 +97,8 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
 {
     struct Dictionary view;
 
-    dictionary_clear(&view);
-
-    for (struct DictionaryEntry* p = current->first; p; p = p->next)
-    {
-        dictionary_increment(&view, p->key, p->value);
-    }
-
-    dictionary_clear(current);
+    dictionary_copy(&view, current);
+    dictionary(current);
 
     for (struct DictionaryEntry* p = view.first; p; p = p->next)
     {
@@ -182,7 +186,7 @@ int main(int count, String args[])
 
         Spring patternBuffer[PATTERN_BUFFER_CAPACITY];
         struct Dictionary current;
-        struct SpringPattern text = 
+        struct SpringPattern text =
         {
             .symbols = buffer,
             .length = mid - buffer
@@ -200,7 +204,7 @@ int main(int count, String args[])
             spring_pattern_append2(&pattern, SPRING_OPERATIONAL);
         }
 
-        dictionary_clear(&current);
+        dictionary(&current);
         dictionary_increment(&current, 0, 1);
         scan(&text, &pattern, &current);
 

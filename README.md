@@ -6,9 +6,10 @@ implemented in the C programming language. I have done my best to minimize time
 complexity while keeping the average running time on the order of 0.0001 s
 (0.1 ms).
 
-The exception is [day 12(a)](src/day12a.c), which runs on the order of
-0.001 s (1 ms) and [day 12(b)](src/day12b.c), which runs on the order of 0.01 s
-(10 ms). Despite my best efforts, these run times cannot be improved.
+The exceptions are [day 12(a)](src/day12a.c), which runs on the order of
+0.001 s (1 ms), and [day 12(b)](src/day12b.c), which runs on the order of 0.01 s
+(10 ms). Despite my best efforts, the order of magnitude of these run times
+cannot be improved.
 
 Some of the more difficult problems were implemented in a higher-level
 programming language before being converted to C. The equivalent code is
@@ -17,7 +18,8 @@ included here as a reference.
 ## Usage
 
 These programs are cross-platform, having been tested on Windows and Linux
-operating systems.
+operating systems. The exception is [day 13](src/day13b.c) which requires a
+compiler-dependent population count functionality.
 
 **Important:** Do not use Windows-style line endings (`CR LF`, i.e. `\r\n`).
 Only use Unix-style line endings (`LF`, i.e. `\n`).
@@ -61,7 +63,7 @@ day01a in.txt
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
-| 13|[Point of Incidence](src/day13b.c)||Sum||
+| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit vector|
 
 ## Constraints
 

@@ -90,11 +90,6 @@ void function_sort_ranges(Function instance)
         range_compare);
 }
 
-void function_clear_ranges(Function instance)
-{
-    instance->count = 0;
-}
-
 void list(List instance)
 {
     instance->count = 0;
@@ -134,19 +129,19 @@ static struct Range* search(Function function, long long value)
     return hi;
 }
 
-static void realize(Function function, List seeds)
+static void realize(Function f, List seeds)
 {
-    if (function->count == 0)
+    if (f->count == 0)
     {
         return;
     }
 
-    function_sort_ranges(function);
+    function_sort_ranges(f);
 
     for (long long* p = seeds->items; p < seeds->items + seeds->count; p++)
     {
         long long input = *p;
-        struct Range* range = search(function, input);
+        struct Range* range = search(f, input);
         long long offset = range->sourceOffset;
 
         if (input >= offset && input < offset + range->length)
@@ -155,7 +150,7 @@ static void realize(Function function, List seeds)
         }
     }
 
-    function_clear_ranges(function);
+    function(f);
 }
 
 static bool read(Function function, char buffer[])
