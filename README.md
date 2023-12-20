@@ -62,9 +62,9 @@ day01a in.txt
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
-| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit vector, Bit matrix|
+| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit array, Bit matrix|
 | 14|[Parabolic Reflector Dish](src/day14.c)||Sum||
-| 15|[Lens Library](src/day15.c)|Cryptography, Hash functions, Dictionaries|Sum|Ordered dictionary|
+| 15|[Lens Library](src/day15.c)|Cryptography, Hash functions, Dictionaries|Sum|Ordered dictionary (linked hash map, separate chaining)|
 
 ## Constraints
 
@@ -77,8 +77,12 @@ the C99 standard.
 external dependencies beyond the C standard library (`libc`) and the C 
 mathematics library (`libm`). The first and second problems for a given day must 
 be implemented separately.
-- Dynamic memory allocation is prohibited (i.e., no calls to `malloc`, `calloc`,
-`realloc`, `aligned_alloc`, or `free`).
+- Dynamic memory allocation is discouraged. The following should be avoided:
+  - `malloc`
+  - `calloc`
+  - `realloc`
+  - `aligned_alloc`
+  - `free`
 - Bounds checking is not required for data structures whose capacity is defined
 by a macro.
 - The first and second problems for a given day may share the same data
@@ -88,6 +92,7 @@ remove from) the public API of the first.
 for those returned from the following:
   - `fclose` (when the mode is `"r"`)
   - `fprintf`
+  - `memcpy`
   - `printf`
 - Only the `main` entry point can do the following:
   - Write to the standard output stream (i.e., call `printf`)
