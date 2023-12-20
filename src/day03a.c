@@ -57,7 +57,7 @@ static void aggregate(String a, String b, long* sum, Validator validator)
     int offset = -1;
     int number = 0;
 
-    for (int i = 0; i < DIMENSION && (current = a[i]); i++)
+    for (int i = 0; i < DIMENSION && a[i]; i++)
     {
         if (isdigit(current))
         {

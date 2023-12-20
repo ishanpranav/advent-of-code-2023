@@ -45,21 +45,20 @@ int main(int count, String args[])
     {
         char tens = 0;
         char ones = 0;
-        char current;
 
-        for (char* p = buffer; (current = *p); p++)
+        for (char* p = buffer; *p; p++)
         {
-            if (!isdigit(current))
+            if (!isdigit(*p))
             {
                 continue;
             }
 
             if (!tens)
             {
-                tens = current;
+                tens = *p;
             }
 
-            ones = current;
+            ones = *p;
         }
 
         sum += (numeric(tens) * 10) + numeric(ones);

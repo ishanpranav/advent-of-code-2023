@@ -21,16 +21,15 @@ static bool read(FILE* stream, long long* result)
     }
 
     long long number = 0;
-    char current;
 
-    for (char* p = buffer; (current = *p); p++)
+    for (char* p = buffer; *p; p++)
     {
-        if (!isdigit(current))
+        if (!isdigit(*p))
         {
             continue;
         }
 
-        number = (number * 10) + (current - '0');
+        number = (number * 10) + (*p - '0');
     }
 
     *result = number;

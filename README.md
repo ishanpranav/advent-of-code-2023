@@ -62,9 +62,9 @@ day01a in.txt
 | 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
-| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit array, Bit matrix|
+| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit array, bit matrix|
 | 14|[Parabolic Reflector Dish](src/day14b.c)||Sum||
-| 15|[Lens Library](src/day15b.c)|Cryptography, Hash functions, Dictionaries|Sum|Ordered dictionary (linked hash map, separate chaining), String builder|
+| 15|[Lens Library](src/day15b.c)|Cryptography, Hash functions, Dictionaries|Sum|Iterable ordered dictionary, string builder|
 | 16|[The Floor Will Be Lava](src/day16b.c)||||
 
 ## Constraints

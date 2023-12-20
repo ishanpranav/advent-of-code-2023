@@ -60,14 +60,12 @@ static int scan_right(String value, int index)
 
     for (int j = index + 1; j < DIMENSION; j++)
     {
-        char current = value[j];
-
-        if (!isdigit(current))
+        if (!isdigit(value[j]))
         {
             break;
         }
 
-        number = (number * 10) + (current - '0');
+        number = (number * 10) + (value[j] - '0');
     }
 
     return number;
@@ -145,11 +143,9 @@ int window_lo_right(Window instance)
 
 static void aggregate(String hi, String mid, String lo, Case cases[], long* sum)
 {
-    char current;
-
-    for (int i = 0; i < DIMENSION && (current = mid[i]); i++)
+    for (int i = 0; i < DIMENSION && mid[i]; i++)
     {
-        if (current != '*')
+        if (mid[i] != '*')
         {
             continue;
         }

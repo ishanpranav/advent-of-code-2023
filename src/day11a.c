@@ -68,9 +68,7 @@ int main(int count, String args[])
 
     while (fgets(buffer, sizeof buffer, stream))
     {
-        char current;
-
-        for (int j = 0; (current = buffer[j]); j++)
+        for (int j = 0; buffer[j]; j++)
         {
             if (buffer[j] == '#')
             {

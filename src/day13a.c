@@ -99,11 +99,10 @@ int main(int count, String args[])
         }
 
         int j = 0;
-        char current;
 
-        while ((current = buffer[j]))
+        while (buffer[j])
         {
-            switch (current)
+            switch (buffer[j])
             {
                 case '#':
                     y[i] = (y[i] << 1) | 1;
