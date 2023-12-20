@@ -13,9 +13,22 @@
 
 struct OrderedDictionaryEntry
 {
+    struct OrderedDictionaryEntry* nextEntry;
     char key[KEY_CAPACITY];
     int value;
-    struct OrderedDictionaryEntry* next;
+};
+
+struct OrderedDictionaryBucket
+{
+    struct OrderedDictionaryEntry* firstEntry;
+    struct OrderedDictionaryBucket* nextBucket;
+    struct OrderedDictionaryBucket* previousBucket;
+};
+
+struct OrderedDictionary
+{
+    struct OrderedDictionaryBucket* firstBucket;
+    struct OrderedDictionaryBucket buckets[BUCKETS];
 };
 
 struct StringBuilder
@@ -25,19 +38,20 @@ struct StringBuilder
 };
 
 typedef char* String;
-typedef struct OrderedDictionaryEntry** OrderedDictionary;
 typedef struct OrderedDictionaryEntry* OrderedDictionaryEntry;
+typedef struct OrderedDictionaryBucket* OrderedDictionaryBucket;
+typedef struct OrderedDictionary* OrderedDictionary;
 typedef struct StringBuilder* StringBuilder;
 
 bool ordered_dictionary_set(
     OrderedDictionary instance,
     String key,
-    int bucket,
+    int hash,
     int value)
 {
     OrderedDictionaryEntry* p;
 
-    for (p = &instance[bucket]; *p; p = &(*p)->next)
+    for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
         if (strcmp(key, (*p)->key) == 0)
         {
@@ -56,6 +70,19 @@ bool ordered_dictionary_set(
         return false;
     }
 
+    if (!instance->buckets[hash].firstEntry)
+    {
+        OrderedDictionaryBucket first = instance->firstBucket;
+
+        instance->buckets[hash].nextBucket = first;
+        instance->firstBucket = instance->buckets + hash;
+
+        if (first)
+        {
+            first->previousBucket = instance->buckets + hash;
+        }
+    }
+
     memcpy(entry->key, key, KEY_CAPACITY);
 
     entry->value = value;
@@ -64,31 +91,49 @@ bool ordered_dictionary_set(
     return true;
 }
 
-void ordered_dictionary_remove(
-    OrderedDictionary instance,
-    String key,
-    int bucket)
+void ordered_dictionary_remove(OrderedDictionary instance, String key, int hash)
 {
     OrderedDictionaryEntry previous = NULL;
 
-    for (OrderedDictionaryEntry current = instance[bucket];
+    for (OrderedDictionaryEntry current = instance->buckets[hash].firstEntry;
         current;
-        current = current->next)
+        current = current->nextEntry)
     {
         if (strcmp(key, current->key) == 0)
         {
             if (previous)
             {
-                previous->next = current->next;
+                previous->nextEntry = current->nextEntry;
+            }
+            else if (current->nextEntry)
+            {
+                instance->buckets[hash].firstEntry = current->nextEntry;
             }
             else
             {
-                instance[bucket] = current->next;
+                if (instance->firstBucket == instance->buckets + hash)
+                {
+                    instance->firstBucket = instance->buckets[hash].nextBucket;
+                }
+
+                if (instance->buckets[hash].nextBucket)
+                {
+                    instance->buckets[hash].nextBucket->previousBucket =
+                        instance->buckets[hash].previousBucket;
+                }
+
+                if (instance->buckets[hash].previousBucket)
+                {
+                    instance->buckets[hash].previousBucket->nextBucket =
+                        instance->buckets[hash].nextBucket;
+                }
+
+                instance->buckets[hash].firstEntry = NULL;
             }
 
             free(current);
 
-            return;
+            break;
         }
 
         previous = current;
@@ -97,21 +142,25 @@ void ordered_dictionary_remove(
 
 void ordered_dictionary_clear(OrderedDictionary instance)
 {
-    for (int bucket = 0; bucket < BUCKETS; bucket++)
+    for (OrderedDictionaryBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
     {
-        OrderedDictionaryEntry current = instance[bucket];
+        OrderedDictionaryEntry entry = bucket->firstEntry;
 
-        while (current)
+        while (entry)
         {
-            OrderedDictionaryEntry next = current->next;
+            OrderedDictionaryEntry nextEntry = entry->nextEntry;
 
-            free(current);
+            free(entry);
 
-            current = next;
+            entry = nextEntry;
         }
 
-        instance[bucket] = NULL;
+        bucket->firstEntry = NULL;
     }
+
+    instance->firstBucket = NULL;
 }
 
 void string_builder(StringBuilder instance)
@@ -155,7 +204,7 @@ int main(int count, String args[])
     char current;
     char buffer[KEY_CAPACITY];
     struct StringBuilder keyBuilder;
-    OrderedDictionaryEntry dictionary[BUCKETS] = { 0 };
+    struct OrderedDictionary dictionary = { 0 };
     clock_t start = clock();
 
     string_builder(&keyBuilder);
@@ -181,7 +230,7 @@ int main(int count, String args[])
             {
                 String key = string_builder_to_string(&keyBuilder);
 
-                ordered_dictionary_remove(dictionary, key, hash);
+                ordered_dictionary_remove(&dictionary, key, hash);
             }
             continue;
 
@@ -191,7 +240,13 @@ int main(int count, String args[])
                 {
                     String key = string_builder_to_string(&keyBuilder);
 
-                    ordered_dictionary_set(dictionary, key, hash, value);
+                    if (!ordered_dictionary_set(&dictionary, key, hash, value))
+                    {
+                        fclose(stream);
+                        fprintf(stderr, "Error: Out of memory.\n");
+
+                        return 1;
+                    }
                 }
 
                 hash = 0;
@@ -211,27 +266,35 @@ int main(int count, String args[])
     {
         String key = string_builder_to_string(&keyBuilder);
 
-        ordered_dictionary_set(dictionary, key, hash, value);
+        if (!ordered_dictionary_set(&dictionary, key, hash, value))
+        {
+            fclose(stream);
+            fprintf(stderr, "Error: Out of memory.\n");
+
+            return 1;
+        }
     }
 
     long sum = 0;
 
-    for (int bucket = 0; bucket < BUCKETS; bucket++)
+    for (OrderedDictionaryBucket bucket = dictionary.firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
     {
         int slot = 1;
 
-        for (OrderedDictionaryEntry entry = dictionary[bucket];
+        for (OrderedDictionaryEntry entry = bucket->firstEntry;
             entry;
-            entry = entry->next)
+            entry = entry->nextEntry)
         {
-            sum += (bucket + 1) * slot * entry->value;
+            sum += (bucket - dictionary.buckets + 1) * slot * entry->value;
             slot++;
         }
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
     fclose(stream);
-    ordered_dictionary_clear(dictionary);
+    ordered_dictionary_clear(&dictionary);
 
     return 0;
 }

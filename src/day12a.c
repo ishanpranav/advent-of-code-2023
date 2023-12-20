@@ -35,6 +35,7 @@ struct SpringPattern
 
 typedef char* String;
 typedef char Spring;
+typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct Dictionary* Dictionary;
 typedef struct SpringPattern* SpringPattern;
 
@@ -54,7 +55,7 @@ void dictionary_increment(Dictionary instance, int key, int change)
 {
     if (instance->buckets[key].key == KEY_EMPTY)
     {
-        struct DictionaryEntry* first = instance->first;
+        DictionaryEntry first = instance->first;
 
         instance->first = instance->buckets + key;
         instance->buckets[key].next = first;
@@ -68,9 +69,9 @@ void dictionary_copy(Dictionary destination, Dictionary source)
 {
     dictionary(destination);
     
-    for (struct DictionaryEntry* p = source->first; p; p = p->next)
+    for (DictionaryEntry entry = source->first; entry; entry = entry->next)
     {
-        dictionary_increment(destination, p->key, p->value);
+        dictionary_increment(destination, entry->key, entry->value);
     }
 }
 
