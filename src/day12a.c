@@ -9,9 +9,6 @@
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
 #define PATTERN_BUFFER_CAPACITY 32
-#define SPRING_OPERATIONAL '.'
-#define SPRING_DAMAGED '#'
-#define SPRING_UNKNOWN '?'
 #define KEY_EMPTY -1
 
 struct DictionaryEntry
@@ -27,17 +24,16 @@ struct Dictionary
     struct DictionaryEntry buckets[PATTERN_BUFFER_CAPACITY];
 };
 
-struct SpringPattern
+struct Pattern
 {
     char* symbols;
     int length;
 };
 
 typedef char* String;
-typedef char Spring;
 typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct Dictionary* Dictionary;
-typedef struct SpringPattern* SpringPattern;
+typedef struct Pattern* Pattern;
 
 void dictionary(Dictionary instance)
 {
@@ -75,26 +71,26 @@ void dictionary_copy(Dictionary destination, Dictionary source)
     }
 }
 
-void spring_pattern(SpringPattern instance, Spring* symbols)
+void pattern(Pattern instance, char* symbols)
 {
     instance->length = 0;
     instance->symbols = symbols;
 }
 
-void spring_pattern_append2(SpringPattern instance, Spring symbol)
+void pattern_append(Pattern instance, char symbol)
 {
     instance->symbols[instance->length] = symbol;
     instance->length++;
 }
 
-void spring_pattern_append3(SpringPattern instance, Spring symbol, int count)
+void pattern_append_many(Pattern instance, char symbol, int count)
 {
     memset(instance->symbols + instance->length, symbol, count);
 
     instance->length += count;
 }
 
-static void read(Spring symbol, SpringPattern pattern, Dictionary current)
+static void read(char symbol, Pattern pattern, Dictionary current)
 {
     struct Dictionary view;
 
@@ -107,34 +103,34 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
 
         switch (symbol)
         {
-            case SPRING_UNKNOWN:
+            case '?':
                 if (state + 1 < pattern->length)
                 {
                     dictionary_increment(current, state + 1, p->value);
                 }
 
-                if (pattern->symbols[state] == SPRING_OPERATIONAL)
+                if (pattern->symbols[state] == '.')
                 {
                     dictionary_increment(current, state, p->value);
                 }
                 break;
 
-            case SPRING_OPERATIONAL:
+            case '.':
                 if (state + 1 < pattern->length &&
-                    pattern->symbols[state + 1] == SPRING_OPERATIONAL)
+                    pattern->symbols[state + 1] == '.')
                 {
                     dictionary_increment(current, state + 1, p->value);
                 }
 
-                if (pattern->symbols[state] == SPRING_OPERATIONAL)
+                if (pattern->symbols[state] == '.')
                 {
                     dictionary_increment(current, state, p->value);
                 }
                 break;
 
-            case SPRING_DAMAGED:
+            case '#':
                 if (state + 1 < pattern->length &&
-                    pattern->symbols[state + 1] == SPRING_DAMAGED)
+                    pattern->symbols[state + 1] == '#')
                 {
                     dictionary_increment(current, state + 1, p->value);
                 }
@@ -143,9 +139,9 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
     }
 }
 
-static void scan(SpringPattern text, SpringPattern pattern, Dictionary current)
+static void scan(Pattern text, Pattern pattern, Dictionary current)
 {
-    for (Spring* p = text->symbols; p < text->symbols + text->length; p++)
+    for (char* p = text->symbols; p < text->symbols + text->length; p++)
     {
         read(*p, pattern, current);
     }
@@ -185,33 +181,33 @@ int main(int count, String args[])
             return 1;
         }
 
-        Spring patternBuffer[PATTERN_BUFFER_CAPACITY];
+        char patternBuffer[PATTERN_BUFFER_CAPACITY];
         struct Dictionary current;
-        struct SpringPattern text =
+        struct Pattern text =
         {
             .symbols = buffer,
             .length = mid - buffer
         };
-        struct SpringPattern pattern;
+        struct Pattern shortPattern;
 
-        spring_pattern(&pattern, patternBuffer);
-        spring_pattern_append2(&pattern, SPRING_OPERATIONAL);
+        pattern(&shortPattern, patternBuffer);
+        pattern_append(&shortPattern, '.');
 
         for (String token = strtok(mid, DELIMITERS);
             token;
             token = strtok(NULL, DELIMITERS))
         {
-            spring_pattern_append3(&pattern, SPRING_DAMAGED, atoi(token));
-            spring_pattern_append2(&pattern, SPRING_OPERATIONAL);
+            pattern_append_many(&shortPattern, '#', atoi(token));
+            pattern_append(&shortPattern, '.');
         }
 
         dictionary(&current);
         dictionary_increment(&current, 0, 1);
-        scan(&text, &pattern, &current);
+        scan(&text, &shortPattern, &current);
 
         total +=
-            current.buckets[pattern.length - 1].value +
-            current.buckets[pattern.length - 2].value;
+            current.buckets[shortPattern.length - 1].value +
+            current.buckets[shortPattern.length - 2].value;
     }
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);

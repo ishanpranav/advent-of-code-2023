@@ -35,7 +35,7 @@ in a stack smashing, segmentation fault, or worse.
 ```sh
 gcc src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -pedantic
 
-./day01a in.txt
+./day01a < in.txt
 ```
 
 ### LLVM
@@ -43,7 +43,7 @@ gcc src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -pedantic
 ```sh
 clang src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -Wno-deprecated-declarations -pedantic
 
-day01a in.txt
+day01a < in.txt
 ```
 
 ## Summary

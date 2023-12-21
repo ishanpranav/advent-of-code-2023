@@ -29,8 +29,8 @@ struct Matrix
     char items[(DIMENSION - 1) * (DIMENSION - 1)];
 };
 
-typedef char* String;
 typedef char* Row;
+typedef char* String;
 typedef struct CoordinateList* CoordinateList;
 typedef struct Matrix* Matrix;
 
@@ -52,12 +52,12 @@ void coordinate_list_add(CoordinateList instance, struct Coordinate item)
     instance->count++;
 }
 
-void matrix(Matrix instance, int n)
+void matrix(Matrix instance, int columns)
 {
     coordinate_empty(&instance->origin);
 
     instance->rows = 0;
-    instance->columns = n;
+    instance->columns = columns;
 }
 
 char matrix_get(Matrix instance, struct Coordinate coordinate)

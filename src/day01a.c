@@ -7,8 +7,6 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 
-typedef char* String;
-
 static int numeric(char digit)
 {
     if (!digit)
@@ -19,29 +17,13 @@ static int numeric(char digit)
     return digit - '0';
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day01a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     long sum = 0;
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         char tens = 0;
         char ones = 0;
@@ -65,7 +47,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

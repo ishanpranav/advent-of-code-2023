@@ -28,17 +28,16 @@ struct Dictionary
     struct DictionaryEntry buckets[PATTERN_BUFFER_CAPACITY];
 };
 
-struct SpringPattern
+struct Pattern
 {
     char* symbols;
     int length;
 };
 
 typedef char* String;
-typedef char Spring;
 typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct Dictionary* Dictionary;
-typedef struct SpringPattern* SpringPattern;
+typedef struct Pattern* Pattern;
 
 void dictionary(Dictionary instance)
 {
@@ -76,26 +75,26 @@ void dictionary_copy(Dictionary destination, Dictionary source)
     }
 }
 
-void spring_pattern(SpringPattern instance, Spring* symbols)
+void pattern(Pattern instance, char* symbols)
 {
     instance->length = 0;
     instance->symbols = symbols;
 }
 
-void spring_pattern_append2(SpringPattern instance, Spring symbol)
+void pattern_append(Pattern instance, char symbol)
 {
     instance->symbols[instance->length] = symbol;
     instance->length++;
 }
 
-void spring_pattern_append3(SpringPattern instance, Spring symbol, int count)
+void pattern_append_many(Pattern instance, char symbol, int count)
 {
     memset(instance->symbols + instance->length, symbol, count);
 
     instance->length += count;
 }
 
-void spring_pattern_concat(SpringPattern instance, SpringPattern other)
+void pattern_concat(Pattern instance, Pattern other)
 {
     memcpy(
         instance->symbols + instance->length,
@@ -105,12 +104,12 @@ void spring_pattern_concat(SpringPattern instance, SpringPattern other)
     instance->length += other->length;
 }
 
-void spring_pattern_set(SpringPattern instance, int index, Spring item)
+void pattern_set(Pattern instance, int index, char item)
 {
     instance->symbols[index] = item;
 }
 
-static void read(Spring symbol, SpringPattern pattern, Dictionary current)
+static void read(char symbol, Pattern pattern, Dictionary current)
 {
     struct Dictionary view;
 
@@ -157,9 +156,9 @@ static void read(Spring symbol, SpringPattern pattern, Dictionary current)
     }
 }
 
-static void scan(SpringPattern text, SpringPattern pattern, Dictionary current)
+static void scan(Pattern text, Pattern pattern, Dictionary current)
 {
-    for (Spring* p = text->symbols; p < text->symbols + text->length; p++)
+    for (char* p = text->symbols; p < text->symbols + text->length; p++)
     {
         read(*p, pattern, current);
     }
@@ -199,32 +198,32 @@ int main(int count, String args[])
             return 1;
         }
 
-        Spring patternBuffer[PATTERN_BUFFER_CAPACITY];
-        Spring shortPatternBuffer[SHORT_PATTERN_BUFFER_CAPACITY];
+        char patternBuffer[PATTERN_BUFFER_CAPACITY];
+        char shortPatternBuffer[SHORT_PATTERN_BUFFER_CAPACITY];
         struct Dictionary current;
-        struct SpringPattern text =
+        struct Pattern text =
         {
             .symbols = buffer,
             .length = mid - buffer
         };
-        struct SpringPattern pattern;
-        struct SpringPattern shortPattern;
+        struct Pattern longPattern;
+        struct Pattern shortPattern;
 
-        spring_pattern(&pattern, patternBuffer);
-        spring_pattern(&shortPattern, shortPatternBuffer);
-        spring_pattern_append2(&pattern, SPRING_OPERATIONAL);
+        pattern(&longPattern, patternBuffer);
+        pattern(&shortPattern, shortPatternBuffer);
+        pattern_append(&longPattern, SPRING_OPERATIONAL);
 
         for (String token = strtok(mid, DELIMITERS);
             token;
             token = strtok(NULL, DELIMITERS))
         {
-            spring_pattern_append3(&shortPattern, SPRING_DAMAGED, atoi(token));
-            spring_pattern_append2(&shortPattern, SPRING_OPERATIONAL);
+            pattern_append_many(&shortPattern, SPRING_DAMAGED, atoi(token));
+            pattern_append(&shortPattern, SPRING_OPERATIONAL);
         }
 
         for (int i = 0; i < 5; i++)
         {
-            spring_pattern_concat(&pattern, &shortPattern);
+            pattern_concat(&longPattern, &shortPattern);
         }
 
         dictionary(&current);
@@ -232,15 +231,15 @@ int main(int count, String args[])
 
         for (int i = 0; i < 4; i++)
         {
-            scan(&text, &pattern, &current);
-            read(SPRING_UNKNOWN, &pattern, &current);
+            scan(&text, &longPattern, &current);
+            read(SPRING_UNKNOWN, &longPattern, &current);
         }
 
-        scan(&text, &pattern, &current);
+        scan(&text, &longPattern, &current);
         
         total +=
-            current.buckets[pattern.length - 1].value +
-            current.buckets[pattern.length - 2].value;
+            current.buckets[longPattern.length - 1].value +
+            current.buckets[longPattern.length - 2].value;
     }
 
     printf("%lld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
