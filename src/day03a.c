@@ -10,22 +10,31 @@
 #include <time.h>
 #define DIMENSION 141
 
+struct View
+{
+    char* a;
+    char* b;
+    int index;
+    int offset;
+};
+
 typedef char* String;
-typedef bool (*Validator)(String a, String b, int index, int offset);
+typedef struct View* View;
+typedef bool (*Validator)(struct View* view);
 
 static bool check(char value)
 {
     return value != '.' && value != '\n' && value;
 }
 
-static bool realize_x(String a, String b, int index, int offset)
+static bool realize_x(View view)
 {
-    if (index < DIMENSION && check(a[index]))
+    if (view->index < DIMENSION && check(view->a[view->index]))
     {
         return true;
     }
 
-    if (offset - 1 >= 0 && check(a[offset - 1]))
+    if (view->offset - 1 >= 0 && check(view->a[view->offset - 1]))
     {
         return true;
     }
@@ -33,11 +42,11 @@ static bool realize_x(String a, String b, int index, int offset)
     return false;
 }
 
-static bool realize_y(String a, String b, int index, int offset)
+static bool realize_y(View view)
 {
-    for (int i = offset - 1; i <= index; i++)
+    for (int i = view->offset - 1; i <= view->index; i++)
     {
-        if (check(b[i]))
+        if (check(view->b[i]))
         {
             return true;
         }
@@ -46,41 +55,49 @@ static bool realize_y(String a, String b, int index, int offset)
     return false;
 }
 
-static bool realize_xy(String a, String b, int index, int offset)
+static bool realize_xy(View view)
 {
-    return realize_x(a, b, index, offset) || realize_y(a, b, index, offset);
+    return realize_x(view) || realize_y(view);
 }
 
 static void aggregate(String a, String b, long* sum, Validator validator)
 {
-    char current;
-    int offset = -1;
     int number = 0;
-
-    for (int i = 0; i < DIMENSION && a[i]; i++)
+    struct View view =
     {
-        if (isdigit(current))
+        .a = a,
+        .b = b,
+        .offset = -1
+    };
+
+    while (view.index < DIMENSION && a[view.index])
+    {
+        if (isdigit(a[view.index]))
         {
-            if (offset == -1)
+            if (view.offset == -1)
             {
-                offset = i;
+                view.offset = view.index;
             }
 
-            number = (number * 10) + (current - '0');
+            number = (number * 10) + (a[view.index] - '0');
+            view.index++;
 
             continue;
         }
 
-        if (number && validator(a, b, i, offset))
+        if (number && validator(&view))
         {
             *sum += number;
         }
 
-        offset = -1;
-        number = 0;
+        number = 0; 
+        view.offset = -1;
+        view.index++;
     }
 
-    if (number && validator(a, b, DIMENSION - 1, offset))
+    view.index = DIMENSION - 1;
+
+    if (number && validator(&view))
     {
         *sum += number;
     }
