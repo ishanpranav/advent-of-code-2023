@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#define DIMENSION 141
+#define DIMENSION 101
 
 struct Matrix
 {
