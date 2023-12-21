@@ -181,24 +181,8 @@ String string_builder_to_string(StringBuilder instance)
     return instance->buffer;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day15b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     int hash = 0;
     int value = 0;
     char current;
@@ -211,7 +195,7 @@ int main(int count, String args[])
 
     keyBuilder.buffer = buffer;
 
-    while ((current = getc(stream)) != EOF)
+    while ((current = getc(stdin)) != EOF)
     {
         if (isdigit(current))
         {
@@ -242,7 +226,6 @@ int main(int count, String args[])
 
                     if (!ordered_dictionary_set(&dictionary, key, hash, value))
                     {
-                        fclose(stream);
                         fprintf(stderr, "Error: Out of memory.\n");
 
                         return 1;
@@ -268,7 +251,6 @@ int main(int count, String args[])
 
         if (!ordered_dictionary_set(&dictionary, key, hash, value))
         {
-            fclose(stream);
             fprintf(stderr, "Error: Out of memory.\n");
 
             return 1;
@@ -293,7 +275,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
     ordered_dictionary_clear(&dictionary);
 
     return 0;

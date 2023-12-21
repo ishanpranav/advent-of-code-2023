@@ -15,12 +15,6 @@ struct Coordinate
     int j;
 };
 
-struct CoordinateList
-{
-    struct Coordinate items[COORDINATE_LIST_CAPACITY];
-    int count;
-};
-
 struct Matrix
 {
     struct Coordinate origin;
@@ -29,27 +23,20 @@ struct Matrix
     char items[(DIMENSION - 1) * (DIMENSION - 1)];
 };
 
+struct Polygon
+{
+    struct Coordinate items[COORDINATE_LIST_CAPACITY];
+    int count;
+};
+
 typedef char* Row;
-typedef char* String;
-typedef struct CoordinateList* CoordinateList;
 typedef struct Matrix* Matrix;
+typedef struct Polygon* Polygon;
 
 void coordinate_empty(struct Coordinate* result)
 {
     result->i = -1;
     result->j = -1;
-}
-
-void coordinate_list(CoordinateList instance, struct Coordinate item)
-{
-    instance->items[0] = item;
-    instance->count = 1;
-}
-
-void coordinate_list_add(CoordinateList instance, struct Coordinate item)
-{
-    instance->items[instance->count] = item;
-    instance->count++;
 }
 
 void matrix(Matrix instance, int columns)
@@ -77,6 +64,18 @@ Row matrix_new_row(Matrix instance)
     instance->rows = m + 1;
 
     return instance->items + (instance->columns * m);
+}
+
+void polygon(Polygon instance, struct Coordinate item)
+{
+    instance->items[0] = item;
+    instance->count = 1;
+}
+
+void polygon_add(Polygon instance, struct Coordinate item)
+{
+    instance->items[instance->count] = item;
+    instance->count++;
 }
 
 static bool scan_hi(
@@ -202,7 +201,7 @@ static bool scan(
     }
 }
 
-int math_shoelace_formula_area(CoordinateList polygon)
+int math_shoelace_formula_area(Polygon polygon)
 {
     int result = 0;
     int lastIndex = polygon->count - 1;
@@ -226,30 +225,13 @@ int math_pick_theorem_i(int a, int b)
     return a - (b / 2) + 1;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day10b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream))
+    if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -259,7 +241,6 @@ int main(int count, String args[])
 
     if (n < 1)
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -281,21 +262,20 @@ int main(int count, String args[])
             a.origin.j = token - buffer;
         }
     }
-    while (fgets(buffer, n + 2, stream));
+    while (fgets(buffer, n + 2, stdin));
 
     if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
     }
 
-    struct CoordinateList path;
+    struct Polygon path;
     struct Coordinate current = a.origin;
     struct Coordinate previous;
 
-    coordinate_list(&path, a.origin);
+    polygon(&path, a.origin);
     coordinate_empty(&previous);
 
     if (!scan_hi(&a, &previous, current) &&
@@ -303,7 +283,6 @@ int main(int count, String args[])
         !scan_left(&a, &previous, current) &&
         !scan_right(&a, &previous, current))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -311,7 +290,7 @@ int main(int count, String args[])
 
     while (previous.i >= 0 && previous.j >= 0)
     {
-        coordinate_list_add(&path, current);
+        polygon_add(&path, current);
 
         current = previous;
 
@@ -328,7 +307,6 @@ int main(int count, String args[])
         path.count);
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

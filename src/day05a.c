@@ -187,30 +187,13 @@ static bool read(Function function, char buffer[])
     return true;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day05a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
+    if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -228,7 +211,7 @@ int main(int count, String args[])
         list_add(&seeds, atoll(token));
     }
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         if (buffer[0] == '\n')
         {
@@ -260,5 +243,4 @@ int main(int count, String args[])
     }
 
     printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 }

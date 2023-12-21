@@ -16,7 +16,6 @@ struct DecimalSet
     bool set[DECIMAL_SET_CAPACITY];
 };
 
-typedef char* String;
 typedef struct DecimalSet* DecimalSet;
 
 static int decimal_set_index(char tens, char ones)
@@ -41,35 +40,18 @@ bool decimal_set_contains(DecimalSet instance, char tens, char ones)
     return instance->set[decimal_set_index(tens, ones)];
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day04a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     long sum = 0;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         char* begin = strchr(buffer, ':');
 
         if (!begin)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -83,7 +65,6 @@ int main(int count, String args[])
 
         if (!mid)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -119,7 +100,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

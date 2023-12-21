@@ -147,35 +147,18 @@ static void scan(Pattern text, Pattern pattern, Dictionary current)
     }
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day12a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     int total = 0;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         char* mid = strchr(buffer, ' ');
 
         if (!mid)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -211,7 +194,6 @@ int main(int count, String args[])
     }
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

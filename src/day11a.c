@@ -7,8 +7,6 @@
 #define DIMENSION 141
 #define SCALE 2
 
-typedef char* String;
-
 static long scan(long vector[], int max, int galaxies)
 {
     int i = 1;
@@ -37,24 +35,8 @@ static long scan(long vector[], int max, int galaxies)
     return result;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day11a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     int n = 0;
     int galaxies = 0;
     int minI = DIMENSION;
@@ -66,7 +48,7 @@ int main(int count, String args[])
     char buffer[DIMENSION + 1];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         for (int j = 0; buffer[j]; j++)
         {
@@ -105,5 +87,4 @@ int main(int count, String args[])
         scan(x + minJ, maxJ - minJ, galaxies);
 
     printf("%ld : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 }

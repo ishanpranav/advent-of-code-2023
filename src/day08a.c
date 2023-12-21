@@ -26,7 +26,6 @@ struct Graph
     struct VertexPair vertices[VERTEX_LAST + 1];
 };
 
-typedef char* String;
 typedef int Vertex;
 typedef char Direction;
 typedef struct Graph* Graph;
@@ -123,32 +122,14 @@ static bool stop(Vertex vertex)
     return vertex == VERTEX_LAST;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day08a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     struct Graph graph;
     Direction directions[DIRECTIONS_CAPACITY];
     clock_t start = clock();
 
-    if (!fgets(directions, sizeof directions, stream) ||
-        !read(stream, &graph))
+    if (!fgets(directions, sizeof directions, stdin) || !read(stdin, &graph))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -157,7 +138,6 @@ int main(int count, String args[])
     int result = graph_walk(&graph, VERTEX_FIRST, directions, stop);
 
     printf("%d : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

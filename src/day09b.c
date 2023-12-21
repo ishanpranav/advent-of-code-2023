@@ -65,35 +65,18 @@ long series_lagrange_previous(Series instance)
     return series_lagrange_extrapolate(instance, -1);
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day09b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     long sum = 0;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         String token = strtok(buffer, DELIMITERS);
 
         if (!token)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -113,7 +96,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

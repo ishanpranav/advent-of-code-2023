@@ -80,29 +80,13 @@ static int parse(String value)
     return 0;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day01b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     long sum = 0;
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         int tens = 0;
         int ones = 0;
@@ -128,7 +112,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

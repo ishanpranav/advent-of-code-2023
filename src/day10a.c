@@ -60,8 +60,8 @@ Row matrix_new_row(Matrix instance)
 }
 
 static bool scan_hi(
-    Matrix matrix, 
-    struct Coordinate* previous, 
+    Matrix matrix,
+    struct Coordinate* previous,
     struct Coordinate current)
 {
     current.i--;
@@ -82,8 +82,8 @@ static bool scan_hi(
 }
 
 static bool scan_lo(
-    Matrix matrix, 
-    struct Coordinate* previous, 
+    Matrix matrix,
+    struct Coordinate* previous,
     struct Coordinate current)
 {
     current.i++;
@@ -104,8 +104,8 @@ static bool scan_lo(
 }
 
 static bool scan_left(
-    Matrix matrix, 
-    struct Coordinate* previous, 
+    Matrix matrix,
+    struct Coordinate* previous,
     struct Coordinate current)
 {
     current.j--;
@@ -126,8 +126,8 @@ static bool scan_left(
 }
 
 static bool scan_right(
-    Matrix matrix, 
-    struct Coordinate* previous, 
+    Matrix matrix,
+    struct Coordinate* previous,
     struct Coordinate current)
 {
     current.j++;
@@ -148,8 +148,8 @@ static bool scan_right(
 }
 
 static bool scan(
-    Matrix matrix, 
-    struct Coordinate* previous, 
+    Matrix matrix,
+    struct Coordinate* previous,
     struct Coordinate current)
 {
     switch (matrix_get(matrix, current))
@@ -182,30 +182,13 @@ static bool scan(
     }
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day10a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream))
+    if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -215,7 +198,6 @@ int main(int count, String args[])
 
     if (n < 1)
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -233,15 +215,14 @@ int main(int count, String args[])
 
         if (token)
         {
-            a.origin.i = a.rows - 1,
+            a.origin.i = a.rows - 1;
             a.origin.j = token - buffer;
         }
     }
-    while (fgets(buffer, n + 2, stream));
+    while (fgets(buffer, n + 2, stdin));
 
     if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -257,7 +238,6 @@ int main(int count, String args[])
         !scan_left(&a, &previous, current) &&
         !scan_right(&a, &previous, current))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -281,7 +261,6 @@ int main(int count, String args[])
     total /= 2;
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

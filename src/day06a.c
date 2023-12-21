@@ -19,31 +19,14 @@ struct Point
 
 typedef char* String;
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day06a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     String token;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
+    if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -58,9 +41,8 @@ int main(int count, String args[])
         pointCount++;
     }
 
-    if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
+    if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -72,7 +54,6 @@ int main(int count, String args[])
 
         if (!token)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -94,7 +75,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", product, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

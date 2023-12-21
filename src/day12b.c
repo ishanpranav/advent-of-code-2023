@@ -11,9 +11,6 @@
 #define KEY_EMPTY -1
 #define PATTERN_BUFFER_CAPACITY 256
 #define SHORT_PATTERN_BUFFER_CAPACITY 32
-#define SPRING_OPERATIONAL '.'
-#define SPRING_DAMAGED '#'
-#define SPRING_UNKNOWN '?'
 
 struct DictionaryEntry
 {
@@ -120,34 +117,34 @@ static void read(char symbol, Pattern pattern, Dictionary current)
     {
         switch (symbol)
         {
-            case SPRING_UNKNOWN:
+            case '?':
                 if (entry->key + 1 < pattern->length)
                 {
                     dictionary_increment(current, entry->key + 1, entry->value);
                 }
 
-                if (pattern->symbols[entry->key] == SPRING_OPERATIONAL)
+                if (pattern->symbols[entry->key] == '.')
                 {
                     dictionary_increment(current, entry->key, entry->value);
                 }
                 break;
 
-            case SPRING_OPERATIONAL:
+            case '.':
                 if (entry->key + 1 < pattern->length &&
-                    pattern->symbols[entry->key + 1] == SPRING_OPERATIONAL)
+                    pattern->symbols[entry->key + 1] == '.')
                 {
                     dictionary_increment(current, entry->key + 1, entry->value);
                 }
 
-                if (pattern->symbols[entry->key] == SPRING_OPERATIONAL)
+                if (pattern->symbols[entry->key] == '.')
                 {
                     dictionary_increment(current, entry->key, entry->value);
                 }
                 break;
 
-            case SPRING_DAMAGED:
+            case '#':
                 if (entry->key + 1 < pattern->length &&
-                    pattern->symbols[entry->key + 1] == SPRING_DAMAGED)
+                    pattern->symbols[entry->key + 1] == '#')
                 {
                     dictionary_increment(current, entry->key + 1, entry->value);
                 }
@@ -164,35 +161,18 @@ static void scan(Pattern text, Pattern pattern, Dictionary current)
     }
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day12b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     long long total = 0;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         char* mid = strchr(buffer, ' ');
 
         if (!mid)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -211,14 +191,14 @@ int main(int count, String args[])
 
         pattern(&longPattern, patternBuffer);
         pattern(&shortPattern, shortPatternBuffer);
-        pattern_append(&longPattern, SPRING_OPERATIONAL);
+        pattern_append(&longPattern, '.');
 
         for (String token = strtok(mid, DELIMITERS);
             token;
             token = strtok(NULL, DELIMITERS))
         {
-            pattern_append_many(&shortPattern, SPRING_DAMAGED, atoi(token));
-            pattern_append(&shortPattern, SPRING_OPERATIONAL);
+            pattern_append_many(&shortPattern, '#', atoi(token));
+            pattern_append(&shortPattern, '.');
         }
 
         for (int i = 0; i < 5; i++)
@@ -232,7 +212,7 @@ int main(int count, String args[])
         for (int i = 0; i < 4; i++)
         {
             scan(&text, &longPattern, &current);
-            read(SPRING_UNKNOWN, &longPattern, &current);
+            read('?', &longPattern, &current);
         }
 
         scan(&text, &longPattern, &current);
@@ -243,7 +223,6 @@ int main(int count, String args[])
     }
 
     printf("%lld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

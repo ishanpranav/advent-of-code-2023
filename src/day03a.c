@@ -103,30 +103,13 @@ static void aggregate(String a, String b, long* sum, Validator validator)
     }
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day03a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char hi[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
-    if (!fgets(hi, sizeof hi, stream))
+    if (!fgets(hi, sizeof hi, stdin))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -135,7 +118,7 @@ int main(int count, String args[])
     long sum = 0;
     char lo[DIMENSION + 1] = { 0 };
 
-    while (fgets(lo, sizeof lo, stream))
+    while (fgets(lo, sizeof lo, stdin))
     {
         aggregate(hi, lo, &sum, realize_xy);
         aggregate(lo, hi, &sum, realize_y);
@@ -144,7 +127,6 @@ int main(int count, String args[])
 
     aggregate(lo, hi, &sum, realize_x);
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 256
+#define DELIMITERS ";, "
 
 enum PossibleResult
 {
@@ -47,37 +48,19 @@ static PossibleResult possible(char token, int number)
     return POSSIBLE_RESULT_POSSIBLE;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day02a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     long sum = 0;
     long game = 1;
-    String delimiters = ";, ";
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         char* start = strchr(buffer, ':');
 
-        if (!start || !strtok(start, delimiters))
+        if (!start || !strtok(start, DELIMITERS))
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -87,7 +70,7 @@ int main(int count, String args[])
         int lastNumber = 0;
         PossibleResult lastPossibleResult = POSSIBLE_RESULT_POSSIBLE;
 
-        while ((token = strtok(NULL, delimiters)))
+        while ((token = strtok(NULL, DELIMITERS)))
         {
             if (!lastNumber)
             {
@@ -107,7 +90,6 @@ int main(int count, String args[])
 
         if (lastPossibleResult == POSSIBLE_RESULT_FORMAT_EXCEPTION)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -122,7 +104,6 @@ int main(int count, String args[])
     }
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

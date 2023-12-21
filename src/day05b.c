@@ -92,6 +92,26 @@ int range_compare(Object left, Object right)
     return 0;
 }
 
+long long math_min(long long a, long long b)
+{
+    if (a < b)
+    {
+        return a;
+    }
+
+    return b;
+}
+
+long long math_max(long long a, long long b)
+{
+    if (a > b)
+    {
+        return a;
+    }
+
+    return b;
+}
+
 void function(Function instance)
 {
     instance->count = 0;
@@ -188,26 +208,6 @@ void function_fill_ranges(Function instance)
     }
 }
 
-long long math_min(long long a, long long b)
-{
-    if (a < b)
-    {
-        return a;
-    }
-
-    return b;
-}
-
-long long math_max(long long a, long long b)
-{
-    if (a > b)
-    {
-        return a;
-    }
-
-    return b;
-}
-
 void function_compose(Function instance, Function other)
 {
     struct Range view[RANGES_CAPACITY];
@@ -292,30 +292,13 @@ static bool read(Function function, char buffer[])
     return true;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day05b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
-    if (!fgets(buffer, sizeof buffer, stream) || !strtok(buffer, DELIMITERS))
+    if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -334,7 +317,6 @@ int main(int count, String args[])
 
         if (!token)
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -355,7 +337,7 @@ int main(int count, String args[])
     function(&current);
     function(&composite);
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         if (buffer[0] == '\n')
         {
@@ -388,7 +370,6 @@ int main(int count, String args[])
 
         if (!read(&current, buffer))
         {
-            fclose(stream);
             fprintf(stderr, "Error: Format.\n");
 
             return 1;
@@ -397,7 +378,6 @@ int main(int count, String args[])
 
     if (!composite.count)
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -442,5 +422,4 @@ int main(int count, String args[])
     }
 
     printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 }

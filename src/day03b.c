@@ -198,33 +198,15 @@ static void aggregate(String hi, String mid, String lo, Case cases[], long* sum)
     }
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day03b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     char hi[DIMENSION + 1] = { 0 };
     char mid[DIMENSION + 1] = { 0 };
     char lo[DIMENSION + 1] = { 0 };
     clock_t start = clock();
 
-    if (!fgets(mid, sizeof mid, stream) ||
-        !fgets(lo, sizeof lo, stream))
+    if (!fgets(mid, sizeof mid, stdin) || !fgets(lo, sizeof lo, stdin))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -249,12 +231,11 @@ int main(int count, String args[])
         memcpy(hi, mid, sizeof hi);
         memcpy(mid, lo, sizeof mid);
     }
-    while (fgets(lo, sizeof lo, stream));
+    while (fgets(lo, sizeof lo, stdin));
 
     memset(lo, 0, sizeof lo);
     aggregate(hi, mid, lo, cases, &sum);
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

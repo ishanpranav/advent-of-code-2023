@@ -33,12 +33,29 @@ struct List
     int count;
 };
 
-typedef char* String;
 typedef int Vertex;
 typedef char Direction;
 typedef struct Graph* Graph;
 typedef struct List* List;
 typedef bool (*Predicate)(Vertex vertex);
+
+long long math_gcd(long long a, long long b)
+{
+    while (b > 0)
+    {
+        long long r = a % b;
+
+        a = b;
+        b = r;
+    }
+
+    return a;
+}
+
+long long math_lcm(long long a, long long b)
+{
+    return (a / math_gcd(a, b)) * b;
+}
 
 void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
 {
@@ -89,24 +106,6 @@ void list_add(List instance, Vertex item)
     instance->count++;
 }
 
-long long math_gcd(long long a, long long b)
-{
-    while (b > 0)
-    {
-        long long r = a % b;
-
-        a = b;
-        b = r;
-    }
-
-    return a;
-}
-
-long long math_lcm(long long a, long long b)
-{
-    return (a / math_gcd(a, b)) * b;
-}
-
 static bool parse(char buffer[], char window[], Vertex* result)
 {
     memcpy(window, buffer, 3);
@@ -125,7 +124,7 @@ static bool parse(char buffer[], char window[], Vertex* result)
     return true;
 }
 
-static bool read(FILE* stream, Graph graph, List starts)
+static bool scan(FILE* stream, Graph graph, List starts)
 {
     char buffer[BUFFER_SIZE];
 
@@ -165,24 +164,8 @@ static bool stop(Vertex vertex)
     return vertex % 36 == VERTEX_STOP_MOD;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day08b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     struct Graph graph;
     struct List starts;
     Direction directions[DIRECTIONS_CAPACITY];
@@ -190,10 +173,9 @@ int main(int count, String args[])
 
     list(&starts);
 
-    if (!fgets(directions, sizeof directions, stream) ||
-        !read(stream, &graph, &starts))
+    if (!fgets(directions, sizeof directions, stdin) ||
+        !scan(stdin, &graph, &starts))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -208,7 +190,6 @@ int main(int count, String args[])
     }
 
     printf("%lld : %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

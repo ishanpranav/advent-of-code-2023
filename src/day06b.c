@@ -9,8 +9,6 @@
 #include <time.h>
 #define BUFFER_SIZE 64
 
-typedef char* String;
-
 static bool read(FILE* stream, long long* result)
 {
     char buffer[BUFFER_SIZE];
@@ -37,31 +35,14 @@ static bool read(FILE* stream, long long* result)
     return true;
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day06b <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     long long t;
     long long dx;
     clock_t start = clock();
 
-    if (!read(stream, &t) || !read(stream, &dx))
+    if (!read(stdin, &t) || !read(stdin, &dx))
     {
-        fclose(stream);
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
@@ -72,7 +53,6 @@ int main(int count, String args[])
         - 1;
 
     printf("%lld : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

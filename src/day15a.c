@@ -5,32 +5,14 @@
 #include <stdio.h>
 #include <time.h>
 
-typedef char* String;
-
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day15a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     long sum = 0;
     int hash = 0;
     char current;
     clock_t start = clock();
 
-    while ((current = getc(stream)) != EOF)
+    while ((current = getc(stdin)) != EOF)
     {
         switch (current)
         {
@@ -47,7 +29,6 @@ int main(int count, String args[])
     sum += hash;
 
     printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

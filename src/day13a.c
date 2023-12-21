@@ -8,7 +8,6 @@
 #include <time.h>
 #define DIMENSION 32
 
-typedef char* String;
 typedef unsigned long BitVector;
 typedef unsigned long* BitMatrix;
 
@@ -61,24 +60,8 @@ static int realize_xy(BitMatrix x, BitMatrix y)
     return realize(x);
 }
 
-int main(int count, String args[])
+int main()
 {
-    if (count != 2)
-    {
-        printf("Usage: day13a <path>\n");
-
-        return 1;
-    }
-
-    FILE* stream = fopen(args[1], "r");
-
-    if (!stream)
-    {
-        fprintf(stderr, "Error: I/O.\n");
-
-        return 1;
-    }
-
     int i = 0;
     int total = 0;
     BitVector x[DIMENSION] = { 0 };
@@ -86,7 +69,7 @@ int main(int count, String args[])
     char buffer[DIMENSION + 2];
     clock_t start = clock();
 
-    while (fgets(buffer, sizeof buffer, stream))
+    while (fgets(buffer, sizeof buffer, stdin))
     {
         if (buffer[0] == '\n')
         {
@@ -124,7 +107,6 @@ int main(int count, String args[])
     total += realize_xy(x, y);
 
     printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    fclose(stream);
 
     return 0;
 }

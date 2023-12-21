@@ -91,7 +91,6 @@ structures and algorithms, but the second problem may only add to (and never
 remove from) the public API of the first.
 - The return values of all C standard library functions must be checked, except
 for those returned from the following:
-  - `fclose` (when the mode is `"r"`)
   - `fprintf`
   - `memcpy`
   - `printf`
