@@ -20,39 +20,39 @@ all: \
 	day15a day15b \
 	day16a day16b
 
-test: all
-	./day01a.o < alt01.txt > out.txt
-	./day01b.o < alt01.txt >> out.txt
-	./day02a.o < alt02.txt >> out.txt
-	./day02b.o < alt02.txt >> out.txt
-	./day03a.o < alt03.txt >> out.txt
-	./day03b.o < alt03.txt >> out.txt
-	./day04a.o < alt04.txt >> out.txt
-	./day04b.o < alt04.txt >> out.txt
-	./day05a.o < alt05.txt >> out.txt
-	./day05b.o < alt05.txt >> out.txt
-	./day06a.o < alt06.txt >> out.txt
-	./day06b.o < alt06.txt >> out.txt
-	./day07a.o < alt07.txt >> out.txt
-	./day07b.o < alt07.txt >> out.txt
-	./day08a.o < alt08.txt >> out.txt
-	./day08b.o < alt08.txt >> out.txt
-	./day09a.o < alt09.txt >> out.txt
-	./day09b.o < alt09.txt >> out.txt
-	./day10a.o < alt10.txt >> out.txt
-	./day10b.o < alt10.txt >> out.txt
-	./day11a.o < alt11.txt >> out.txt
-	./day11b.o < alt11.txt >> out.txt
-	./day12a.o < alt12.txt >> out.txt
-	./day12b.o < alt12.txt >> out.txt
-	./day13a.o < alt13.txt >> out.txt
-	./day13b.o < alt13.txt >> out.txt
-	./day14a.o < alt14.txt >> out.txt
-	./day14b.o < alt14.txt >> out.txt
-	./day15a.o < alt15.txt >> out.txt
-	./day15b.o < alt15.txt >> out.txt
-	./day16a.o < alt16.txt >> out.txt
-	./day16b.o < alt16.txt >> out.txt
+test:
+	cat alt01.txt | ./day01a.o > out.txt
+	cat alt01.txt | ./day01b.o >> out.txt
+	cat alt02.txt | ./day02a.o >> out.txt
+	cat alt02.txt | ./day02b.o >> out.txt
+	cat alt03.txt | ./day03a.o >> out.txt
+	cat alt03.txt | ./day03b.o >> out.txt
+	cat alt04.txt | ./day04a.o >> out.txt
+	cat alt04.txt | ./day04b.o >> out.txt
+	cat alt05.txt | ./day05a.o >> out.txt
+	cat alt05.txt | ./day05b.o >> out.txt
+	cat alt06.txt | ./day06a.o >> out.txt
+	cat alt06.txt | ./day06b.o >> out.txt
+	cat alt07.txt | ./day07a.o >> out.txt
+	cat alt07.txt | ./day07b.o >> out.txt
+	cat alt08.txt | ./day08a.o >> out.txt
+	cat alt08.txt | ./day08b.o >> out.txt
+	cat alt09.txt | ./day09a.o >> out.txt
+	cat alt09.txt | ./day09b.o >> out.txt
+	cat alt10.txt | ./day10a.o >> out.txt
+	cat alt10.txt | ./day10b.o >> out.txt
+	cat alt11.txt | ./day11a.o >> out.txt
+	cat alt11.txt | ./day11b.o >> out.txt
+	cat alt12.txt | ./day12a.o >> out.txt
+	cat alt12.txt | ./day12b.o >> out.txt
+	cat alt13.txt | ./day13a.o >> out.txt
+	cat alt13.txt | ./day13b.o >> out.txt
+	cat alt14.txt | ./day14a.o >> out.txt
+	cat alt14.txt | ./day14b.o >> out.txt
+	cat alt15.txt | ./day15a.o >> out.txt
+	cat alt15.txt | ./day15b.o >> out.txt
+	cat alt16.txt | ./day16a.o >> out.txt
+	cat alt16.txt | ./day16b.o >> out.txt
 	cat out.txt
 	
 day01a: src/day01a.c

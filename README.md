@@ -30,15 +30,15 @@ allocation, all buffers have fixed sizes. Ensure that all buffers (see `#define`
 statements) have sufficient capacity before running. Not doing so could result
 in a stack smashing, segmentation fault, or worse.
 
-### GCC
+### GCC on Linux
 
 ```sh
 gcc src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -pedantic
 
-./day01a < in.txt
+cat in.txt | ./day01a
 ```
 
-### LLVM
+### LLVM on Windows
 
 ```sh
 clang src/day01a.c -o day01a -std=c99 -O2 -lm -Wall -Wextra -Wno-deprecated-declarations -pedantic
