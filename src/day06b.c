@@ -52,7 +52,7 @@ int main()
         - floor((t - sqrt(t * t - 4 * dx)) / 2)
         - 1;
 
-    printf("%lld : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("06b %lld %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

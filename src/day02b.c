@@ -74,7 +74,7 @@ int main()
         sum += r * g * b;
     }
 
-    printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("02b %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

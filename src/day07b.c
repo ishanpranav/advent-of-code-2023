@@ -270,7 +270,7 @@ int main()
         sum += (players.count - i) * players.items[i].bid;
     }
 
-    printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("07b %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

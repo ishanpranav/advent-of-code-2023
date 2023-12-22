@@ -123,7 +123,7 @@ int main()
 
     long total = scan(&a);
 
-    printf("%ld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("14a %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

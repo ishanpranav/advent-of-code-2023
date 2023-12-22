@@ -307,7 +307,7 @@ int main()
         math_shoelace_formula_area(&path),
         path.count);
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("10b %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

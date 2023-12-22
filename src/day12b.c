@@ -222,7 +222,7 @@ int main()
             current.buckets[longPattern.length - 2].value;
     }
 
-    printf("%lld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("12b %lld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

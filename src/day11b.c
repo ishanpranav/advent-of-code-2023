@@ -88,5 +88,5 @@ int main()
         scan(y + minI, maxI - minI, galaxies) +
         scan(x + minJ, maxJ - minJ, galaxies);
 
-    printf("%lld : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("11b %lld %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 }

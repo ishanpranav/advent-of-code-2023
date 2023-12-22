@@ -135,7 +135,7 @@ int main()
 
     int result = graph_walk(&graph, VERTEX_FIRST, directions, stop);
 
-    printf("%d : %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("08a %d %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

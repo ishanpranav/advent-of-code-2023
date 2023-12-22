@@ -187,7 +187,7 @@ int main()
         lcm = math_lcm(lcm, graph_walk(&graph, *p, directions, stop));
     }
 
-    printf("%lld : %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("08b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

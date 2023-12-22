@@ -2,5 +2,5 @@
 
 int main() 
 { 
-    printf("16a X X\n");
+    printf("14b X X\n");
 }

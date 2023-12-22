@@ -419,5 +419,5 @@ int main()
         }
     }
 
-    printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("05b %lld %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
 }

@@ -261,7 +261,7 @@ int main()
 
     total /= 2;
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("10a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

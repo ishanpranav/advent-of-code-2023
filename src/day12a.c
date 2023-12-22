@@ -193,7 +193,7 @@ int main()
             current.buckets[shortPattern.length - 2].value;
     }
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("12a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

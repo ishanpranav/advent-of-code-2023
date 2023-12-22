@@ -106,7 +106,7 @@ int main()
 
     total += realize_xy(x, y);
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("13a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

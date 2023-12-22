@@ -74,7 +74,7 @@ int main()
             - 1;
     }
 
-    printf("%ld : %lf\n", product, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("06a %ld %lf\n", product, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

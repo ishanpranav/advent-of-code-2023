@@ -28,7 +28,7 @@ int main()
 
     sum += hash;
 
-    printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("15a %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

@@ -119,7 +119,7 @@ int main()
 
     total += realize_xy(x, y);
 
-    printf("%ld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("13b %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

@@ -243,5 +243,5 @@ int main()
         }
     }
 
-    printf("%lld : %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("05a %lld %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
 }

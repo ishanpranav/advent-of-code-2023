@@ -46,7 +46,7 @@ int main()
         sum += (numeric(tens) * 10) + numeric(ones);
     }
 
-    printf("%ld : %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("01a %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
