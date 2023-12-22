@@ -9,7 +9,7 @@
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
 #define KEY_EMPTY -1
-#define PATTERN_BUFFER_CAPACITY 256
+#define LONG_PATTERN_BUFFER_CAPACITY 256
 #define SHORT_PATTERN_BUFFER_CAPACITY 32
 
 struct DictionaryEntry
@@ -22,7 +22,7 @@ struct DictionaryEntry
 struct Dictionary
 {
     struct DictionaryEntry* first;
-    struct DictionaryEntry buckets[PATTERN_BUFFER_CAPACITY];
+    struct DictionaryEntry buckets[LONG_PATTERN_BUFFER_CAPACITY];
 };
 
 struct Pattern
@@ -178,7 +178,7 @@ int main()
             return 1;
         }
 
-        char patternBuffer[PATTERN_BUFFER_CAPACITY];
+        char patternBuffer[LONG_PATTERN_BUFFER_CAPACITY];
         char shortPatternBuffer[SHORT_PATTERN_BUFFER_CAPACITY];
         struct Dictionary current;
         struct Pattern text =

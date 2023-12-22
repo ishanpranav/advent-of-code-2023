@@ -24,9 +24,10 @@ struct Matrix
 
 typedef char* String;
 typedef char* Row;
+typedef struct Coordinate* Coordinate;
 typedef struct Matrix* Matrix;
 
-void coordinate_empty(struct Coordinate* result)
+void coordinate_empty(Coordinate result)
 {
     result->i = -1;
     result->j = -1;
@@ -61,7 +62,7 @@ Row matrix_new_row(Matrix instance)
 
 static bool scan_hi(
     Matrix matrix,
-    struct Coordinate* previous,
+    Coordinate previous,
     struct Coordinate current)
 {
     current.i--;
@@ -83,7 +84,7 @@ static bool scan_hi(
 
 static bool scan_lo(
     Matrix matrix,
-    struct Coordinate* previous,
+    Coordinate previous,
     struct Coordinate current)
 {
     current.i++;
@@ -105,7 +106,7 @@ static bool scan_lo(
 
 static bool scan_left(
     Matrix matrix,
-    struct Coordinate* previous,
+    Coordinate previous,
     struct Coordinate current)
 {
     current.j--;
@@ -127,7 +128,7 @@ static bool scan_left(
 
 static bool scan_right(
     Matrix matrix,
-    struct Coordinate* previous,
+    Coordinate previous,
     struct Coordinate current)
 {
     current.j++;
@@ -149,7 +150,7 @@ static bool scan_right(
 
 static bool scan(
     Matrix matrix,
-    struct Coordinate* previous,
+    Coordinate previous,
     struct Coordinate current)
 {
     switch (matrix_get(matrix, current))

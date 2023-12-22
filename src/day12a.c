@@ -8,8 +8,8 @@
 #include <time.h>
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
-#define PATTERN_BUFFER_CAPACITY 32
 #define KEY_EMPTY -1
+#define SHORT_PATTERN_BUFFER_CAPACITY 32
 
 struct DictionaryEntry
 {
@@ -21,7 +21,7 @@ struct DictionaryEntry
 struct Dictionary
 {
     struct DictionaryEntry* first;
-    struct DictionaryEntry buckets[PATTERN_BUFFER_CAPACITY];
+    struct DictionaryEntry buckets[SHORT_PATTERN_BUFFER_CAPACITY];
 };
 
 struct Pattern
@@ -39,7 +39,7 @@ void dictionary(Dictionary instance)
 {
     instance->first = NULL;
 
-    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    for (int i = 0; i < SHORT_PATTERN_BUFFER_CAPACITY; i++)
     {
         instance->buckets[i].key = KEY_EMPTY;
         instance->buckets[i].value = 0;
@@ -97,7 +97,7 @@ static void read(char symbol, Pattern pattern, Dictionary current)
     dictionary_copy(&view, current);
     dictionary(current);
 
-    for (struct DictionaryEntry* p = view.first; p; p = p->next)
+    for (DictionaryEntry p = view.first; p; p = p->next)
     {
         int state = p->key;
 
@@ -164,7 +164,7 @@ int main()
             return 1;
         }
 
-        char patternBuffer[PATTERN_BUFFER_CAPACITY];
+        char shortPatternBuffer[SHORT_PATTERN_BUFFER_CAPACITY];
         struct Dictionary current;
         struct Pattern text =
         {
@@ -173,7 +173,7 @@ int main()
         };
         struct Pattern shortPattern;
 
-        pattern(&shortPattern, patternBuffer);
+        pattern(&shortPattern, shortPatternBuffer);
         pattern_append(&shortPattern, '.');
 
         for (String token = strtok(mid, DELIMITERS);

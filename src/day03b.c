@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define DIMENSION 141
 #define CASES 8
+#define DIMENSION 141
 
 struct Window
 {

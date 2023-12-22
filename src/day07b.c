@@ -7,10 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define B_PLAYER_LIST_CAPACITY 1024
 #define BUFFER_SIZE 16
 #define DELIMITERS " "
 #define HAND_SIZE 5
-#define PLAYER_LIST_CAPACITY 1024
 
 enum BCard
 {
@@ -57,7 +57,7 @@ struct BPlayer
 
 struct BPlayerList
 {
-    struct BPlayer items[PLAYER_LIST_CAPACITY];
+    struct BPlayer items[B_PLAYER_LIST_CAPACITY];
     int count;
 };
 

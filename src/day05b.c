@@ -40,21 +40,23 @@ struct IntervalList
 
 typedef const void* Object;
 typedef char* String;
+typedef struct Range* Range;
 typedef struct Function* Function;
+typedef struct Interval* Interval;
 typedef struct IntervalList* IntervalList;
 
 void range_from_interval(
     long long min,
     long long max,
     long long intercept,
-    struct Range* result)
+    Range result)
 {
     result->destinationOffset = min + intercept;
     result->sourceOffset = min;
     result->length = max - min;
 }
 
-void range_identity(long long min, long long max, struct Range* result)
+void range_identity(long long min, long long max, Range result)
 {
     range_from_interval(min, max, 0, result);
 }
@@ -132,7 +134,7 @@ void function_sort_ranges(Function instance)
         range_compare);
 }
 
-void function_get_ranges(Function instance, struct Range* result)
+void function_get_ranges(Function instance, struct Range result[])
 {
     memcpy(result, instance->ranges, instance->count * sizeof(struct Range));
 }
@@ -161,8 +163,8 @@ void function_fill_ranges(Function instance)
     function_get_ranges(instance, view);
     function(instance);
 
-    struct Range* first = view;
-    struct Range* last = view + count - 1;
+    Range first = view;
+    Range last = view + count - 1;
     long long min = first->sourceOffset;
 
     if (min)
@@ -175,9 +177,9 @@ void function_fill_ranges(Function instance)
 
     function_add_range(instance, *first);
 
-    for (struct Range* current = first + 1; current <= last; current++)
+    for (Range current = first + 1; current <= last; current++)
     {
-        struct Range* previous = current - 1;
+        Range previous = current - 1;
 
         long long previousMax = previous->sourceOffset + previous->length;
         long long currentMin = current->sourceOffset;
@@ -211,16 +213,14 @@ void function_fill_ranges(Function instance)
 void function_compose(Function instance, Function other)
 {
     struct Range view[RANGES_CAPACITY];
-    struct Range* last = view + instance->count - 1;
+    Range last = view + instance->count - 1;
 
     function_get_ranges(instance, view);
     function(instance);
 
-    for (struct Range* a = view; a <= last; a++)
+    for (Range a = view; a <= last; a++)
     {
-        for (struct Range* b = other->ranges;
-            b < other->ranges + other->count;
-            b++)
+        for (Range b = other->ranges; b < other->ranges + other->count; b++)
         {
             long long aMin = a->sourceOffset;
             long long aMax = aMin + a->length;
@@ -392,14 +392,12 @@ int main()
 
     long long min = LLONG_MAX;
 
-    for (struct Interval* seed = seeds.items;
-        seed < seeds.items + seeds.count;
-        seed++)
+    for (Interval seed = seeds.items; seed < seeds.items + seeds.count; seed++)
     {
         long long seedMin = seed->min;
         long long seedMax = seed->max;
 
-        for (struct Range* range = composite.ranges;
+        for (Range range = composite.ranges;
             range < composite.ranges + composite.count;
             range++)
         {

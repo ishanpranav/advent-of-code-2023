@@ -7,7 +7,7 @@
 #include <string.h>
 #include <time.h>
 #define DIMENSION 141
-#define COORDINATE_LIST_CAPACITY 16384
+#define POLYGON_CAPACITY 16384
 
 struct Coordinate
 {
@@ -25,15 +25,16 @@ struct Matrix
 
 struct Polygon
 {
-    struct Coordinate items[COORDINATE_LIST_CAPACITY];
+    struct Coordinate items[POLYGON_CAPACITY];
     int count;
 };
 
 typedef char* Row;
+typedef struct Coordinate* Coordinate;
 typedef struct Matrix* Matrix;
 typedef struct Polygon* Polygon;
 
-void coordinate_empty(struct Coordinate* result)
+void coordinate_empty(Coordinate result)
 {
     result->i = -1;
     result->j = -1;
@@ -80,7 +81,7 @@ void polygon_add(Polygon instance, struct Coordinate item)
 
 static bool scan_hi(
     Matrix matrix,
-    struct Coordinate* previous, 
+    Coordinate previous, 
     struct Coordinate current)
 {
     current.i--;
@@ -102,7 +103,7 @@ static bool scan_hi(
 
 static bool scan_lo(
     Matrix matrix,
-    struct Coordinate* previous, 
+    Coordinate previous, 
     struct Coordinate current)
 {
     current.i++;
@@ -124,7 +125,7 @@ static bool scan_lo(
 
 static bool scan_left(
     Matrix matrix,
-    struct Coordinate* previous, 
+    Coordinate previous, 
     struct Coordinate current)
 {
     current.j--;
@@ -146,7 +147,7 @@ static bool scan_left(
 
 static bool scan_right(
     Matrix matrix,
-    struct Coordinate* previous, 
+    Coordinate previous, 
     struct Coordinate current)
 {
     current.j++;
@@ -168,7 +169,7 @@ static bool scan_right(
 
 static bool scan(
     Matrix matrix,
-    struct Coordinate* previous, 
+    Coordinate previous, 
     struct Coordinate current)
 {
     switch (matrix_get(matrix, current))

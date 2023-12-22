@@ -34,6 +34,7 @@ struct List
 
 typedef const void* Object;
 typedef char* String;
+typedef struct Range* Range;
 typedef struct Function* Function;
 typedef struct List* List;
 
@@ -101,14 +102,14 @@ void list_add(List instance, long long item)
     instance->count++;
 }
 
-static struct Range* search(Function function, long long value)
+static Range search(Function function, long long value)
 {
-    struct Range* lo = function->ranges;
-    struct Range* hi = lo + function->count - 1;
+    Range lo = function->ranges;
+    Range hi = lo + function->count - 1;
 
     while (lo <= hi)
     {
-        struct Range* current = lo + ((hi - lo) / 2);
+        Range current = lo + ((hi - lo) / 2);
         long long other = current->sourceOffset;
 
         if (other == value)
@@ -141,7 +142,7 @@ static void realize(Function f, List seeds)
     for (long long* p = seeds->items; p < seeds->items + seeds->count; p++)
     {
         long long input = *p;
-        struct Range* range = search(f, input);
+        Range range = search(f, input);
         long long offset = range->sourceOffset;
 
         if (input >= offset && input < offset + range->length)

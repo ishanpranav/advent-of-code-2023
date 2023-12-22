@@ -9,8 +9,6 @@
 #include <time.h>
 #define BUFFER_SIZE 32
 #define DIRECTIONS_CAPACITY 512
-#define DIRECTION_LEFT 'L'
-#define DIRECTION_RIGHT 'R'
 #define LIST_CAPACITY 1024
 #define VERTEX_OFFSET -13330
 #define VERTEX_STOP_MOD 25
@@ -33,8 +31,8 @@ struct List
     int count;
 };
 
+typedef char* String;
 typedef int Vertex;
-typedef char Direction;
 typedef struct Graph* Graph;
 typedef struct List* List;
 typedef bool (*Predicate)(Vertex vertex);
@@ -66,22 +64,22 @@ void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
 int graph_walk(
     Graph instance,
     Vertex start,
-    Direction directions[],
+    String directions,
     Predicate predicate)
 {
     int result = 0;
-    Direction* direction = directions;
+    String direction = directions;
 
     while (!predicate(start))
     {
         switch (*direction)
         {
-            case DIRECTION_LEFT:
+            case 'L':
                 start = instance->vertices[start].left;
                 direction++;
                 result++;
                 break;
-            case DIRECTION_RIGHT:
+            case 'R':
                 start = instance->vertices[start].right;
                 direction++;
                 result++;
@@ -168,7 +166,7 @@ int main()
 {
     struct Graph graph;
     struct List starts;
-    Direction directions[DIRECTIONS_CAPACITY];
+    char directions[DIRECTIONS_CAPACITY];
     clock_t start = clock();
 
     list(&starts);

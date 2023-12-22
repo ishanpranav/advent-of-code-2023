@@ -38,18 +38,17 @@ Row matrix_new_row(Matrix instance)
     return instance->items + (instance->columns * m);
 }
 
-void matrix_vertical_swap(Matrix instance, int i1, int i2, int j)
+void matrix_swap(Matrix instance, int i1, int j1, int i2, int j2)
 {
-    i1 *= instance->columns;
-    i2 *= instance->columns;
+    int index1 = (i1 * instance->columns) + j1;
+    int index2 = (i2 * instance->columns) + j2;
+    char swap = instance->items[index1];
 
-    char swap = instance->items[i2 + j];
-
-    instance->items[i2 + j] = instance->items[i1 + j];
-    instance->items[i1 + j] = swap;
+    instance->items[index1] = instance->items[index2];
+    instance->items[index2] = swap;
 }
 
-static int find(Matrix matrix, int i, int j)
+static int find_hi(Matrix matrix, int i, int j)
 {
     for (int row = i - 1; row >= 0; row--)
     {
@@ -60,6 +59,24 @@ static int find(Matrix matrix, int i, int j)
     }
 
     return -1;
+}
+
+static long scan(Matrix matrix)
+{
+    long result = 0;
+
+    for (int i = 0; i < matrix->rows; i++)
+    {
+        for (int j = 0; j < matrix->columns; j++)
+        {
+            if (matrix_get(matrix, i, j) == 'O')
+            {
+                result += matrix->rows - i;
+            }
+        }
+    }
+
+    return result;
 }
 
 int main()
@@ -83,7 +100,6 @@ int main()
         return 1;
     }
 
-    int total = 0;
     struct Matrix a;
 
     matrix(&a, n);
@@ -94,29 +110,20 @@ int main()
     }
     while (fgets(buffer, n + 2, stdin));
 
-    for (int i = 1; i < a.rows; i++)
-    {
-        for (int j = 0; j < a.columns; j++)
-        {
-            if (matrix_get(&a, i, j) == 'O')
-            {
-                matrix_vertical_swap(&a, i, find(&a, i, j) + 1, j);
-            }
-        }
-    }
-
     for (int i = 0; i < a.rows; i++)
     {
         for (int j = 0; j < a.columns; j++)
         {
             if (matrix_get(&a, i, j) == 'O')
             {
-                total += a.rows - i;
+                matrix_swap(&a, i, j, find_hi(&a, i, j) + 1, j);
             }
         }
     }
 
-    printf("%d : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    long total = scan(&a);
+
+    printf("%ld : %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
