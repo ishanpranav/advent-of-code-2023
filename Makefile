@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -pedantic -std=c99 -Wall -Wextra
+CFLAGS = -O3 -pedantic -std=c99 -Wall -Wextra
 CMATH = -lm
 
 all: \

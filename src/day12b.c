@@ -40,7 +40,7 @@ void dictionary(Dictionary instance)
 {
     instance->first = NULL;
 
-    for (int i = 0; i < PATTERN_BUFFER_CAPACITY; i++)
+    for (int i = 0; i < LONG_PATTERN_BUFFER_CAPACITY; i++)
     {
         instance->buckets[i].key = KEY_EMPTY;
         instance->buckets[i].value = 0;
