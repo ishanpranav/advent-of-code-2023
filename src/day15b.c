@@ -14,8 +14,8 @@
 struct OrderedDictionaryEntry
 {
     struct OrderedDictionaryEntry* nextEntry;
-    char key[KEY_CAPACITY];
     int value;
+    char key[KEY_CAPACITY];
 };
 
 struct OrderedDictionaryBucket

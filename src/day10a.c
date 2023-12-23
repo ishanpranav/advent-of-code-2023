@@ -22,7 +22,6 @@ struct Matrix
     char items[(DIMENSION - 1) * (DIMENSION - 1)];
 };
 
-typedef char* String;
 typedef char* Row;
 typedef struct Coordinate* Coordinate;
 typedef struct Matrix* Matrix;
@@ -51,13 +50,16 @@ void matrix_set(Matrix instance, struct Coordinate coordinate, char item)
     instance->items[(instance->columns * coordinate.i) + coordinate.j] = item;
 }
 
-Row matrix_new_row(Matrix instance)
+void matrix_add_row(Matrix instance, char values[])
 {
     int m = instance->rows;
 
     instance->rows = m + 1;
 
-    return instance->items + (instance->columns * m);
+    memcpy(
+        instance->items + (instance->columns * m), 
+        values, 
+        instance->columns);
 }
 
 static bool scan_hi(
@@ -210,8 +212,8 @@ int main()
 
     do
     {
-        memcpy(matrix_new_row(&a), buffer, n);
-
+        matrix_add_row(&a, buffer);
+        
         char* token = strchr(buffer, 'S');
 
         if (token)

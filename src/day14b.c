@@ -2,20 +2,63 @@
 
 // Parabolic Reflector Dish Part 2
 
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define BUCKETS 197
 #define DIMENSION 101
+#define ITERATIONS 1000000000
+
+enum
+{
+    KEY_SIZE = (DIMENSION - 1) * (DIMENSION - 1)
+};
+
+struct DictionaryEntry
+{
+    struct DictionaryEntry* nextEntry;
+    long value;
+    char key[KEY_SIZE];
+};
+
+struct DictionaryBucket
+{
+    struct DictionaryEntry* firstEntry;
+    struct DictionaryBucket* nextBucket;
+};
+
+struct Dictionary
+{
+    struct DictionaryBucket* firstBucket;
+    struct DictionaryBucket buckets[BUCKETS];
+};
 
 struct Matrix
 {
     int rows;
     int columns;
-    char items[(DIMENSION - 1) * (DIMENSION - 1)];
+    char items[KEY_SIZE];
 };
 
 typedef char* Row;
+typedef struct DictionaryEntry* DictionaryEntry;
+typedef struct DictionaryBucket* DictionaryBucket;
+typedef struct Dictionary* Dictionary;
 typedef struct Matrix* Matrix;
+
+unsigned int char_array_get_hash_code(char instance[])
+{
+    unsigned int result = 7;
+
+    for (int i = 0; i < KEY_SIZE; i++)
+    {
+        result = (result * 31) + instance[i];
+    }
+
+    return result;
+}
 
 void matrix(Matrix instance, int columns)
 {
@@ -28,75 +71,106 @@ char matrix_get(Matrix instance, int i, int j)
     return instance->items[(instance->columns * i) + j];
 }
 
-Row matrix_new_row(Matrix instance)
+void matrix_set(Matrix instance, int i, int j, char value)
+{
+    instance->items[(instance->columns * i) + j] = value;
+}
+
+void matrix_add_row(Matrix instance, char values[])
 {
     int m = instance->rows;
 
     instance->rows = m + 1;
 
-    return instance->items + (instance->columns * m);
+    memcpy(
+        instance->items + (instance->columns * m),
+        values,
+        instance->columns);
 }
 
-void matrix_swap(Matrix instance, int i1, int j1, int i2, int j2)
+void matrix_to_char_array(Matrix instance, char value[])
 {
-    int index1 = (i1 * instance->columns) + j1;
-    int index2 = (i2 * instance->columns) + j2;
-    char swap = instance->items[index1];
-
-    instance->items[index1] = instance->items[index2];
-    instance->items[index2] = swap;
+    memcpy(value, instance->items, instance->rows * instance->columns);
 }
 
-static int find_hi(Matrix matrix, int i, int j)
+bool dictionary_set(Dictionary instance, char key[], long value)
 {
-    for (int row = i - 1; row >= 0; row--)
+    DictionaryEntry* p;
+    int hash = char_array_get_hash_code(key) % BUCKETS;
+
+    for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
-        if (matrix_get(matrix, row, j) != '.')
+        if (memcmp(key, (*p)->key, KEY_SIZE) == 0)
         {
-            return row;
+            (*p)->value = value;
+
+            return true;
         }
     }
 
-    return -1;
+    DictionaryEntry entry = calloc(1, sizeof(struct DictionaryEntry));
+
+    if (!entry)
+    {
+        return false;
+    }
+
+    if (!instance->buckets[hash].firstEntry)
+    {
+        DictionaryBucket first = instance->firstBucket;
+
+        instance->buckets[hash].nextBucket = first;
+        instance->firstBucket = instance->buckets + hash;
+    }
+
+    memcpy(entry->key, key, KEY_SIZE);
+
+    entry->value = value;
+    *p = entry;
+
+    return true;
 }
 
-static int find_lo(Matrix matrix, int i, int j)
+bool dictionary_try_get_value(Dictionary instance, char key[], long* result)
 {
-    for (int row = i + 1; row < matrix->rows; ++row)
+    int hash = char_array_get_hash_code(key) % BUCKETS;
+
+    for (DictionaryEntry entry = instance->buckets[hash].firstEntry;
+        entry;
+        entry = entry->nextEntry)
     {
-        if (matrix_get(matrix, row, j) != '.')
+        if (memcmp(key, entry->key, KEY_SIZE) == 0)
         {
-            return row;
+            *result = entry->value;
+
+            return true;
         }
     }
 
-    return matrix->rows;
+    return false;
 }
 
-static int find_left(Matrix matrix, int i, int j)
+void dictionary_clear(Dictionary instance)
 {
-    for (int column = j - 1; column >= 0; column--)
+    for (DictionaryBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
     {
-        if (matrix_get(matrix, i, column) != '.')
+        DictionaryEntry entry = bucket->firstEntry;
+
+        while (entry)
         {
-            return column;
+            DictionaryEntry nextEntry = entry->nextEntry;
+
+            free(entry);
+
+            entry = nextEntry;
         }
+
+        bucket->firstEntry = NULL;
     }
 
-    return -1;
-}
-
-static int find_right(Matrix matrix, int i, int j)
-{
-    for (int column = j + 1; column < matrix->columns; ++column)
-    {
-        if (matrix_get(matrix, i, column) != '.')
-        {
-            return column;
-        }
-    }
-
-    return matrix->columns;
+    instance->firstBucket = NULL;
 }
 
 static void roll_hi(Matrix matrix)
@@ -105,9 +179,15 @@ static void roll_hi(Matrix matrix)
     {
         for (int j = 0; j < matrix->columns; j++)
         {
-            if (matrix_get(matrix, i, j) == 'O')
+            if (matrix_get(matrix, i, j) != 'O')
             {
-                matrix_swap(matrix, i, j, find_hi(matrix, i, j) + 1, j);
+                continue;
+            }
+
+            for (int k = i - 1; k >= 0 && matrix_get(matrix, k, j) == '.'; k--)
+            {
+                matrix_set(matrix, k, j, 'O');
+                matrix_set(matrix, k + 1, j, '.');
             }
         }
     }
@@ -115,13 +195,21 @@ static void roll_hi(Matrix matrix)
 
 static void roll_lo(Matrix matrix)
 {
-    for (int i = 0; i < matrix->rows; i++)
+    for (int i = matrix->rows - 1; i >= 0; i--)
     {
         for (int j = 0; j < matrix->columns; j++)
         {
-            if (matrix_get(matrix, i, j) == 'O')
+            if (matrix_get(matrix, i, j) != 'O')
             {
-                matrix_swap(matrix, i, j, find_lo(matrix, i, j) - 1, j);
+                continue;
+            }
+
+            for (int k = i + 1;
+                k < matrix->rows && matrix_get(matrix, k, j) == '.';
+                k++)
+            {
+                matrix_set(matrix, k, j, 'O');
+                matrix_set(matrix, k - 1, j, '.');
             }
         }
     }
@@ -133,9 +221,15 @@ static void roll_left(Matrix matrix)
     {
         for (int j = 0; j < matrix->columns; j++)
         {
-            if (matrix_get(matrix, i, j) == 'O')
+            if (matrix_get(matrix, i, j) != 'O')
             {
-                matrix_swap(matrix, i, j, i, find_hi(matrix, i, j) + 1);
+                continue;
+            }
+
+            for (int k = j - 1; k >= 0 && matrix_get(matrix, i, k) == '.'; k--)
+            {
+                matrix_set(matrix, i, k, 'O');
+                matrix_set(matrix, i, k + 1, '.');
             }
         }
     }
@@ -143,13 +237,21 @@ static void roll_left(Matrix matrix)
 
 static void roll_right(Matrix matrix)
 {
-    for (int i = 0; i < matrix->rows; i++)
+    for (int i = matrix->rows - 1; i >= 0; i--)
     {
-        for (int j = 0; j < matrix->columns; j++)
+        for (int j = matrix->columns - 1; j >= 0; j--)
         {
-            if (matrix_get(matrix, i, j) == 'O')
+            if (matrix_get(matrix, i, j) != 'O')
             {
-                matrix_swap(matrix, i, j, i, find_hi(matrix, i, j) - 1);
+                continue;
+            }
+
+            for (int k = j + 1;
+                k < matrix->columns && matrix_get(matrix, i, k) == '.';
+                k++)
+            {
+                matrix_set(matrix, i, k, 'O');
+                matrix_set(matrix, i, k - 1, '.');
             }
         }
     }
@@ -195,34 +297,41 @@ int main()
     }
 
     struct Matrix a;
+    Dictionary cache = calloc(1, sizeof(struct Dictionary));
 
     matrix(&a, n);
 
     do
     {
-        memcpy(matrix_new_row(&a), buffer, n);
+        matrix_add_row(&a, buffer);
     }
     while (fgets(buffer, n + 2, stdin));
 
-    for (int i = 0; i < 100; i++) 
+    for (long i = 0; i < ITERATIONS; i++)
     {
-        for (int j = 0; j < 10000000; j++) 
+        long value;
+        char key[KEY_SIZE];
+
+        roll_hi(&a);
+        roll_left(&a);
+        roll_lo(&a);
+        roll_right(&a);
+        matrix_to_char_array(&a, key);
+
+        if (dictionary_try_get_value(cache, key, &value))
         {
-            roll_hi(&a);
-            roll_left(&a);
-            roll_lo(&a);
-            roll_right(&a);
+            i = ITERATIONS - ((ITERATIONS - value) % (i - value));
         }
-
-        printf("\r%d%%", i + 1);
-        fflush(NULL);
+        else
+        {
+            dictionary_set(cache, key, i);
+        }
     }
-
-    printf("\n");
 
     long total = scan(&a);
 
-    printf("14a %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("14b %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    dictionary_clear(cache);
 
     return 0;
 }

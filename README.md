@@ -6,9 +6,14 @@ implemented in the C programming language. I have done my best to minimize time
 complexity while keeping the average running time on the order of 0.0001 s
 (0.1 ms).
 
-The exceptions are [day 12(a)](src/day12a.c), which runs on the order of
-0.001 s (1 ms), and [day 12(b)](src/day12b.c), which runs on the order of 0.01 s
-(10 ms). Despite my best efforts, the order of magnitude of these run times
+The exceptions are:
+- [Day 12(a)](src/day12a.c), which runs on the order of
+0.001 s (1 ms).
+- [Day 12(b)](src/day12b.c), which runs on the order of 0.01 s
+(10 ms).
+- [Day 14(b)](src/day14b.c), which runs on the order of 0.01 s (10 ms).
+
+Despite my best efforts, the order of magnitude of these run times
 cannot be improved.
 
 Some of the more difficult problems were implemented in a higher-level

@@ -13,7 +13,7 @@ struct Matrix
     int rows;
     int columns;
     char items[(DIMENSION - 1) * (DIMENSION - 1)];
-}; 
+};
 
 typedef char* Row;
 typedef struct Matrix* Matrix;
@@ -29,36 +29,21 @@ char matrix_get(Matrix instance, int i, int j)
     return instance->items[(instance->columns * i) + j];
 }
 
-Row matrix_new_row(Matrix instance)
+void matrix_set(Matrix instance, int i, int j, char value)
+{
+    instance->items[(instance->columns * i) + j] = value;
+}
+
+void matrix_add_row(Matrix instance, char values[])
 {
     int m = instance->rows;
 
     instance->rows = m + 1;
 
-    return instance->items + (instance->columns * m);
-}
-
-void matrix_swap(Matrix instance, int i1, int j1, int i2, int j2)
-{
-    int index1 = (i1 * instance->columns) + j1;
-    int index2 = (i2 * instance->columns) + j2;
-    char swap = instance->items[index1];
-
-    instance->items[index1] = instance->items[index2];
-    instance->items[index2] = swap;
-}
-
-static int find_hi(Matrix matrix, int i, int j)
-{
-    for (int row = i - 1; row >= 0; row--)
-    {
-        if (matrix_get(matrix, row, j) != '.')
-        {
-            return row;
-        }
-    }
-
-    return -1;
+    memcpy(
+        instance->items + (instance->columns * m), 
+        values, 
+        instance->columns);
 }
 
 static void roll_hi(Matrix matrix)
@@ -67,9 +52,15 @@ static void roll_hi(Matrix matrix)
     {
         for (int j = 0; j < matrix->columns; j++)
         {
-            if (matrix_get(matrix, i, j) == 'O')
+            if (matrix_get(matrix, i, j) != 'O')
             {
-                matrix_swap(matrix, i, j, find_hi(matrix, i, j) + 1, j);
+                continue;
+            }
+
+            for (int k = i - 1; k >= 0 && matrix_get(matrix, k, j) == '.'; k--)
+            {
+                matrix_set(matrix, k, j, 'O');
+                matrix_set(matrix, k + 1, j, '.');
             }
         }
     }
@@ -120,7 +111,7 @@ int main()
 
     do
     {
-        memcpy(matrix_new_row(&a), buffer, n);
+        matrix_add_row(&a, buffer);
     }
     while (fgets(buffer, n + 2, stdin));
 
