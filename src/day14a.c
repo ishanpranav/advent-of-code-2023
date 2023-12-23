@@ -46,6 +46,24 @@ void matrix_add_row(Matrix instance, char values[])
         instance->columns);
 }
 
+static long scan(Matrix matrix)
+{
+    long result = 0;
+
+    for (int i = 0; i < matrix->rows; i++)
+    {
+        for (int j = 0; j < matrix->columns; j++)
+        {
+            if (matrix_get(matrix, i, j) == 'O')
+            {
+                result += matrix->rows - i;
+            }
+        }
+    }
+
+    return result;
+}
+
 static void roll_hi(Matrix matrix)
 {
     for (int i = 0; i < matrix->rows; i++)
@@ -64,24 +82,6 @@ static void roll_hi(Matrix matrix)
             }
         }
     }
-}
-
-static long scan(Matrix matrix)
-{
-    long result = 0;
-
-    for (int i = 0; i < matrix->rows; i++)
-    {
-        for (int j = 0; j < matrix->columns; j++)
-        {
-            if (matrix_get(matrix, i, j) == 'O')
-            {
-                result += matrix->rows - i;
-            }
-        }
-    }
-
-    return result;
 }
 
 int main()

@@ -48,18 +48,6 @@ typedef struct DictionaryBucket* DictionaryBucket;
 typedef struct Dictionary* Dictionary;
 typedef struct Matrix* Matrix;
 
-unsigned int char_array_get_hash_code(char instance[])
-{
-    unsigned int result = 7;
-
-    for (int i = 0; i < KEY_SIZE; i++)
-    {
-        result = (result * 31) + instance[i];
-    }
-
-    return result;
-}
-
 void matrix(Matrix instance, int columns)
 {
     instance->rows = 0;
@@ -93,16 +81,28 @@ void matrix_to_char_array(Matrix instance, char value[])
     memcpy(value, instance->items, instance->rows * instance->columns);
 }
 
-bool dictionary_set(Dictionary instance, char key[], long value)
+bool dictionary_replace(
+    Dictionary instance,
+    char key[],
+    long* existingValue,
+    long newValue)
 {
     DictionaryEntry* p;
-    int hash = char_array_get_hash_code(key) % BUCKETS;
+    unsigned int hash = 7;
+
+    for (int i = 0; i < KEY_SIZE; i++)
+    {
+        hash = (hash * 31) + key[i];
+    }
+
+    hash %= BUCKETS;
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
         if (memcmp(key, (*p)->key, KEY_SIZE) == 0)
         {
-            (*p)->value = value;
+            *existingValue = (*p)->value;
+            (*p)->value = newValue;
 
             return true;
         }
@@ -125,29 +125,10 @@ bool dictionary_set(Dictionary instance, char key[], long value)
 
     memcpy(entry->key, key, KEY_SIZE);
 
-    entry->value = value;
+    entry->value = newValue;
     *p = entry;
 
     return true;
-}
-
-bool dictionary_try_get_value(Dictionary instance, char key[], long* result)
-{
-    int hash = char_array_get_hash_code(key) % BUCKETS;
-
-    for (DictionaryEntry entry = instance->buckets[hash].firstEntry;
-        entry;
-        entry = entry->nextEntry)
-    {
-        if (memcmp(key, entry->key, KEY_SIZE) == 0)
-        {
-            *result = entry->value;
-
-            return true;
-        }
-    }
-
-    return false;
 }
 
 void dictionary_clear(Dictionary instance)
@@ -171,6 +152,24 @@ void dictionary_clear(Dictionary instance)
     }
 
     instance->firstBucket = NULL;
+}
+
+static long scan(Matrix matrix)
+{
+    long result = 0;
+
+    for (int i = 0; i < matrix->rows; i++)
+    {
+        for (int j = 0; j < matrix->columns; j++)
+        {
+            if (matrix_get(matrix, i, j) == 'O')
+            {
+                result += matrix->rows - i;
+            }
+        }
+    }
+
+    return result;
 }
 
 static void roll_hi(Matrix matrix)
@@ -257,22 +256,49 @@ static void roll_right(Matrix matrix)
     }
 }
 
-static long scan(Matrix matrix)
+static void roll(Matrix matrix)
 {
-    long result = 0;
+    roll_hi(matrix);
+    roll_left(matrix);
+    roll_lo(matrix);
+    roll_right(matrix);
+}
 
-    for (int i = 0; i < matrix->rows; i++)
+static bool roll_many(Matrix matrix, Dictionary cache)
+{
+    long i = 0;
+
+    while (i < ITERATIONS)
     {
-        for (int j = 0; j < matrix->columns; j++)
+        long previous = -1;
+        char key[KEY_SIZE];
+
+        roll(matrix);
+        matrix_to_char_array(matrix, key);
+
+        if (!dictionary_replace(cache, key, &previous, i))
         {
-            if (matrix_get(matrix, i, j) == 'O')
-            {
-                result += matrix->rows - i;
-            }
+            return false;
         }
+
+        if (previous != -1)
+        {
+            i = ITERATIONS - ((ITERATIONS - previous) % (i - previous)) + 1;
+
+            break;
+        }
+
+        i++;
     }
 
-    return result;
+    while (i < ITERATIONS)
+    {
+        roll(matrix);
+
+        i++;
+    }
+
+    return true;
 }
 
 int main()
@@ -307,25 +333,11 @@ int main()
     }
     while (fgets(buffer, n + 2, stdin));
 
-    for (long i = 0; i < ITERATIONS; i++)
+    if (!roll_many(&a, cache))
     {
-        long value;
-        char key[KEY_SIZE];
+        fprintf(stderr, "Error: Out of memory.\n");
 
-        roll_hi(&a);
-        roll_left(&a);
-        roll_lo(&a);
-        roll_right(&a);
-        matrix_to_char_array(&a, key);
-
-        if (dictionary_try_get_value(cache, key, &value))
-        {
-            i = ITERATIONS - ((ITERATIONS - value) % (i - value));
-        }
-        else
-        {
-            dictionary_set(cache, key, i);
-        }
+        return 1;
     }
 
     long total = scan(&a);
