@@ -7,6 +7,7 @@ complexity while keeping the average running time on the order of 0.0001 s
 (0.1 ms).
 
 The exceptions are:
+
 - [Day 12(a)](src/day12a.c), which runs on the order of
 0.001 s (1 ms).
 - [Day 12(b)](src/day12b.c), which runs on the order of 0.01 s
@@ -16,7 +17,7 @@ The exceptions are:
 Despite my best efforts, the order of magnitude of these run times
 cannot be improved.
 
-Some of the more difficult problems were implemented in a higher-level
+Some of the more complex problems were implemented in a higher-level
 programming language before being converted to C. The equivalent code is
 included here as a reference.
 
@@ -68,9 +69,10 @@ day01a < in.txt
 | 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
 | 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
 | 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit array, bit matrix|
-| 14|[Parabolic Reflector Dish](src/day14b.c)||Sum||
+| 14|[Parabolic Reflector Dish](src/day14b.c)|Strings, Dictionaries|Sum|Character matrix, cycle detection|
 | 15|[Lens Library](src/day15b.c)|Cryptography, Hash functions, Dictionaries|Sum|Iterable ordered dictionary, string builder|
 | 16|[The Floor Will Be Lava](src/day16b.c)||||
+| 17|[Clumsy Crucible](src/day17b.c)|Graph theory, Pathfinding algorithms, Priority queues|Minimum|[Dijkstra\'s algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm), [_d_-ary heap](https://en.wikipedia.org/wiki/D-ary_heap)|
 
 ## Constraints
 

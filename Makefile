@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -O3 -pedantic -std=c99 -Wall -Wextra
-CMATH = -lm
+LIBM = -lm
 
 all: \
 	day01a day01b \
@@ -18,7 +18,8 @@ all: \
 	day13a day13b \
 	day14a day14b \
 	day15a day15b \
-	day16a day16b
+	day16a day16b \
+	day17a day17b
 
 test:
 	cat alt01.txt | ./day01a.o > out.txt
@@ -53,6 +54,8 @@ test:
 	cat alt15.txt | ./day15b.o >> out.txt
 	cat alt16.txt | ./day16a.o >> out.txt
 	cat alt16.txt | ./day16b.o >> out.txt
+	cat alt17.txt | ./day17a.o >> out.txt
+	cat alt17.txt | ./day17b.o >> out.txt
 	cat out.txt
 	
 day01a: src/day01a.c
@@ -104,10 +107,10 @@ day08b: src/day08b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day09a: src/day09a.c
-	$(CC) $(CFLAGS) $< -o $@.o $(CMATH)
+	$(CC) $(CFLAGS) $< -o $@.o $(LIBM)
 	
 day09b: src/day09b.c
-	$(CC) $(CFLAGS) $< -o $@.o $(CMATH)
+	$(CC) $(CFLAGS) $< -o $@.o $(LIBM)
 	
 day10a: src/day10a.c
 	$(CC) $(CFLAGS) $< -o $@.o
@@ -149,6 +152,12 @@ day16a: src/day16a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day16b: src/day16b.c
+	$(CC) $(CFLAGS) $< -o $@.o
+	
+day17a: src/day17a.c
+	$(CC) $(CFLAGS) $< -o $@.o
+	
+day17b: src/day17b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 clean:

@@ -54,6 +54,7 @@ is impractical, use numeric suffixes instead.
 |`k`   |term number|
 |`lo`  |smaller pointer, point below, lower buffer|
 |`m`   |matrix size in an arbitrary dimension|
+|`mid` |middle pointer, middle buffer|
 |`n`   |count|
 |`p`   |arbitrary pointer|
 |`r`   |red color component|
