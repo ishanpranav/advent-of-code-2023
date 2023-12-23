@@ -61,6 +61,20 @@ static int find_hi(Matrix matrix, int i, int j)
     return -1;
 }
 
+static void roll_hi(Matrix matrix)
+{
+    for (int i = 0; i < matrix->rows; i++)
+    {
+        for (int j = 0; j < matrix->columns; j++)
+        {
+            if (matrix_get(matrix, i, j) == 'O')
+            {
+                matrix_swap(matrix, i, j, find_hi(matrix, i, j) + 1, j);
+            }
+        }
+    }
+}
+
 static long scan(Matrix matrix)
 {
     long result = 0;
@@ -110,16 +124,7 @@ int main()
     }
     while (fgets(buffer, n + 2, stdin));
 
-    for (int i = 0; i < a.rows; i++)
-    {
-        for (int j = 0; j < a.columns; j++)
-        {
-            if (matrix_get(&a, i, j) == 'O')
-            {
-                matrix_swap(&a, i, j, find_hi(&a, i, j) + 1, j);
-            }
-        }
-    }
+    roll_hi(&a);
 
     long total = scan(&a);
 
