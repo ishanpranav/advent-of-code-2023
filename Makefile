@@ -89,10 +89,10 @@ day05b: src/day05b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day06a: src/day06a.c
-	$(CC) $(CFLAGS) $< -o $@.o $(CMATH)
+	$(CC) $(CFLAGS) $< -o $@.o $(LIBM)
 	
 day06b: src/day06b.c
-	$(CC) $(CFLAGS) $< -o $@.o $(CMATH)
+	$(CC) $(CFLAGS) $< -o $@.o $(LIBM)
 	
 day07a: src/day07a.c
 	$(CC) $(CFLAGS) $< -o $@.o

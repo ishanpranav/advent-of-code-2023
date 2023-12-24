@@ -41,6 +41,7 @@ struct IntervalList
 typedef const void* Object;
 typedef char* String;
 typedef struct Range* Range;
+typedef struct Range* RangeArray;
 typedef struct Function* Function;
 typedef struct Interval* Interval;
 typedef struct IntervalList* IntervalList;
@@ -119,9 +120,9 @@ void function(Function instance)
     instance->count = 0;
 }
 
-void function_add_range(Function instance, struct Range item)
+void function_add_range(Function instance, Range item)
 {
-    instance->ranges[instance->count] = item;
+    instance->ranges[instance->count] = *item;
     instance->count++;
 }
 
@@ -134,9 +135,9 @@ void function_sort_ranges(Function instance)
         range_compare);
 }
 
-void function_get_ranges(Function instance, struct Range result[])
+void function_get_ranges(Function instance, RangeArray results)
 {
-    memcpy(result, instance->ranges, instance->count * sizeof(struct Range));
+    memcpy(results, instance->ranges, instance->count * sizeof(struct Range));
 }
 
 void function_fill_ranges(Function instance)
@@ -152,7 +153,7 @@ void function_fill_ranges(Function instance)
             .length = LLONG_MAX
         };
 
-        function_add_range(instance, infinity);
+        function_add_range(instance, &infinity);
 
         return;
     }
@@ -172,10 +173,10 @@ void function_fill_ranges(Function instance)
         struct Range identity;
 
         range_identity(LLONG_MIN, min, &identity);
-        function_add_range(instance, identity);
+        function_add_range(instance, &identity);
     }
 
-    function_add_range(instance, *first);
+    function_add_range(instance, first);
 
     for (Range current = first + 1; current <= last; current++)
     {
@@ -193,10 +194,10 @@ void function_fill_ranges(Function instance)
                 previousMax + 1,
                 currentMin + current->length,
                 &identity);
-            function_add_range(instance, identity);
+            function_add_range(instance, &identity);
         }
 
-        function_add_range(instance, *current);
+        function_add_range(instance, current);
     }
 
     long long lastMax = last->sourceOffset + last->length;
@@ -206,7 +207,7 @@ void function_fill_ranges(Function instance)
         struct Range identity;
 
         range_identity(lastMax + 1, LLONG_MAX, &identity);
-        function_add_range(instance, identity);
+        function_add_range(instance, &identity);
     }
 }
 
@@ -242,7 +243,7 @@ void function_compose(Function instance, Function other)
                 a->destinationOffset - a->sourceOffset +
                 b->destinationOffset - b->sourceOffset,
                 &range);
-            function_add_range(instance, range);
+            function_add_range(instance, &range);
         }
     }
 }
@@ -252,9 +253,9 @@ void interval_list(IntervalList instance)
     instance->count = 0;
 }
 
-void interval_list_add(IntervalList instance, struct Interval item)
+void interval_list_add(IntervalList instance, Interval item)
 {
-    instance->items[instance->count] = item;
+    instance->items[instance->count] = *item;
     instance->count++;
 }
 
@@ -287,7 +288,7 @@ static bool read(Function function, char buffer[])
 
     range.length = atoll(token);
 
-    function_add_range(function, range);
+    function_add_range(function, &range);
 
     return true;
 }
@@ -328,7 +329,7 @@ int main()
             .max = offset + atoll(token)
         };
 
-        interval_list_add(&seeds, interval);
+        interval_list_add(&seeds, &interval);
     }
 
     struct Function current;

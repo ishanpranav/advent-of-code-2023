@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BUCKETS 256
 #define KEY_CAPACITY 8
+#define ORDERED_DICTIONARY_BUCKETS 256
 
 struct OrderedDictionaryEntry
 {
@@ -28,7 +28,7 @@ struct OrderedDictionaryBucket
 struct OrderedDictionary
 {
     struct OrderedDictionaryBucket* firstBucket;
-    struct OrderedDictionaryBucket buckets[BUCKETS];
+    struct OrderedDictionaryBucket buckets[ORDERED_DICTIONARY_BUCKETS];
 };
 
 struct StringBuilder

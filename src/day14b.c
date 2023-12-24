@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BUCKETS 197
+#define DICTIONARY_BUCKETS 197
 #define DIMENSION 101
 #define ITERATIONS 1000000000
 
@@ -38,7 +38,7 @@ struct DictionaryBucket
 struct Dictionary
 {
     struct DictionaryBucket* firstBucket;
-    struct DictionaryBucket buckets[BUCKETS];
+    struct DictionaryBucket buckets[DICTIONARY_BUCKETS];
 };
 
 struct Matrix
@@ -102,7 +102,7 @@ Exception dictionary_replace(
         hash = (hash * 31) + key[i];
     }
 
-    hash %= BUCKETS;
+    hash %= DICTIONARY_BUCKETS;
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {

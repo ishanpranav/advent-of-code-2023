@@ -40,14 +40,14 @@ void matrix(Matrix instance, int n)
     instance->columns = n;
 }
 
-char matrix_get(Matrix instance, struct Coordinate coordinate)
+char matrix_get(Matrix instance, Coordinate coordinate)
 {
-    return instance->items[(instance->columns * coordinate.i) + coordinate.j];
+    return instance->items[(instance->columns * coordinate->i) + coordinate->j];
 }
 
-void matrix_set(Matrix instance, struct Coordinate coordinate, char item)
+void matrix_set(Matrix instance, Coordinate coordinate, char item)
 {
-    instance->items[(instance->columns * coordinate.i) + coordinate.j] = item;
+    instance->items[(instance->columns * coordinate->i) + coordinate->j] = item;
 }
 
 void matrix_add_row(Matrix instance, char values[])
@@ -57,17 +57,14 @@ void matrix_add_row(Matrix instance, char values[])
     instance->rows = m + 1;
 
     memcpy(
-        instance->items + (instance->columns * m), 
-        values, 
+        instance->items + (instance->columns * m),
+        values,
         instance->columns);
 }
 
-static bool scan_hi(
-    Matrix matrix,
-    Coordinate previous,
-    struct Coordinate current)
+static bool scan_hi(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current.i--;
+    current->i--;
 
     char other = matrix_get(matrix, current);
 
@@ -76,20 +73,16 @@ static bool scan_hi(
         case '|':
         case '7':
         case 'F':
-            *previous = current;
-
+            *previous = *current;
             return true;
 
         default: return false;
     }
 }
 
-static bool scan_lo(
-    Matrix matrix,
-    Coordinate previous,
-    struct Coordinate current)
+static bool scan_lo(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current.i++;
+    current->i++;
 
     char other = matrix_get(matrix, current);
 
@@ -98,20 +91,16 @@ static bool scan_lo(
         case '|':
         case 'L':
         case 'J':
-            *previous = current;
-
+            *previous = *current;
             return true;
 
         default: return false;
     }
 }
 
-static bool scan_left(
-    Matrix matrix,
-    Coordinate previous,
-    struct Coordinate current)
+static bool scan_left(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current.j--;
+    current->j--;
 
     char other = matrix_get(matrix, current);
 
@@ -120,20 +109,16 @@ static bool scan_left(
         case '-':
         case 'L':
         case 'F':
-            *previous = current;
-
+            *previous = *current;
             return true;
 
         default: return false;
     }
 }
 
-static bool scan_right(
-    Matrix matrix,
-    Coordinate previous,
-    struct Coordinate current)
+static bool scan_right(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current.j++;
+    current->j++;
 
     char other = matrix_get(matrix, current);
 
@@ -142,18 +127,14 @@ static bool scan_right(
         case '-':
         case 'J':
         case '7':
-            *previous = current;
-
+            *previous = *current;
             return true;
 
         default: return false;
     }
 }
 
-static bool scan(
-    Matrix matrix,
-    Coordinate previous,
-    struct Coordinate current)
+static bool scan(Matrix matrix, Coordinate previous, Coordinate current)
 {
     switch (matrix_get(matrix, current))
     {
@@ -213,7 +194,7 @@ int main()
     do
     {
         matrix_add_row(&a, buffer);
-        
+
         char* token = strchr(buffer, 'S');
 
         if (token)
@@ -236,10 +217,10 @@ int main()
 
     coordinate_empty(&previous);
 
-    if (!scan_hi(&a, &previous, current) &&
-        !scan_lo(&a, &previous, current) &&
-        !scan_left(&a, &previous, current) &&
-        !scan_right(&a, &previous, current))
+    if (!scan_hi(&a, &previous, &current) &&
+        !scan_lo(&a, &previous, &current) &&
+        !scan_left(&a, &previous, &current) &&
+        !scan_right(&a, &previous, &current))
     {
         fprintf(stderr, "Error: Format.\n");
 
@@ -253,12 +234,12 @@ int main()
         current = previous;
         total++;
 
-        if (!scan(&a, &previous, current))
+        if (!scan(&a, &previous, &current))
         {
             coordinate_empty(&previous);
         }
 
-        matrix_set(&a, current, 0);
+        matrix_set(&a, &current, 0);
     }
 
     total /= 2;

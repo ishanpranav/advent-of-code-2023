@@ -67,6 +67,7 @@ typedef char* String;
 typedef enum Card Card;
 typedef enum HandType HandType;
 typedef struct Hand* Hand;
+typedef struct Player* Player;
 typedef struct PlayerList* PlayerList;
 
 Card card(char symbol)
@@ -132,9 +133,9 @@ void player_list(PlayerList instance)
     instance->count = 0;
 }
 
-void player_list_add(PlayerList instance, struct Player item)
+void player_list_add(PlayerList instance, Player item)
 {
-    instance->items[instance->count] = item;
+    instance->items[instance->count] = *item;
     instance->count++;
 }
 
@@ -243,7 +244,7 @@ int main()
         player.handType = handType;
         player.bid = atoi(token);
 
-        player_list_add(&players, player);
+        player_list_add(&players, &player);
     }
 
     player_list_sort(&players);
