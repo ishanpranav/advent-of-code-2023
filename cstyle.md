@@ -12,7 +12,7 @@
 ## Wrapping
 
 - The line limit is 80 characters.
-- Do not split long strings to meet the character limit.
+- Split long strings to meet the character limit.
 
 ## Bracing
 
