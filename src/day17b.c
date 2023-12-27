@@ -13,6 +13,11 @@
 #define STEP_MIN 4
 #define STEP_MAX 11
 
+enum
+{
+    LOCAL_MAX = INT_MAX / 2
+};
+
 enum Direction
 {
     DIRECTION_NONE = 0,
@@ -36,8 +41,8 @@ struct CoordinatePriorityQueueElement
 struct CoordinatePriorityQueue
 {
     struct Coordinate items[COORDINATE_PRIORITY_QUEUE_CAPACITY];
-    int first;
-    int last;
+    long first;
+    long last;
 };
 
 struct State
@@ -134,10 +139,10 @@ bool coordinate_priority_queue_try_dequeue(
 void state(State instance, int priority)
 {
     instance->priority = priority;
-    instance->hi = INT_MAX / 2;
-    instance->lo = INT_MAX / 2;
-    instance->left = INT_MAX / 2;
-    instance->right = INT_MAX / 2;
+    instance->hi = LOCAL_MAX;
+    instance->lo = LOCAL_MAX;
+    instance->left = LOCAL_MAX;
+    instance->right = LOCAL_MAX;
 }
 
 void state_matrix(StateMatrix instance, int columns)
@@ -154,11 +159,10 @@ State state_matrix_get(StateMatrix instance, int i, int j)
 static void scan_hi(
     StateMatrix matrix,
     Coordinate current,
+    int priority,
     CoordinatePriorityQueue priorityQueue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->left, initialState->right);
 
     coordinate.j = current->j;
     coordinate.obstacle = DIRECTION_VERTICAL;
@@ -190,12 +194,11 @@ static void scan_hi(
 static void scan_lo(
     StateMatrix matrix,
     Coordinate current,
+    int priority,
     CoordinatePriorityQueue priorityQueue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->left, initialState->right);
-
+    
     coordinate.j = current->j;
     coordinate.obstacle = DIRECTION_VERTICAL;
 
@@ -226,11 +229,10 @@ static void scan_lo(
 static void scan_left(
     StateMatrix matrix,
     Coordinate current,
+    int priority,
     CoordinatePriorityQueue priorityQueue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->hi, initialState->lo);
 
     coordinate.i = current->i;
     coordinate.obstacle = DIRECTION_HORIZONTAL;
@@ -262,11 +264,9 @@ static void scan_left(
 static void scan_right(
     StateMatrix matrix,
     Coordinate current,
+    int priority,
     CoordinatePriorityQueue priorityQueue)
 {
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->hi, initialState->lo);
-
     struct Coordinate coordinate;
 
     coordinate.i = current->i;
@@ -358,14 +358,20 @@ int main()
     {
         if (current.obstacle != DIRECTION_VERTICAL)
         {
-            scan_hi(matrix, &current, priorityQueue);
-            scan_lo(matrix, &current, priorityQueue);
+            State currentState = state_matrix_get(matrix, current.i, current.j);
+            int priority = math_min(currentState->left, currentState->right);
+        
+            scan_hi(matrix, &current, priority, priorityQueue);
+            scan_lo(matrix, &current, priority, priorityQueue);
         }
 
         if (current.obstacle != DIRECTION_HORIZONTAL)
         {
-            scan_left(matrix, &current, priorityQueue);
-            scan_right(matrix, &current, priorityQueue);
+            State currentState = state_matrix_get(matrix, current.i, current.j);
+            int priority = math_min(currentState->hi, currentState->lo);
+
+            scan_left(matrix, &current, priority, priorityQueue);
+            scan_right(matrix, &current, priority, priorityQueue);
         }
     }
 
@@ -374,21 +380,10 @@ int main()
         matrix->rows - 1,
         matrix->columns - 1);
     int min = finalState->hi;
-
-    if (finalState->lo < min) 
-    {
-        min = finalState->lo;
-    }
-
-    if (finalState->left < min) 
-    {
-        min = finalState->left;
-    }
-
-    if (finalState->right < min)
-    {
-        min = finalState->right;
-    }
+    
+    min = math_min(min, finalState->lo);
+    min = math_min(min, finalState->left);
+    min = math_min(min, finalState->right);
     
     printf("17b %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     free(matrix);
