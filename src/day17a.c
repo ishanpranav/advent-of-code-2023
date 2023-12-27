@@ -16,7 +16,7 @@
 enum Direction
 {
     DIRECTION_NONE = 0,
-    DIRECtION_HORIZONTAL,
+    DIRECTION_HORIZONTAL,
     DIRECTION_VERTICAL
 };
 
@@ -127,7 +127,7 @@ bool coordinate_priority_queue_try_dequeue(
     {
         instance->first++;
     }
-    
+
     return true;
 }
 
@@ -238,7 +238,7 @@ static void scan_left(
     int priority = math_min(initialState->hi, initialState->lo);
 
     coordinate.i = current->i;
-    coordinate.obstacle = DIRECtION_HORIZONTAL;
+    coordinate.obstacle = DIRECTION_HORIZONTAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
@@ -275,7 +275,7 @@ static void scan_right(
     struct Coordinate coordinate;
 
     coordinate.i = current->i;
-    coordinate.obstacle = DIRECtION_HORIZONTAL;
+    coordinate.obstacle = DIRECTION_HORIZONTAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
