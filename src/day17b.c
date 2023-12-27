@@ -1,6 +1,6 @@
 // Licensed under the MIT License.
 
-// Clumsy Crucible Part 1
+// Clumsy Crucible Part 2
 
 #include <limits.h>
 #include <stdbool.h>
@@ -149,11 +149,6 @@ void state_matrix(StateMatrix instance, int columns)
 State state_matrix_get(StateMatrix instance, int i, int j)
 {
     return instance->items + (i * instance->columns) + j;
-}
-
-void state_matrix_add_row(StateMatrix instance)
-{
-    instance->rows++;
 }
 
 static void scan_hi(
@@ -329,7 +324,7 @@ int main()
 
     do
     {
-        state_matrix_add_row(matrix);
+        matrix->rows++;
 
         for (int j = 0; j < n; j++)
         {
@@ -378,12 +373,23 @@ int main()
         matrix,
         matrix->rows - 1,
         matrix->columns - 1);
-    int min = math_min(
-        finalState->hi,
-        math_min(
-            finalState->lo,
-            math_min(finalState->left, finalState->right)));
+    int min = finalState->hi;
 
+    if (finalState->lo < min) 
+    {
+        min = finalState->lo;
+    }
+
+    if (finalState->left < min) 
+    {
+        min = finalState->left;
+    }
+
+    if (finalState->right < min)
+    {
+        min = finalState->right;
+    }
+    
     printf("17b %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     free(matrix);
     free(priorityQueue);

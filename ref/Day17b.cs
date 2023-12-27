@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace Advent;
+namespace Day17;
 
 internal enum Direction
 {
@@ -28,25 +28,25 @@ internal readonly struct Coordinate
 
 internal sealed class State
 {
-    public State(uint priority)
+    public State(int priority)
     {
         Priority = priority;
-        Hi = int.MaxValue;
-        Lo = int.MaxValue;
-        Left = int.MaxValue;
-        Right = int.MaxValue;
+        Hi = int.MaxValue / 2;
+        Lo = int.MaxValue / 2;
+        Left = int.MaxValue / 2;
+        Right = int.MaxValue / 2;
     }
 
-    public uint Priority { get; }
-    public uint Hi { get; set; }
-    public uint Lo { get; set; }
-    public uint Left { get; set; }
-    public uint Right { get; set; }
+    public int Priority { get; }
+    public int Hi { get; set; }
+    public int Lo { get; set; }
+    public int Left { get; set; }
+    public int Right { get; set; }
 }
 
 internal sealed class StateMatrix
 {
-    private readonly State[,] _items = new State[150, 150];
+    private readonly State[,] _items = new State[256, 256];
 
     public StateMatrix(int columns)
     {
@@ -97,18 +97,18 @@ internal static class Program
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        uint result = Run(reader);
+        int result = Run(reader);
 
         stopwatch.Stop();
         Console.WriteLine("17a {0} {1}", result, stopwatch.Elapsed.TotalSeconds);
     }
 
-    private static void ScanHi(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
+    private static void ScanHi(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
     {
         State initialState = matrix[current];
 
         int j = current.J;
-        uint priority = Math.Min(initialState.Left, initialState.Right);
+        int priority = Math.Min(initialState.Left, initialState.Right);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -134,12 +134,12 @@ internal static class Program
         }
     }
 
-    private static void ScanLo(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
+    private static void ScanLo(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
     {
         State initialState = matrix[current];
 
         int j = current.J;
-        uint priority = Math.Min(initialState.Left, initialState.Right);
+        int priority = Math.Min(initialState.Left, initialState.Right);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -165,12 +165,12 @@ internal static class Program
         }
     }
 
-    private static void ScanLeft(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
+    private static void ScanLeft(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
     {
         State initialState = matrix[current];
 
         int i = current.I;
-        uint priority = Math.Min(initialState.Hi, initialState.Lo);
+        int priority = Math.Min(initialState.Hi, initialState.Lo);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -196,12 +196,12 @@ internal static class Program
         }
     }
 
-    private static void ScanRight(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
+    private static void ScanRight(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
     {
         State initialState = matrix[current];
 
         int i = current.I;
-        uint priority = Math.Min(initialState.Hi, initialState.Lo);
+        int priority = Math.Min(initialState.Hi, initialState.Lo);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -227,7 +227,7 @@ internal static class Program
         }
     }
 
-    private static uint Run(StreamReader reader)
+    private static int Run(StreamReader reader)
     {
         string? line = reader.ReadLine();
 
@@ -244,7 +244,7 @@ internal static class Program
 
             for (int j = 0; j < line.Length; j++)
             {
-                matrix[matrix.Rows - 1, j] = new State((uint)(line[j] - '0'));
+                matrix[matrix.Rows - 1, j] = new State((int)(line[j] - '0'));
             }
         }
         while ((line = reader.ReadLine()) != null);
@@ -256,7 +256,7 @@ internal static class Program
         initial.Left = 0;
         initial.Right = 0;
 
-        PriorityQueue<Coordinate, uint> coordinates = new PriorityQueue<Coordinate, uint>();
+        PriorityQueue<Coordinate, int> coordinates = new PriorityQueue<Coordinate, int>();
 
         coordinates.Enqueue(new Coordinate(0, 0, Direction.None), 0);
 
@@ -275,22 +275,22 @@ internal static class Program
             }
         }
 
-        State finalState = matrix[matrix.Rows - 1, matrix.Columns - 1];
-        uint min = target.Hi;
+        State target = matrix[matrix.Rows - 1, matrix.Columns - 1];
+        int min = target.Hi;
 
-        if (finalState.Lo < min)
+        if (target.Lo < min)
         {
             min = target.Lo;
         }
 
-        if (finalState.Left < min)
+        if (target.Left < min)
         {
-            min = finalState.Left;
+            min = target.Left;
         }
 
-        if (finalState.Right < min)
+        if (target.Right < min)
         {
-            min = finalState.Right;
+            min = target.Right;
         }
 
         return min;
