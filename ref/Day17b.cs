@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 
 namespace Advent;
 
@@ -25,20 +28,20 @@ internal readonly struct Coordinate
 
 internal sealed class State
 {
-    public State(int priority)
+    public State(uint priority)
     {
         Priority = priority;
-        Hi = 9999;
-        Lo = 9999;
-        Left = 9999;
-        Right = 9999;
+        Hi = int.MaxValue;
+        Lo = int.MaxValue;
+        Left = int.MaxValue;
+        Right = int.MaxValue;
     }
 
-    public int Priority { get; }
-    public int Hi { get; set; }
-    public int Lo { get; set; }
-    public int Left { get; set; }
-    public int Right { get; set; }
+    public uint Priority { get; }
+    public uint Hi { get; set; }
+    public uint Lo { get; set; }
+    public uint Left { get; set; }
+    public uint Right { get; set; }
 }
 
 internal sealed class StateMatrix
@@ -94,18 +97,18 @@ internal static class Program
 
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        int result = Run(reader);
+        uint result = Run(reader);
 
         stopwatch.Stop();
         Console.WriteLine("17a {0} {1}", result, stopwatch.Elapsed.TotalSeconds);
     }
 
-    private static void ScanHi(StateMatrix matrix, Coordinate current, List<Coordinate> next)
+    private static void ScanHi(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
     {
         State initialState = matrix[current];
 
         int j = current.J;
-        int priority = Math.Min(initialState.Left, initialState.Right);
+        uint priority = Math.Min(initialState.Left, initialState.Right);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -127,16 +130,16 @@ internal static class Program
 
             currentState.Lo = priority;
 
-            next.Add(new Coordinate(i, j, Direction.Vertical));
+            coordinates.Enqueue(new Coordinate(i, j, Direction.Vertical), priority);
         }
     }
 
-    private static void ScanLo(StateMatrix matrix, Coordinate current, List<Coordinate> next)
+    private static void ScanLo(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
     {
         State initialState = matrix[current];
 
         int j = current.J;
-        int priority = Math.Min(initialState.Left, initialState.Right);
+        uint priority = Math.Min(initialState.Left, initialState.Right);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -158,16 +161,16 @@ internal static class Program
 
             currentState.Hi = priority;
 
-            next.Add(new Coordinate(i, j, Direction.Vertical));
+            coordinates.Enqueue(new Coordinate(i, j, Direction.Vertical), priority);
         }
     }
 
-    private static void ScanLeft(StateMatrix matrix, Coordinate current, List<Coordinate> next)
+    private static void ScanLeft(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
     {
         State initialState = matrix[current];
 
         int i = current.I;
-        int priority = Math.Min(initialState.Hi, initialState.Lo);
+        uint priority = Math.Min(initialState.Hi, initialState.Lo);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -189,16 +192,16 @@ internal static class Program
 
             currentState.Right = priority;
 
-            next.Add(new Coordinate(i, j, Direction.Horizontal));
+            coordinates.Enqueue(new Coordinate(i, j, Direction.Horizontal), priority);
         }
     }
 
-    private static void ScanRight(StateMatrix matrix, Coordinate current, List<Coordinate> next)
+    private static void ScanRight(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, uint> coordinates)
     {
         State initialState = matrix[current];
 
         int i = current.I;
-        int priority = Math.Min(initialState.Hi, initialState.Lo);
+        uint priority = Math.Min(initialState.Hi, initialState.Lo);
 
         for (int k = 1; k <= Max; k++)
         {
@@ -220,11 +223,11 @@ internal static class Program
 
             currentState.Left = priority;
 
-            next.Add(new Coordinate(i, j, Direction.Horizontal));
+            coordinates.Enqueue(new Coordinate(i, j, Direction.Horizontal), priority);
         }
     }
 
-    private static int Run(StreamReader reader)
+    private static uint Run(StreamReader reader)
     {
         string? line = reader.ReadLine();
 
@@ -241,7 +244,7 @@ internal static class Program
 
             for (int j = 0; j < line.Length; j++)
             {
-                matrix[matrix.Rows - 1, j] = new State(line[j] - '0');
+                matrix[matrix.Rows - 1, j] = new State((uint)(line[j] - '0'));
             }
         }
         while ((line = reader.ReadLine()) != null);
@@ -253,49 +256,41 @@ internal static class Program
         initial.Left = 0;
         initial.Right = 0;
 
-        List<Coordinate> nextList = new List<Coordinate>
+        PriorityQueue<Coordinate, uint> coordinates = new PriorityQueue<Coordinate, uint>();
+
+        coordinates.Enqueue(new Coordinate(0, 0, Direction.None), 0);
+
+        while (coordinates.TryDequeue(out Coordinate current, out _))
         {
-            new Coordinate(0, 0, Direction.None)
-        };
-
-        while (nextList.Count > 0)
-        {
-            List<Coordinate> currentList = nextList;
-
-            nextList = new List<Coordinate>();
-
-            foreach (Coordinate current in currentList)
+            if (current.Forbidden != Direction.Vertical)
             {
-                if (current.Forbidden != Direction.Vertical)
-                {
-                    ScanHi(matrix, current, nextList);
-                    ScanLo(matrix, current, nextList);
-                }
+                ScanHi(matrix, current, coordinates);
+                ScanLo(matrix, current, coordinates);
+            }
 
-                if (current.Forbidden != Direction.Horizontal)
-                {
-                    ScanLeft(matrix, current, nextList);
-                    ScanRight(matrix, current, nextList);
-                }
+            if (current.Forbidden != Direction.Horizontal)
+            {
+                ScanLeft(matrix, current, coordinates);
+                ScanRight(matrix, current, coordinates);
             }
         }
 
-        State target = matrix[matrix.Rows - 1, matrix.Columns - 1];
-        int min = target.Hi;
+        State finalState = matrix[matrix.Rows - 1, matrix.Columns - 1];
+        uint min = target.Hi;
 
-        if (target.Lo < min)
+        if (finalState.Lo < min)
         {
             min = target.Lo;
         }
 
-        if (target.Left < min)
+        if (finalState.Left < min)
         {
-            min = target.Left;
+            min = finalState.Left;
         }
 
-        if (target.Right < min)
+        if (finalState.Right < min)
         {
-            min = target.Right;
+            min = finalState.Right;
         }
 
         return min;
