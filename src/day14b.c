@@ -83,9 +83,9 @@ void matrix_add_row(Matrix instance, char values[])
         instance->columns);
 }
 
-void matrix_to_char_array(Matrix instance, char value[])
+void matrix_to_char_array(Matrix instance, char result[])
 {
-    memcpy(value, instance->items, instance->rows * instance->columns);
+    memcpy(result, instance->items, instance->rows * instance->columns);
 }
 
 Exception dictionary_replace(
