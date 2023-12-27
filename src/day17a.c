@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define COORDINATE_PRIORITY_QUEUE_CAPACITY 1000000
 #define DIMENSION 256
 #define STEP_MIN 4
 #define STEP_MAX 11
@@ -34,8 +35,9 @@ struct CoordinatePriorityQueueElement
 
 struct CoordinatePriorityQueue
 {
-    struct CoordinatePriorityQueueElement* first;
-    struct CoordinatePriorityQueueElement* last;
+    struct Coordinate items[COORDINATE_PRIORITY_QUEUE_CAPACITY];
+    int first;
+    int last;
 };
 
 struct State
@@ -73,8 +75,8 @@ int math_min(int a, int b)
 
 void coordinate_priority_queue(CoordinatePriorityQueue instance)
 {
-    instance->first = NULL;
-    instance->last = NULL;
+    instance->first = -1;
+    instance->last = -1;
 }
 
 void coordinate_priority_queue_enqueue(
@@ -82,41 +84,50 @@ void coordinate_priority_queue_enqueue(
     Coordinate value,
     int priority)
 {
-    CoordinatePriorityQueueElement element =
-        malloc(sizeof(struct CoordinatePriorityQueueElement));
-
-    element->value = *value;
-    element->next = NULL;
-
-    if (!instance->first)
+    if (instance->first == -1)
     {
-        instance->first = element;
-        instance->last = element;
-
-        return;
+        instance->first = 0;
+        instance->last = 0;
+    }
+    else if (
+        instance->first > 0 &&
+        instance->last == COORDINATE_PRIORITY_QUEUE_CAPACITY - 1)
+    {
+        instance->last = 0;
+    }
+    else
+    {
+        instance->last++;
     }
 
-    instance->last->next = element;
-    instance->last = element;
+    instance->items[instance->last] = *value;
 }
 
 bool coordinate_priority_queue_try_dequeue(
     CoordinatePriorityQueue instance,
     Coordinate result)
 {
-    if (!instance->first)
+    if (instance->first == -1)
     {
         return false;
     }
 
-    *result = instance->first->value;
+    *result = instance->items[instance->first];
 
-    CoordinatePriorityQueueElement next = instance->first->next;
-
-    free(instance->first);
-
-    instance->first = next;
-
+    if (instance->first == instance->last)
+    {
+        instance->first = -1;
+        instance->last = -1;
+    }
+    else if (instance->first == COORDINATE_PRIORITY_QUEUE_CAPACITY - 1)
+    {
+        instance->first = 0;
+    }
+    else 
+    {
+        instance->first++;
+    }
+    
     return true;
 }
 
@@ -380,4 +391,5 @@ int main()
             math_min(finalState->left, finalState->right)));
 
     printf("17a %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
+    free(matrix);
 }
