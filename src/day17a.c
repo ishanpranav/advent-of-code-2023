@@ -8,10 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_PRIORITY_QUEUE_CAPACITY 1000000
+#define COORDINATE_PRIORITY_QUEUE_CAPACITY 65536
 #define DIMENSION 256
-#define STEP_MIN 4
-#define STEP_MAX 11
+#define STEP_MIN 1
+#define STEP_MAX 4
 
 enum Direction
 {
@@ -304,6 +304,9 @@ static void scan_right(
 int main()
 {
     char buffer[DIMENSION + 1];
+    StateMatrix matrix = malloc(sizeof(struct StateMatrix));
+    CoordinatePriorityQueue priorityQueue =
+        malloc(sizeof(struct CoordinatePriorityQueue));
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))
@@ -321,8 +324,6 @@ int main()
 
         return 1;
     }
-
-    StateMatrix matrix = malloc(sizeof(struct StateMatrix));
 
     state_matrix(matrix, n);
 
@@ -353,14 +354,7 @@ int main()
     initialState->left = 0;
     initialState->right = 0;
 
-    struct Coordinate current;
-
-    current.i = 0;
-    current.j = 0;
-    current.obstacle = DIRECTION_NONE;
-
-    CoordinatePriorityQueue priorityQueue =
-        malloc(sizeof(struct CoordinatePriorityQueue));
+    struct Coordinate current = { 0 };
 
     coordinate_priority_queue(priorityQueue);
     coordinate_priority_queue_enqueue(priorityQueue, &current, 0);
@@ -373,7 +367,7 @@ int main()
             scan_lo(matrix, &current, priorityQueue);
         }
 
-        if (current.obstacle != DIRECtION_HORIZONTAL)
+        if (current.obstacle != DIRECTION_HORIZONTAL)
         {
             scan_left(matrix, &current, priorityQueue);
             scan_right(matrix, &current, priorityQueue);
@@ -392,4 +386,5 @@ int main()
 
     printf("17a %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     free(matrix);
+    free(priorityQueue);
 }
