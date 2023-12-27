@@ -54,9 +54,11 @@ char matrix_get(Matrix instance, Coordinate coordinate)
     return instance->items[(instance->columns * coordinate->i) + coordinate->j];
 }
 
-void matrix_set(Matrix instance, Coordinate coordinate, char item)
+void matrix_set(Matrix instance, Coordinate coordinate, char value)
 {
-    instance->items[(instance->columns * coordinate->i) + coordinate->j] = item;
+    int index = (instance->columns * coordinate->i) + coordinate->j;
+
+    instance->items[index] = value;
 }
 
 void matrix_add_row(Matrix instance, String value)
@@ -82,16 +84,21 @@ void polygon_add(Polygon instance, Coordinate item)
 
 static bool scan_hi(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current->i--;
+    struct Coordinate coordinate =
+    {
+        .i = current->i - 1,
+        .j = current->j
+    };
 
-    char other = matrix_get(matrix, current);
+    char other = matrix_get(matrix, &coordinate);
 
     switch (other)
     {
         case '|':
         case '7':
         case 'F':
-            *previous = *current;
+            *previous = coordinate;
+
             return true;
 
         default: return false;
@@ -100,16 +107,21 @@ static bool scan_hi(Matrix matrix, Coordinate previous, Coordinate current)
 
 static bool scan_lo(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current->i++;
+    struct Coordinate coordinate =
+    {
+        .i = current->i + 1,
+        .j = current->j
+    };
 
-    char other = matrix_get(matrix, current);
+    char other = matrix_get(matrix, &coordinate);
 
     switch (other)
     {
         case '|':
         case 'L':
         case 'J':
-            *previous = *current;
+            *previous = coordinate;
+
             return true;
 
         default: return false;
@@ -118,16 +130,21 @@ static bool scan_lo(Matrix matrix, Coordinate previous, Coordinate current)
 
 static bool scan_left(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current->j--;
+    struct Coordinate coordinate =
+    {
+        .i = current->i,
+        .j = current->j - 1
+    };
 
-    char other = matrix_get(matrix, current);
+    char other = matrix_get(matrix, &coordinate);
 
     switch (other)
     {
         case '-':
         case 'L':
         case 'F':
-            *previous = *current;
+            *previous = coordinate;
+
             return true;
 
         default: return false;
@@ -136,16 +153,21 @@ static bool scan_left(Matrix matrix, Coordinate previous, Coordinate current)
 
 static bool scan_right(Matrix matrix, Coordinate previous, Coordinate current)
 {
-    current->j++;
+    struct Coordinate coordinate =
+    {
+        .i = current->i,
+        .j = current->j + 1
+    };
 
-    char other = matrix_get(matrix, current);
+    char other = matrix_get(matrix, &coordinate);
 
     switch (other)
     {
         case '-':
         case 'J':
         case '7':
-            *previous = *current;
+            *previous = coordinate;
+
             return true;
 
         default: return false;

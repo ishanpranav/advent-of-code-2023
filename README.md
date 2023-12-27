@@ -9,9 +9,9 @@ complexity while keeping the average running time on the order of 0.0001 s
 The exceptions are:
 
 - [Day 12(a)](src/day12a.c), which runs on the order of
-0.001 s (1 ms).
+  0.001 s (1 ms).
 - [Day 12(b)](src/day12b.c), which runs on the order of 0.01 s
-(10 ms).
+  (10 ms).
 - [Day 14(b)](src/day14b.c), which runs on the order of 0.01 s (10 ms).
 
 Despite my best efforts, the order of magnitude of these run times
@@ -54,37 +54,37 @@ day01a < in.txt
 
 ## Summary
 
-|Day|Problem|Domain|Result|Implementation|
-|:-:|:-----:|:----:|:----:|:-------|
-| 1 |[Trebuchet?!](src/day01b.c)|Strings, Tries|Sum|Primitive [trie](https://en.wikipedia.org/wiki/Trie)|
-| 2 |[Cube Conundrum](src/day02b.c)|Strings|Sum||
-| 3 |[Gear Ratios](src/day03b.c)|Dynamic programming|Sum|Sliding window technique|
-| 4 |[Scratchcards](src/day04b.c)|Hash sets|Sum||
-| 5 |[If You Give A Seed A Fertilizer](src/day05b.c)|Functions, Sorting algorithms|Minimum|Function composition, System of linear equations|
-| 6 |[Wait For It](src/day06b.c)|Physics, Algebra|Product|[Quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula)|
-| 7 |[Camel Cards](src/day07b.c)|Statistics, Dictionaries, Sorting algorithms|Sum|Frequency map with mode-tracking|
-| 8 |[Haunted Wasteland](src/day08b.c)|Graph theory, Number theory, Dictionaries|Least Common Multiple|[Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph|
-| 9 |[Mirage Maintenance](src/day09b.c)|Numerical analysis|Sum|[Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)|
-| 10|[Pipe Maze](src/day10b.c)|Geometry, Graph theory, Pathfinding algorithms|Count|[Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph|
-| 11|[Cosmic Expansion](src/day11b.c)|Geometry|Sum|[Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)|
-| 12|[Hot Springs](src/day12b.c)|Automata theory, Regular expressions, Dictionaries|Sum|[Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary|
-| 13|[Point of Incidence](src/day13b.c)|Binary arithmetic|Sum|Bit array, bit matrix|
-| 14|[Parabolic Reflector Dish](src/day14b.c)|Strings, Dictionaries|Sum|Character matrix, cycle detection|
-| 15|[Lens Library](src/day15b.c)|Cryptography, Hash functions, Dictionaries|Sum|Iterable ordered dictionary, string builder|
-| 16|[The Floor Will Be Lava](src/day16b.c)||||
-| 17|[Clumsy Crucible](src/day17b.c)|Graph theory, Pathfinding algorithms, Priority queues|Minimum|[Dijkstra\'s algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm), [_d_-ary heap](https://en.wikipedia.org/wiki/D-ary_heap)|
+| Day |                     Problem                     |                        Domain                         |        Result         | Implementation                                                                                                                                                                                                    |
+| :-: | :---------------------------------------------: | :---------------------------------------------------: | :-------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  1  |           [Trebuchet?!](src/day01b.c)           |                    Strings, Tries                     |          Sum          | Primitive [trie](https://en.wikipedia.org/wiki/Trie)                                                                                                                                                              |
+|  2  |         [Cube Conundrum](src/day02b.c)          |                        Strings                        |          Sum          |                                                                                                                                                                                                                   |
+|  3  |           [Gear Ratios](src/day03b.c)           |                  Dynamic programming                  |          Sum          | Sliding window technique                                                                                                                                                                                          |
+|  4  |          [Scratchcards](src/day04b.c)           |                       Hash sets                       |          Sum          |                                                                                                                                                                                                                   |
+|  5  | [If You Give A Seed A Fertilizer](src/day05b.c) |             Functions, Sorting algorithms             |        Minimum        | Function composition, System of linear equations                                                                                                                                                                  |
+|  6  |           [Wait For It](src/day06b.c)           |                   Physics, Algebra                    |        Product        | [Quadratic formula](https://en.wikipedia.org/wiki/Quadratic_formula)                                                                                                                                              |
+|  7  |           [Camel Cards](src/day07b.c)           |     Statistics, Dictionaries, Sorting algorithms      |          Sum          | Frequency map with mode-tracking                                                                                                                                                                                  |
+|  8  |        [Haunted Wasteland](src/day08b.c)        |       Graph theory, Number theory, Dictionaries       | Least Common Multiple | [Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph                                                                                                                         |
+|  9  |       [Mirage Maintenance](src/day09b.c)        |                  Numerical analysis                   |          Sum          | [Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)                                                                                                                                          |
+| 10  |            [Pipe Maze](src/day10b.c)            |    Geometry, Graph theory, Pathfinding algorithms     |         Count         | [Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph |
+| 11  |        [Cosmic Expansion](src/day11b.c)         |                       Geometry                        |          Sum          | [Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)                                                                                                                                                |
+| 12  |           [Hot Springs](src/day12b.c)           |  Automata theory, Regular expressions, Dictionaries   |          Sum          | [Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary                                                                                      |
+| 13  |       [Point of Incidence](src/day13b.c)        |                   Binary arithmetic                   |          Sum          | Bit array, bit matrix                                                                                                                                                                                             |
+| 14  |    [Parabolic Reflector Dish](src/day14b.c)     |                 Strings, Dictionaries                 |          Sum          | Character matrix, cycle detection                                                                                                                                                                                 |
+| 15  |          [Lens Library](src/day15b.c)           |      Cryptography, Hash functions, Dictionaries       |          Sum          | Iterable ordered dictionary, string builder                                                                                                                                                                       |
+| 16  |     [The Floor Will Be Lava](src/day16b.c)      |                                                       |                       |                                                                                                                                                                                                                   |
+| 17  |         [Clumsy Crucible](src/day17b.c)         | Graph theory, Pathfinding algorithms, Priority queues |        Minimum        | [Dijkstra\'s algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm), [_d_-ary heap](https://en.wikipedia.org/wiki/D-ary_heap)                                                                           |
 
 ## Constraints
 
 I am adhering to the following constraints to ensure high code quality.
 
 - Adhere to the [project style guide](cstyle.md).
-- Final solutions must be implemented in the C programming language following 
-the C99 standard.
-- All solutions must be standalone files with no user-defined headers and no 
-external dependencies beyond the C standard library (`libc`) and the C 
-mathematics library (`libm`). The first and second problems for a given day must 
-be implemented separately.
+- Final solutions must be implemented in the C programming language following
+  the C99 standard.
+- All solutions must be standalone files with no user-defined headers and no
+  external dependencies beyond the C standard library (`libc`) and the C
+  mathematics library (`libm`). The first and second problems for a given day
+  must be implemented separately.
 - Dynamic memory allocation is discouraged. The following should be avoided:
   - `malloc`
   - `calloc`
@@ -92,17 +92,17 @@ be implemented separately.
   - `aligned_alloc`
   - `free`
 - Bounds checking is not required for data structures whose capacity is defined
-by a macro.
+  by a macro.
 - The first and second problems for a given day may share the same data
-structures and algorithms, but the second problem may only add to (and never
-remove from) the public API of the first.
+  structures and algorithms, but the second problem may only add to (and never
+  remove from) the public API of the first.
 - The return values of all C standard library functions must be checked, except
-for those returned from the following:
+  for those returned from the following:
   - `fprintf`
   - `memcpy`
   - `printf`
 - Only the `main` entry point can do the following:
   - Write to the standard output stream (i.e., call `printf`)
   - Write to the standard error stream (i.e., call `fprintf` with `stderr` as
-  the first argument)
+    the first argument)
   - Terminate the program

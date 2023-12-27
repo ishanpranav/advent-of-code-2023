@@ -240,7 +240,7 @@ int main()
             continue;
         }
 
-        hash = ((hash + current) * 17) % BUCKETS;
+        hash = ((hash + current) * 17) % ORDERED_DICTIONARY_BUCKETS;
 
         string_builder_append(&keyBuilder, current);
     }
