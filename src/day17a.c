@@ -13,6 +13,11 @@
 #define STEP_MIN 1
 #define STEP_MAX 4
 
+enum
+{
+    LOCAL_MAX = INT_MAX / 2
+};
+
 enum Direction
 {
     DIRECTION_NONE = 0,
@@ -27,17 +32,11 @@ struct Coordinate
     enum Direction obstacle;
 };
 
-struct CoordinatePriorityQueueElement
-{
-    struct CoordinatePriorityQueueElement* next;
-    struct Coordinate value;
-};
-
-struct CoordinatePriorityQueue
+struct CoordinateQueue
 {
     struct Coordinate items[COORDINATE_PRIORITY_QUEUE_CAPACITY];
-    int first;
-    int last;
+    long first;
+    long last;
 };
 
 struct State
@@ -58,8 +57,7 @@ struct StateMatrix
 
 typedef enum Direction Direction;
 typedef struct Coordinate* Coordinate;
-typedef struct CoordinatePriorityQueue* CoordinatePriorityQueue;
-typedef struct CoordinatePriorityQueueElement* CoordinatePriorityQueueElement;
+typedef struct CoordinateQueue* CoordinateQueue;
 typedef struct State* State;
 typedef struct StateMatrix* StateMatrix;
 
@@ -73,16 +71,13 @@ int math_min(int a, int b)
     return b;
 }
 
-void coordinate_priority_queue(CoordinatePriorityQueue instance)
+void coordinate_queue(CoordinateQueue instance)
 {
     instance->first = -1;
     instance->last = -1;
 }
 
-void coordinate_priority_queue_enqueue(
-    CoordinatePriorityQueue instance,
-    Coordinate value,
-    int priority)
+void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate value)
 {
     if (instance->first == -1)
     {
@@ -103,9 +98,7 @@ void coordinate_priority_queue_enqueue(
     instance->items[instance->last] = *value;
 }
 
-bool coordinate_priority_queue_try_dequeue(
-    CoordinatePriorityQueue instance,
-    Coordinate result)
+bool coordinate_queue_try_dequeue(CoordinateQueue instance, Coordinate result)
 {
     if (instance->first == -1)
     {
@@ -134,10 +127,10 @@ bool coordinate_priority_queue_try_dequeue(
 void state(State instance, int priority)
 {
     instance->priority = priority;
-    instance->hi = INT_MAX / 2;
-    instance->lo = INT_MAX / 2;
-    instance->left = INT_MAX / 2;
-    instance->right = INT_MAX / 2;
+    instance->hi = LOCAL_MAX;
+    instance->lo = LOCAL_MAX;
+    instance->left = LOCAL_MAX;
+    instance->right = LOCAL_MAX;
 }
 
 void state_matrix(StateMatrix instance, int columns)
@@ -151,19 +144,13 @@ State state_matrix_get(StateMatrix instance, int i, int j)
     return instance->items + (i * instance->columns) + j;
 }
 
-void state_matrix_add_row(StateMatrix instance)
-{
-    instance->rows++;
-}
-
 static void scan_hi(
     StateMatrix matrix,
     Coordinate current,
-    CoordinatePriorityQueue priorityQueue)
+    int priority,
+    CoordinateQueue queue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->left, initialState->right);
 
     coordinate.j = current->j;
     coordinate.obstacle = DIRECTION_VERTICAL;
@@ -188,19 +175,18 @@ static void scan_hi(
 
         state->lo = priority;
 
-        coordinate_priority_queue_enqueue(priorityQueue, &coordinate, priority);
+        coordinate_queue_enqueue(queue, &coordinate);
     }
 }
 
 static void scan_lo(
     StateMatrix matrix,
     Coordinate current,
-    CoordinatePriorityQueue priorityQueue)
+    int priority,
+    CoordinateQueue queue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->left, initialState->right);
-
+    
     coordinate.j = current->j;
     coordinate.obstacle = DIRECTION_VERTICAL;
 
@@ -224,18 +210,17 @@ static void scan_lo(
 
         state->hi = priority;
 
-        coordinate_priority_queue_enqueue(priorityQueue, &coordinate, priority);
+        coordinate_queue_enqueue(queue, &coordinate);
     }
 }
 
 static void scan_left(
     StateMatrix matrix,
     Coordinate current,
-    CoordinatePriorityQueue priorityQueue)
+    int priority,
+    CoordinateQueue queue)
 {
     struct Coordinate coordinate;
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->hi, initialState->lo);
 
     coordinate.i = current->i;
     coordinate.obstacle = DIRECTION_HORIZONTAL;
@@ -260,18 +245,16 @@ static void scan_left(
 
         state->right = priority;
 
-        coordinate_priority_queue_enqueue(priorityQueue, &coordinate, priority);
+        coordinate_queue_enqueue(queue, &coordinate);
     }
 }
 
 static void scan_right(
     StateMatrix matrix,
     Coordinate current,
-    CoordinatePriorityQueue priorityQueue)
+    int priority,
+    CoordinateQueue queue)
 {
-    State initialState = state_matrix_get(matrix, current->i, current->j);
-    int priority = math_min(initialState->hi, initialState->lo);
-
     struct Coordinate coordinate;
 
     coordinate.i = current->i;
@@ -297,16 +280,31 @@ static void scan_right(
 
         state->left = priority;
 
-        coordinate_priority_queue_enqueue(priorityQueue, &coordinate, priority);
+        coordinate_queue_enqueue(queue, &coordinate);
     }
 }
 
 int main()
 {
-    char buffer[DIMENSION + 1];
     StateMatrix matrix = malloc(sizeof(struct StateMatrix));
-    CoordinatePriorityQueue priorityQueue =
-        malloc(sizeof(struct CoordinatePriorityQueue));
+
+    if (!matrix)
+    {
+        fprintf(stderr, "Error: Out of memory.\n");
+
+        return 1;
+    }
+
+    CoordinateQueue queue = malloc(sizeof(struct CoordinateQueue));
+    
+    if (!queue)
+    {
+        fprintf(stderr, "Error: Out of memory.\n");
+
+        return 1;
+    }
+
+    char buffer[DIMENSION + 1];
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))
@@ -329,7 +327,7 @@ int main()
 
     do
     {
-        state_matrix_add_row(matrix);
+        matrix->rows++;
 
         for (int j = 0; j < n; j++)
         {
@@ -356,21 +354,27 @@ int main()
 
     struct Coordinate current = { 0 };
 
-    coordinate_priority_queue(priorityQueue);
-    coordinate_priority_queue_enqueue(priorityQueue, &current, 0);
+    coordinate_queue(queue);
+    coordinate_queue_enqueue(queue, &current);
 
-    while (coordinate_priority_queue_try_dequeue(priorityQueue, &current))
+    while (coordinate_queue_try_dequeue(queue, &current))
     {
         if (current.obstacle != DIRECTION_VERTICAL)
         {
-            scan_hi(matrix, &current, priorityQueue);
-            scan_lo(matrix, &current, priorityQueue);
+            State currentState = state_matrix_get(matrix, current.i, current.j);
+            int priority = math_min(currentState->left, currentState->right);
+        
+            scan_hi(matrix, &current, priority, queue);
+            scan_lo(matrix, &current, priority, queue);
         }
 
         if (current.obstacle != DIRECTION_HORIZONTAL)
         {
-            scan_left(matrix, &current, priorityQueue);
-            scan_right(matrix, &current, priorityQueue);
+            State currentState = state_matrix_get(matrix, current.i, current.j);
+            int priority = math_min(currentState->hi, currentState->lo);
+
+            scan_left(matrix, &current, priority, queue);
+            scan_right(matrix, &current, priority, queue);
         }
     }
 
@@ -378,13 +382,12 @@ int main()
         matrix,
         matrix->rows - 1,
         matrix->columns - 1);
-    int min = math_min(
-        finalState->hi,
-        math_min(
-            finalState->lo,
-            math_min(finalState->left, finalState->right)));
-
+    int min = math_min(finalState->hi, finalState->lo);
+    
+    min = math_min(min, finalState->left);
+    min = math_min(min, finalState->right);
+    
     printf("17a %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     free(matrix);
-    free(priorityQueue);
+    free(queue);
 }
