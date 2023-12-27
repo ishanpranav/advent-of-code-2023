@@ -332,7 +332,7 @@ int main()
     }
 
     struct Matrix a;
-    Dictionary cache = calloc(1, sizeof(struct Dictionary));
+    struct Dictionary cache;
 
     matrix(&a, n);
 
@@ -342,19 +342,19 @@ int main()
     }
     while (fgets(buffer, n + 2, stdin));
 
-    switch (roll_many(&a, cache))
+    switch (roll_many(&a, &cache))
     {
         case EXCEPTION_OUT_OF_MEMORY:
             fprintf(stderr, "Error: Out of memory.\n");
             return 1;
-            
+
         default: break;
     }
 
     long total = scan(&a);
 
     printf("14b %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    dictionary_clear(cache);
+    dictionary_clear(&cache);
 
     return 0;
 }
