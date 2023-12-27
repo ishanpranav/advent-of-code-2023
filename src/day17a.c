@@ -26,10 +26,16 @@ struct Coordinate
     enum Direction obstacle;
 };
 
+struct CoordinatePriorityQueueElement
+{
+    struct CoordinatePriorityQueueElement* next;
+    struct Coordinate value;
+};
+
 struct CoordinatePriorityQueue
 {
-    struct Coordinate items[10000000];
-    int count;
+    struct CoordinatePriorityQueueElement* first;
+    struct CoordinatePriorityQueueElement* last;
 };
 
 struct State
@@ -51,6 +57,7 @@ struct StateMatrix
 typedef enum Direction Direction;
 typedef struct Coordinate* Coordinate;
 typedef struct CoordinatePriorityQueue* CoordinatePriorityQueue;
+typedef struct CoordinatePriorityQueueElement* CoordinatePriorityQueueElement;
 typedef struct State* State;
 typedef struct StateMatrix* StateMatrix;
 
@@ -66,31 +73,49 @@ int math_min(int a, int b)
 
 void coordinate_priority_queue(CoordinatePriorityQueue instance)
 {
-    instance->count = 0;
+    instance->first = NULL;
+    instance->last = NULL;
 }
 
 void coordinate_priority_queue_enqueue(
     CoordinatePriorityQueue instance,
-    Coordinate value, 
+    Coordinate value,
     int priority)
 {
-    instance->items[instance->count] = *value;
-    instance->count++;
+    CoordinatePriorityQueueElement element =
+        malloc(sizeof(struct CoordinatePriorityQueueElement));
+
+    element->value = *value;
+    element->next = NULL;
+
+    if (!instance->first)
+    {
+        instance->first = element;
+        instance->last = element;
+
+        return;
+    }
+
+    instance->last->next = element;
+    instance->last = element;
 }
 
 bool coordinate_priority_queue_try_dequeue(
     CoordinatePriorityQueue instance,
     Coordinate result)
 {
-    if (!instance->count)
+    if (!instance->first)
     {
         return false;
     }
 
-    instance->count--;
-    result->i = instance->items[instance->count].i;
-    result->j = instance->items[instance->count].j;
-    result->obstacle = instance->items[instance->count].obstacle;
+    *result = instance->first->value;
+
+    CoordinatePriorityQueueElement next = instance->first->next;
+
+    free(instance->first);
+
+    instance->first = next;
 
     return true;
 }
@@ -323,7 +348,7 @@ int main()
     current.j = 0;
     current.obstacle = DIRECTION_NONE;
 
-    CoordinatePriorityQueue priorityQueue = 
+    CoordinatePriorityQueue priorityQueue =
         malloc(sizeof(struct CoordinatePriorityQueue));
 
     coordinate_priority_queue(priorityQueue);
