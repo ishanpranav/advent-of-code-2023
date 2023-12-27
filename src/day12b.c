@@ -65,7 +65,7 @@ void dictionary_increment(Dictionary instance, int key, long long change)
 void dictionary_copy(Dictionary destination, Dictionary source)
 {
     dictionary(destination);
-    
+
     for (DictionaryEntry entry = source->first; entry; entry = entry->next)
     {
         dictionary_increment(destination, entry->key, entry->value);
@@ -101,9 +101,9 @@ void pattern_concat(Pattern instance, Pattern other)
     instance->length += other->length;
 }
 
-void pattern_set(Pattern instance, int index, char item)
+void pattern_set(Pattern instance, int index, char value)
 {
-    instance->symbols[index] = item;
+    instance->symbols[index] = value;
 }
 
 static void read(char symbol, Pattern pattern, Dictionary current)
@@ -216,7 +216,7 @@ int main()
         }
 
         scan(&text, &longPattern, &current);
-        
+
         total +=
             current.buckets[longPattern.length - 1].value +
             current.buckets[longPattern.length - 2].value;
