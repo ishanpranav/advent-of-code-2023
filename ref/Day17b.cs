@@ -18,12 +18,12 @@ internal readonly struct Coordinate
     {
         I = i;
         J = j;
-        Forbidden = forbidden;
+        Obstacle = forbidden;
     }
 
     public int I { get; }
     public int J { get; }
-    public Direction Forbidden { get; }
+    public Direction Obstacle { get; }
 }
 
 internal sealed class State
@@ -89,7 +89,7 @@ internal sealed class StateMatrix
 internal static class Program
 {
     public const int Min = 4;
-    public const int Max = 10;
+    public const int Max = 11;
 
     private static void Main()
     {
@@ -103,14 +103,11 @@ internal static class Program
         Console.WriteLine("17a {0} {1}", result, stopwatch.Elapsed.TotalSeconds);
     }
 
-    private static void ScanHi(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
+    private static void ScanHi(StateMatrix matrix, Coordinate current, int priority, PriorityQueue<Coordinate, int> coordinates)
     {
-        State initialState = matrix[current];
-
         int j = current.J;
-        int priority = Math.Min(initialState.Left, initialState.Right);
 
-        for (int k = 1; k <= Max; k++)
+        for (int k = 1; k < Max; k++)
         {
             int i = current.I - k;
 
@@ -134,14 +131,11 @@ internal static class Program
         }
     }
 
-    private static void ScanLo(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
+    private static void ScanLo(StateMatrix matrix, Coordinate current, int priority, PriorityQueue<Coordinate, int> coordinates)
     {
-        State initialState = matrix[current];
-
         int j = current.J;
-        int priority = Math.Min(initialState.Left, initialState.Right);
 
-        for (int k = 1; k <= Max; k++)
+        for (int k = 1; k < Max; k++)
         {
             int i = current.I + k;
 
@@ -165,14 +159,11 @@ internal static class Program
         }
     }
 
-    private static void ScanLeft(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
+    private static void ScanLeft(StateMatrix matrix, Coordinate current, int priority, PriorityQueue<Coordinate, int> coordinates)
     {
-        State initialState = matrix[current];
-
         int i = current.I;
-        int priority = Math.Min(initialState.Hi, initialState.Lo);
-
-        for (int k = 1; k <= Max; k++)
+        
+        for (int k = 1; k < Max; k++)
         {
             int j = current.J - k;
 
@@ -196,14 +187,11 @@ internal static class Program
         }
     }
 
-    private static void ScanRight(StateMatrix matrix, Coordinate current, PriorityQueue<Coordinate, int> coordinates)
+    private static void ScanRight(StateMatrix matrix, Coordinate current, int priority, PriorityQueue<Coordinate, int> coordinates)
     {
-        State initialState = matrix[current];
-
         int i = current.I;
-        int priority = Math.Min(initialState.Hi, initialState.Lo);
-
-        for (int k = 1; k <= Max; k++)
+        
+        for (int k = 1; k < Max; k++)
         {
             int j = current.J + k;
 
@@ -249,49 +237,43 @@ internal static class Program
         }
         while ((line = reader.ReadLine()) != null);
 
-        State initial = matrix[0, 0];
+        State initialState = matrix[0, 0];
 
-        initial.Hi = 0;
-        initial.Lo = 0;
-        initial.Left = 0;
-        initial.Right = 0;
+        initialState.Hi = 0;
+        initialState.Lo = 0;
+        initialState.Left = 0;
+        initialState.Right = 0;
 
-        PriorityQueue<Coordinate, int> coordinates = new PriorityQueue<Coordinate, int>();
+        PriorityQueue<Coordinate, int> queue = new PriorityQueue<Coordinate, int>();
 
-        coordinates.Enqueue(new Coordinate(0, 0, Direction.None), 0);
+        queue.Enqueue(new Coordinate(0, 0, Direction.None), 0);
 
-        while (coordinates.TryDequeue(out Coordinate current, out _))
+        while (queue.TryDequeue(out Coordinate current, out _))
         {
-            if (current.Forbidden != Direction.Vertical)
+            if (current.Obstacle != Direction.Vertical)
             {
-                ScanHi(matrix, current, coordinates);
-                ScanLo(matrix, current, coordinates);
+                State currentState = matrix[current];
+                int priority = Math.Min(currentState.Left, currentState.Right);
+
+                ScanHi(matrix, current, priority, queue);
+                ScanLo(matrix, current, priority, queue);
             }
 
-            if (current.Forbidden != Direction.Horizontal)
+            if (current.Obstacle != Direction.Horizontal)
             {
-                ScanLeft(matrix, current, coordinates);
-                ScanRight(matrix, current, coordinates);
+                State currentState = matrix[current];
+                int priority = Math.Min(currentState.Hi, currentState.Lo);
+
+                ScanLeft(matrix, current, priority, queue);
+                ScanRight(matrix, current, priority, queue);
             }
         }
 
         State target = matrix[matrix.Rows - 1, matrix.Columns - 1];
-        int min = target.Hi;
+        int min = Math.Min(target.Hi, target.Lo);
 
-        if (target.Lo < min)
-        {
-            min = target.Lo;
-        }
-
-        if (target.Left < min)
-        {
-            min = target.Left;
-        }
-
-        if (target.Right < min)
-        {
-            min = target.Right;
-        }
+        min = Math.Min(min, target.Left);
+        min = Math.Min(min, target.Right);
 
         return min;
     }
