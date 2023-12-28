@@ -35,8 +35,8 @@ struct Table
 {
     int rows;
     int columns;
-    bool set[DIMENSION * DIMENSION][DIRECTION_NONE];
     char matrix[DIMENSION * DIMENSION];
+    bool set[DIMENSION * DIMENSION][DIRECTION_NONE];
 };
 
 typedef enum Direction Direction;
@@ -113,19 +113,6 @@ bool table_set_add(Table instance, Coordinate coordinate)
     instance->set[index][coordinate->direction] = true;
 
     return true;
-}
-
-bool table_set_contains(Table instance, int i, int j)
-{
-    for (Direction direction = 0; direction < DIRECTION_NONE; direction++)
-    {
-        if (instance->set[(i * instance->rows) + j][direction])
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 static int scan(Table table, Coordinate current)
@@ -235,11 +222,16 @@ static int scan(Table table, Coordinate current)
 
     int result = 0;
 
-    for (int i = 0; i < table->rows; i++)
+    for (int k = 0; k < table->rows * table->columns; k++)
     {
-        for (int j = 0; j < table->columns; j++)
+        for (Direction direction = 0; direction < DIRECTION_NONE; direction++)
         {
-            result += table_set_contains(table, i, j);
+            if (table->set[k][direction])
+            {
+                result++;
+
+                break;
+            }
         }
     }
 
