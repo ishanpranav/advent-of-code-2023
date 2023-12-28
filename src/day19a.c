@@ -335,7 +335,6 @@ static bool parse_range(Tokenizer tokenizer, Range result)
         return false;
     }
 
-    // result->identifier = PROPERTY_NONE;
     result->relation = 0;
 
     return true;
@@ -388,61 +387,6 @@ int main()
         }
 
         function_dictionary_set(&dictionary, key, &current);
-    }
-
-    printf("OK"); fflush(stdout);
-    for (FunctionDictionaryBucket bucket = dictionary.firstBucket;
-        bucket;
-        bucket = bucket->nextBucket)
-    {
-        for (FunctionDictionaryEntry entry = bucket->firstEntry;
-            entry;
-            entry = entry->nextEntry)
-        {
-            char str[100] = { 0 };
-
-            strcpy(str, entry->key);
-            printf("%s{", str);
-
-            for (Range range = entry->value.ranges;
-                range < entry->value.ranges + entry->value.count;
-                range++)
-            {
-                if (range->relation)
-                {
-                    switch (range->identifier)
-                    {
-                        case PROPERTY_A:
-                            printf("a");
-                            break;
-                        case PROPERTY_M:
-                            printf("m");
-                            break;
-                        case PROPERTY_S:
-                            printf("s");
-                            break;
-                        case PROPERTY_X:
-                            printf("x");
-                            break;
-                        default: break;
-                    }
-
-                    printf("%c%d:", range->relation, range->comparand);
-                }
-
-                char otherStr[100] = { 0 };
-
-                strcpy(otherStr, range->key);
-                printf("%s", otherStr);
-
-                if (range != entry->value.ranges + entry->value.count - 1)
-                {
-                    printf(",");
-                }
-            }
-
-            printf("}\n");
-        }
     }
 
     long sum = 0;
