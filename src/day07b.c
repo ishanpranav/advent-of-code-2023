@@ -132,12 +132,13 @@ void b_player_list(BPlayerList instance)
     instance->count = 0;
 }
 
-void b_player_list_add(BPlayerList instance, BPlayer item)
+BPlayer b_player_list_new_player(BPlayerList instance)
 {
-    int count = instance->count;
+    BPlayer result = instance->items + instance->count;
 
-    instance->items[count] = *item;
-    instance->count = count + 1;
+    instance->count++;
+
+    return result;
 }
 
 void b_player_list_sort(BPlayerList instance)
@@ -226,8 +227,8 @@ int main()
             return 1;
         }
 
-        struct BPlayer player;
         struct BHand current = { 0 };
+        BPlayer player = b_player_list_new_player(&players);
 
         for (int i = 0; i < HAND_SIZE; i++)
         {
@@ -242,7 +243,7 @@ int main()
 
             b_hand_add(&current, drawn);
 
-            player.cards[i] = drawn;
+            player->cards[i] = drawn;
         }
 
         HandType handType = b_hand_get_type(&current);
@@ -256,10 +257,8 @@ int main()
             return 1;
         }
 
-        player.handType = handType;
-        player.bid = atoi(token);
-
-        b_player_list_add(&players, &player);
+        player->handType = handType;
+        player->bid = atoi(token);
     }
 
     b_player_list_sort(&players);

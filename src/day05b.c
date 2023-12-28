@@ -120,6 +120,15 @@ void function(Function instance)
     instance->count = 0;
 }
 
+Range function_new_range(Function instance)
+{
+    Range result = instance->ranges + instance->count;
+
+    instance->count++;
+
+    return result;
+}
+
 void function_add_range(Function instance, Range item)
 {
     instance->ranges[instance->count] = *item;
@@ -146,14 +155,11 @@ void function_fill_ranges(Function instance)
 
     if (!count)
     {
-        struct Range infinity =
-        {
-            .sourceOffset = 0,
-            .destinationOffset = 0,
-            .length = LLONG_MAX
-        };
+        Range infinity = function_new_range(instance);
 
-        function_add_range(instance, &infinity);
+        infinity->sourceOffset = 0;
+        infinity->destinationOffset = 0;
+        infinity->length = LLONG_MAX;
 
         return;
     }
@@ -170,10 +176,7 @@ void function_fill_ranges(Function instance)
 
     if (min)
     {
-        struct Range identity;
-
-        range_identity(LLONG_MIN, min, &identity);
-        function_add_range(instance, &identity);
+        range_identity(LLONG_MIN, min, function_new_range(instance));
     }
 
     function_add_range(instance, first);
@@ -188,13 +191,10 @@ void function_fill_ranges(Function instance)
 
         if (difference > 1)
         {
-            struct Range identity;
-
             range_identity(
                 previousMax + 1,
                 currentMin + current->length,
-                &identity);
-            function_add_range(instance, &identity);
+                function_new_range(instance));
         }
 
         function_add_range(instance, current);
@@ -204,10 +204,7 @@ void function_fill_ranges(Function instance)
 
     if (lastMax < LLONG_MAX)
     {
-        struct Range identity;
-
-        range_identity(lastMax + 1, LLONG_MAX, &identity);
-        function_add_range(instance, &identity);
+        range_identity(lastMax + 1, LLONG_MAX, function_new_range(instance));
     }
 }
 
@@ -235,15 +232,12 @@ void function_compose(Function instance, Function other)
                 continue;
             }
 
-            struct Range range;
-
             range_from_interval(
                 math_max(aMin, bMin),
                 math_min(aMax, bMax),
                 a->destinationOffset - a->sourceOffset +
                 b->destinationOffset - b->sourceOffset,
-                &range);
-            function_add_range(instance, &range);
+                function_new_range(instance));
         }
     }
 }
@@ -267,10 +261,10 @@ static bool read(Function function, char buffer[])
     {
         return false;
     }
+    
+    Range range = function_new_range(function);
 
-    struct Range range;
-
-    range.destinationOffset = atoll(token);
+    range->destinationOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
 
     if (!token)
@@ -278,7 +272,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    range.sourceOffset = atoll(token);
+    range->sourceOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
 
     if (!token)
@@ -286,9 +280,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    range.length = atoll(token);
-
-    function_add_range(function, &range);
+    range->length = atoll(token);
 
     return true;
 }

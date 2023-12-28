@@ -372,7 +372,7 @@ int main()
             break;
         }
 
-        char key[KEY_SIZE] = { 0 };
+        char key[KEY_SIZE];
         struct Function current;
         struct Tokenizer lexer;
 

@@ -133,10 +133,13 @@ void player_list(PlayerList instance)
     instance->count = 0;
 }
 
-void player_list_add(PlayerList instance, Player item)
+Player player_list_new_player(PlayerList instance)
 {
-    instance->items[instance->count] = *item;
+    Player result = instance->items + instance->count;
+
     instance->count++;
+
+    return result;
 }
 
 void player_list_sort(PlayerList instance)
@@ -211,8 +214,8 @@ int main()
             return 1;
         }
 
-        struct Player player;
         struct Hand hand = { 0 };
+        Player player = player_list_new_player(&players);
 
         for (int i = 0; i < HAND_SIZE; i++)
         {
@@ -227,7 +230,7 @@ int main()
 
             hand_add(&hand, drawn);
 
-            player.cards[i] = drawn;
+            player->cards[i] = drawn;
         }
 
         HandType handType = hand_get_type(&hand);
@@ -241,10 +244,8 @@ int main()
             return 1;
         }
 
-        player.handType = handType;
-        player.bid = atoi(token);
-
-        player_list_add(&players, &player);
+        player->handType = handType;
+        player->bid = atoi(token);
     }
 
     player_list_sort(&players);
@@ -257,6 +258,6 @@ int main()
     }
 
     printf("07a %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
-    
+
     return 0;
 }

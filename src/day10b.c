@@ -30,7 +30,6 @@ struct Polygon
 };
 
 typedef char* Row;
-typedef char* String;
 typedef struct Coordinate* Coordinate;
 typedef struct Matrix* Matrix;
 typedef struct Polygon* Polygon;
@@ -61,13 +60,16 @@ void matrix_set(Matrix instance, Coordinate coordinate, char value)
     instance->items[index] = value;
 }
 
-void matrix_add_row(Matrix instance, String value)
+void matrix_add_row(Matrix instance, char values[])
 {
     int m = instance->rows;
 
     instance->rows = m + 1;
 
-    memcpy(instance->items + (instance->columns * m), value, instance->columns);
+    memcpy(
+        instance->items + (instance->columns * m),
+        values,
+        instance->columns);
 }
 
 void polygon(Polygon instance, Coordinate item)
