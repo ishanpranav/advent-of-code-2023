@@ -76,10 +76,10 @@ Property property(char value)
 {
     switch (value)
     {
-        case 'A': return PROPERTY_A;
-        case 'M': return PROPERTY_M;
-        case 'S': return PROPERTY_S;
-        case 'X': return PROPERTY_X;
+        case 'a': return PROPERTY_A;
+        case 'm': return PROPERTY_M;
+        case 's': return PROPERTY_S;
+        case 'x': return PROPERTY_X;
         default: return 0;
     }
 }
@@ -282,43 +282,60 @@ static bool parse_number(Tokenizer tokenizer, int* result)
 
 static bool parse_key(Tokenizer tokenizer, char result[])
 {
+    int i = 0;
+
     while (islower(*tokenizer->current))
     {
-        *result = tokenizer_pop(tokenizer);
-        result++;
+        result[i] = tokenizer_pop(tokenizer);
+        i++;
+    }
+
+    while (i < KEY_SIZE)
+    {
+        result[i] = '\0';
+        i++;
     }
 
     return true;
 }
 
+static bool parse_action(Tokenizer tokenizer, char result[])
+{
+    switch (*tokenizer->current)
+    {
+        case 'A':
+        case 'R':
+            result[0] = tokenizer_pop(tokenizer);
+            return true;
+
+        default: return parse_key(tokenizer, result);
+    }
+}
+
 static bool parse_range(Tokenizer tokenizer, Range result)
 {
-    char ahead;
-
-    if (tokenizer_try_peek_ahead(tokenizer, &ahead) &&
-        (ahead == '<' || ahead == '>'))
+    if (*tokenizer->current &&
+        (tokenizer->current[1] == '<' || tokenizer->current[1] == '>'))
     {
         result->identifier = property(tokenizer_pop(tokenizer));
-
-        tokenizer_pop(tokenizer);
+        result->relation = tokenizer_pop(tokenizer);
 
         if (!parse_number(tokenizer, &result->comparand) ||
             tokenizer_pop(tokenizer) != ':' ||
-            !parse_key(tokenizer, result->key))
+            !parse_action(tokenizer, result->key))
         {
             return false;
         }
 
-        result->relation = ahead;
-
         return true;
     }
 
-    if (!parse_key(tokenizer, result->key))
+    if (!parse_action(tokenizer, result->key))
     {
         return false;
     }
 
+    // result->identifier = PROPERTY_NONE;
     result->relation = 0;
 
     return true;
@@ -373,6 +390,61 @@ int main()
         function_dictionary_set(&dictionary, key, &current);
     }
 
+    printf("OK"); fflush(stdout);
+    for (FunctionDictionaryBucket bucket = dictionary.firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
+    {
+        for (FunctionDictionaryEntry entry = bucket->firstEntry;
+            entry;
+            entry = entry->nextEntry)
+        {
+            char str[100] = { 0 };
+
+            strcpy(str, entry->key);
+            printf("%s{", str);
+
+            for (Range range = entry->value.ranges;
+                range < entry->value.ranges + entry->value.count;
+                range++)
+            {
+                if (range->relation)
+                {
+                    switch (range->identifier)
+                    {
+                        case PROPERTY_A:
+                            printf("a");
+                            break;
+                        case PROPERTY_M:
+                            printf("m");
+                            break;
+                        case PROPERTY_S:
+                            printf("s");
+                            break;
+                        case PROPERTY_X:
+                            printf("x");
+                            break;
+                        default: break;
+                    }
+
+                    printf("%c%d:", range->relation, range->comparand);
+                }
+
+                char otherStr[100] = { 0 };
+
+                strcpy(otherStr, range->key);
+                printf("%s", otherStr);
+
+                if (range != entry->value.ranges + entry->value.count - 1)
+                {
+                    printf(",");
+                }
+            }
+
+            printf("}\n");
+        }
+    }
+
     long sum = 0;
 
     while (fgets(buffer, sizeof buffer, stdin))
@@ -397,7 +469,7 @@ int main()
 
             int number;
 
-            tokenizer(&lexer, p);
+            tokenizer(&lexer, p + 1);
             parse_number(&lexer, &number);
 
             localSum += number;
