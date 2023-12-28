@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Day19;
 
-internal enum Identifier
+internal enum Property
 {
     X = 0,
     M = 1,
@@ -17,14 +17,14 @@ internal enum Identifier
 
 internal interface IExpression
 {
-    bool Evaluate(Dynamic value, Expression expression);
+    bool Evaluate(Dynamic value, FunctionDictionary expression);
 }
 
 internal sealed class Dynamic
 {
-    private readonly int[] _properties = new int[Enum.GetValues<Identifier>().Length];
+    private readonly int[] _properties = new int[Enum.GetValues<Property>().Length];
 
-    public int this[Identifier property]
+    public int this[Property property]
     {
         get
         {
@@ -44,7 +44,7 @@ internal sealed class AcceptAction : IExpression
         return "A";
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
         return true;
     }
@@ -57,7 +57,7 @@ internal sealed class RejectAction : IExpression
         return "R";
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
         return false;
     }
@@ -77,7 +77,7 @@ internal sealed class JumpAction : IExpression
         return Destination;
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
         return expression[Destination].Evaluate(value, expression);
     }
@@ -85,13 +85,13 @@ internal sealed class JumpAction : IExpression
 
 internal sealed class LessThanCondition : IExpression
 {
-    public LessThanCondition(Identifier identifier, int comparand)
+    public LessThanCondition(Property identifier, int comparand)
     {
         Identifier = identifier;
         Comparand = comparand;
     }
 
-    public Identifier Identifier { get; }
+    public Property Identifier { get; }
     public int Comparand { get; }
 
     public override string ToString()
@@ -99,7 +99,7 @@ internal sealed class LessThanCondition : IExpression
         return $"{Identifier.ToString().ToLowerInvariant()}<{Comparand}";
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
         return value[Identifier] < Comparand;
     }
@@ -107,13 +107,13 @@ internal sealed class LessThanCondition : IExpression
 
 internal sealed class GreaterThanCondition : IExpression
 {
-    public GreaterThanCondition(Identifier identiifer, int comparand)
+    public GreaterThanCondition(Property identiifer, int comparand)
     {
         Identifier = identiifer;
         Comparand = comparand;
     }
 
-    public Identifier Identifier { get; }
+    public Property Identifier { get; }
     public int Comparand { get; }
 
     public override string ToString()
@@ -121,15 +121,15 @@ internal sealed class GreaterThanCondition : IExpression
         return $"{Identifier.ToString().ToLowerInvariant()}>{Comparand}";
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
         return value[Identifier] > Comparand;
     }
 }
 
-internal sealed class Rule
+internal sealed class Range
 {
-    public Rule(IExpression condition, IExpression action)
+    public Range(IExpression condition, IExpression action)
     {
         Condition = condition;
         Action = action;
@@ -144,30 +144,30 @@ internal sealed class Rule
     }
 }
 
-internal sealed class RuleSet
+internal sealed class Function
 {
-    private readonly List<Rule> _rules = new List<Rule>();
+    private readonly List<Range> _ranges = new List<Range>();
 
-    public ICollection<Rule> Rules
+    public ICollection<Range> Ranges
     {
         get
         {
-            return _rules;
+            return _ranges;
         }
     }
 
     public void Write(StringBuilder output)
     {
-        output.AppendJoin(',', _rules);
+        output.AppendJoin(',', _ranges);
     }
 
-    public bool Evaluate(Dynamic value, Expression expression)
+    public bool Evaluate(Dynamic value, FunctionDictionary expression)
     {
-        foreach (Rule rule in _rules)
+        foreach (Range range in _ranges)
         {
-            if (rule.Condition.Evaluate(value, expression))
+            if (range.Condition.Evaluate(value, expression))
             {
-                return rule.Action.Evaluate(value, expression);
+                return range.Action.Evaluate(value, expression);
             }
         }
 
@@ -175,31 +175,31 @@ internal sealed class RuleSet
     }
 }
 
-internal sealed class Expression
+internal sealed class FunctionDictionary
 {
-    private readonly Dictionary<string, RuleSet> _ruleSets = new Dictionary<string, RuleSet>();
+    private readonly Dictionary<string, Function> _functions = new Dictionary<string, Function>();
 
-    public RuleSet this[string name]
+    public Function this[string name]
     {
         get
         {
-            return _ruleSets[name];
+            return _functions[name];
         }
         set
         {
-            _ruleSets[name] = value;
+            _functions[name] = value;
         }
     }
 
     public void Write(StringBuilder output)
     {
-        foreach (KeyValuePair<string, RuleSet> ruleSet in _ruleSets)
+        foreach (KeyValuePair<string, Function> function in _functions)
         {
             output
-                .Append(ruleSet.Key)
+                .Append(function.Key)
                 .Append('{');
 
-            ruleSet.Value.Write(output);
+            function.Value.Write(output);
 
             output.AppendLine("}");
         }
@@ -254,7 +254,7 @@ internal sealed class Parser
         _index = 0;
     }
 
-    private bool ParseLabel([MaybeNullWhen(false)] out string result)
+    private bool ParseKey([MaybeNullWhen(false)] out string result)
     {
         StringBuilder builder = new StringBuilder();
 
@@ -268,14 +268,14 @@ internal sealed class Parser
         return true;
     }
 
-    private static Identifier GetIdentifier(char token)
+    private static Property GetProperty(char token)
     {
         switch (token)
         {
-            case 'a': return Identifier.A;
-            case 'm': return Identifier.M;
-            case 's': return Identifier.S;
-            case 'x': return Identifier.X;
+            case 'a': return Property.A;
+            case 'm': return Property.M;
+            case 's': return Property.S;
+            case 'x': return Property.X;
             default: throw new ArgumentException(null, nameof(token));
         }
     }
@@ -297,7 +297,7 @@ internal sealed class Parser
                 return true;
 
             default:
-                if (!ParseLabel(out string? label))
+                if (!ParseKey(out string? label))
                 {
                     result = null;
                     return false;
@@ -320,7 +320,7 @@ internal sealed class Parser
         return comparand > 0;
     }
 
-    private bool ParseRule([MaybeNullWhen(false)] out Rule result)
+    private bool ParseRange([MaybeNullWhen(false)] out Range result)
     {
         IExpression? action;
 
@@ -340,7 +340,7 @@ internal sealed class Parser
                         return false;
                     }
 
-                    result = new Rule(new LessThanCondition(GetIdentifier(first), comparand), action);
+                    result = new Range(new LessThanCondition(GetProperty(first), comparand), action);
                     return true;
 
                 case '>':
@@ -355,7 +355,7 @@ internal sealed class Parser
                         return false;
                     }
 
-                    result = new Rule(new GreaterThanCondition(GetIdentifier(first), comparand), action);
+                    result = new Range(new GreaterThanCondition(GetProperty(first), comparand), action);
                     return true;
             }
         }
@@ -367,39 +367,32 @@ internal sealed class Parser
             return false;
         }
 
-        result = new Rule(new AcceptAction(), action);
+        result = new Range(new AcceptAction(), action);
 
         return true;
     }
 
-    public bool ParseRuleSet(
-        [MaybeNullWhen(false)] out string name,
-        [MaybeNullWhen(false)] out RuleSet ruleSet)
+    public bool ParseFunction(
+        [MaybeNullWhen(false)] out string key,
+        [MaybeNullWhen(false)] out Function result)
     {
-        if (!ParseLabel(out name))
+        if (!ParseKey(out key) || Pop() != '{')
         {
-            ruleSet = null;
+            result = null;
 
             return false;
         }
 
-        if (Pop() != '{')
-        {
-            ruleSet = null;
-
-            return false;
-        }
-
-        ruleSet = new RuleSet();
+        result = new Function();
 
         do
         {
-            if (!ParseRule(out Rule? rule))
+            if (!ParseRange(out Range? range))
             {
                 return false;
             }
 
-            ruleSet.Rules.Add(rule);
+            result.Ranges.Add(range);
         }
         while (Pop() == ',');
 
@@ -425,7 +418,7 @@ internal static class Program
     {
         string? line;
         Parser parser = new Parser();
-        Expression expression = new Expression();
+        FunctionDictionary dictionary = new FunctionDictionary();
 
         while ((line = reader.ReadLine()) != null)
         {
@@ -436,12 +429,12 @@ internal static class Program
 
             parser.SetTokens(line);
 
-            if (!parser.ParseRuleSet(out string? name, out RuleSet? ruleSet))
+            if (!parser.ParseFunction(out string? name, out Function? function))
             {
                 throw new FormatException();
             }
 
-            expression[name] = ruleSet;
+            dictionary[name] = function;
         }
 
         int sum = 0;
@@ -452,9 +445,9 @@ internal static class Program
             string[] segments = line.Substring(0, line.Length - 1).Split(',');
             int localSum = 0;
 
-            foreach (Identifier identifier in Enum.GetValues<Identifier>())
+            foreach (Property property in Enum.GetValues<Property>())
             {
-                string segment = segments[(int)identifier];
+                string segment = segments[(int)property];
                 int index = segment.IndexOf('=');
 
                 if (index == -1)
@@ -464,17 +457,15 @@ internal static class Program
 
                 int number = int.Parse(segment.Substring(index + 1)); 
 
-                dynamic[identifier] = number;
+                dynamic[property] = number;
                 localSum += number;
             }
 
-            if (expression["in"].Evaluate(dynamic, expression))
+            if (dictionary["in"].Evaluate(dynamic, dictionary))
             {
                 sum += localSum;
             }
         }
-
-        Console.WriteLine(expression.ToString());
 
         return sum;
     }
