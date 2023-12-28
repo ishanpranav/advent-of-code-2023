@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_PRIORITY_QUEUE_CAPACITY 65536
+#define COORDINATE_QUEUE_CAPACITY 32768
 #define DIMENSION 256
 #define STEP_MIN 1
 #define STEP_MAX 4
@@ -29,12 +29,12 @@ struct Coordinate
 {
     int i;
     int j;
-    enum Direction obstacle;
+    enum Direction direction;
 };
 
 struct CoordinateQueue
 {
-    struct Coordinate items[COORDINATE_PRIORITY_QUEUE_CAPACITY];
+    struct Coordinate items[COORDINATE_QUEUE_CAPACITY];
     long first;
     long last;
 };
@@ -84,9 +84,7 @@ void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate value)
         instance->first = 0;
         instance->last = 0;
     }
-    else if (
-        instance->first > 0 &&
-        instance->last == COORDINATE_PRIORITY_QUEUE_CAPACITY - 1)
+    else if (instance->first && instance->last == COORDINATE_QUEUE_CAPACITY - 1)
     {
         instance->last = 0;
     }
@@ -112,11 +110,11 @@ bool coordinate_queue_try_dequeue(CoordinateQueue instance, Coordinate result)
         instance->first = -1;
         instance->last = -1;
     }
-    else if (instance->first == COORDINATE_PRIORITY_QUEUE_CAPACITY - 1)
+    else if (instance->first == COORDINATE_QUEUE_CAPACITY - 1)
     {
         instance->first = 0;
     }
-    else 
+    else
     {
         instance->first++;
     }
@@ -153,7 +151,7 @@ static void scan_hi(
     struct Coordinate coordinate;
 
     coordinate.j = current->j;
-    coordinate.obstacle = DIRECTION_VERTICAL;
+    coordinate.direction = DIRECTION_VERTICAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
@@ -186,9 +184,9 @@ static void scan_lo(
     CoordinateQueue queue)
 {
     struct Coordinate coordinate;
-    
+
     coordinate.j = current->j;
-    coordinate.obstacle = DIRECTION_VERTICAL;
+    coordinate.direction = DIRECTION_VERTICAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
@@ -223,7 +221,7 @@ static void scan_left(
     struct Coordinate coordinate;
 
     coordinate.i = current->i;
-    coordinate.obstacle = DIRECTION_HORIZONTAL;
+    coordinate.direction = DIRECTION_HORIZONTAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
@@ -258,7 +256,7 @@ static void scan_right(
     struct Coordinate coordinate;
 
     coordinate.i = current->i;
-    coordinate.obstacle = DIRECTION_HORIZONTAL;
+    coordinate.direction = DIRECTION_HORIZONTAL;
 
     for (int k = 1; k < STEP_MAX; k++)
     {
@@ -296,7 +294,7 @@ int main()
     }
 
     CoordinateQueue queue = malloc(sizeof(struct CoordinateQueue));
-    
+
     if (!queue)
     {
         fprintf(stderr, "Error: Out of memory.\n");
@@ -359,16 +357,16 @@ int main()
 
     while (coordinate_queue_try_dequeue(queue, &current))
     {
-        if (current.obstacle != DIRECTION_VERTICAL)
+        if (current.direction != DIRECTION_VERTICAL)
         {
             State currentState = state_matrix_get(matrix, current.i, current.j);
             int priority = math_min(currentState->left, currentState->right);
-        
+
             scan_hi(matrix, &current, priority, queue);
             scan_lo(matrix, &current, priority, queue);
         }
 
-        if (current.obstacle != DIRECTION_HORIZONTAL)
+        if (current.direction != DIRECTION_HORIZONTAL)
         {
             State currentState = state_matrix_get(matrix, current.i, current.j);
             int priority = math_min(currentState->hi, currentState->lo);
@@ -383,10 +381,10 @@ int main()
         matrix->rows - 1,
         matrix->columns - 1);
     int min = math_min(finalState->hi, finalState->lo);
-    
+
     min = math_min(min, finalState->left);
     min = math_min(min, finalState->right);
-    
+
     printf("17a %d %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
     free(matrix);
     free(queue);

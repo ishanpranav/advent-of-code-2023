@@ -35,7 +35,6 @@ typedef char* String;
 typedef int Vertex;
 typedef struct Graph* Graph;
 typedef struct List* List;
-typedef bool (*Predicate)(Vertex vertex);
 
 long long math_gcd(long long a, long long b)
 {
@@ -59,38 +58,6 @@ void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
 {
     instance->vertices[vertex].left = left;
     instance->vertices[vertex].right = right;
-}
-
-int graph_walk(
-    Graph instance,
-    Vertex start,
-    String directions,
-    Predicate predicate)
-{
-    int result = 0;
-    String direction = directions;
-
-    while (!predicate(start))
-    {
-        switch (*direction)
-        {
-            case 'L':
-                start = instance->vertices[start].left;
-                direction++;
-                result++;
-                break;
-            case 'R':
-                start = instance->vertices[start].right;
-                direction++;
-                result++;
-                break;
-            default:
-                direction = directions;
-                break;
-        }
-    }
-
-    return result;
 }
 
 void list(List instance)
@@ -122,7 +89,7 @@ static bool parse(char buffer[], char window[], Vertex* result)
     return true;
 }
 
-static bool scan(FILE* stream, Graph graph, List starts)
+static bool read(FILE* stream, Graph graph, List starts)
 {
     char buffer[BUFFER_SIZE];
 
@@ -157,9 +124,32 @@ static bool scan(FILE* stream, Graph graph, List starts)
     return true;
 }
 
-static bool stop(Vertex vertex)
+static int scan(Graph instance, Vertex start, String directions)
 {
-    return vertex % 36 == VERTEX_STOP_MOD;
+    int result = 0;
+    String direction = directions;
+
+    while (start % 36 != VERTEX_STOP_MOD)
+    {
+        switch (*direction)
+        {
+            case 'L':
+                start = instance->vertices[start].left;
+                direction++;
+                result++;
+                break;
+            case 'R':
+                start = instance->vertices[start].right;
+                direction++;
+                result++;
+                break;
+            default:
+                direction = directions;
+                break;
+        }
+    }
+
+    return result;
 }
 
 int main()
@@ -172,7 +162,7 @@ int main()
     list(&starts);
 
     if (!fgets(directions, sizeof directions, stdin) ||
-        !scan(stdin, &graph, &starts))
+        !read(stdin, &graph, &starts))
     {
         fprintf(stderr, "Error: Format.\n");
 
@@ -180,11 +170,11 @@ int main()
     }
 
     Vertex* first = starts.items;
-    long long lcm = graph_walk(&graph, *first, directions, stop);
+    long long lcm = scan(&graph, *first, directions);
 
     for (Vertex* p = first + 1; p < first + starts.count; p++)
     {
-        lcm = math_lcm(lcm, graph_walk(&graph, *p, directions, stop));
+        lcm = math_lcm(lcm, scan(&graph, *p, directions));
     }
 
     printf("08b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);

@@ -307,11 +307,11 @@ int main()
         matrix_set(&a, &current, 0);
     }
 
-    int total = math_pick_theorem_i(
+    int area = math_pick_theorem_i(
         math_shoelace_formula_area(&path),
         path.count);
 
-    printf("10b %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("10b %d %lf\n", area, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

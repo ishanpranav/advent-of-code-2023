@@ -27,44 +27,11 @@ struct Graph
 typedef char* String;
 typedef int Vertex;
 typedef struct Graph* Graph;
-typedef bool (*Predicate)(Vertex vertex);
 
 void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
 {
     instance->vertices[vertex].left = left;
     instance->vertices[vertex].right = right;
-}
-
-int graph_walk(
-    Graph instance, 
-    Vertex start, 
-    String directions, 
-    Predicate predicate)
-{
-    int result = 0;
-    char* direction = directions;
-
-    while (!predicate(start))
-    {
-        switch (*direction)
-        {
-        case 'L':
-            start = instance->vertices[start].left;
-            direction++;
-            result++;
-            break;
-        case 'R':
-            start = instance->vertices[start].right;
-            direction++;
-            result++;
-            break;
-        default:
-            direction = directions;
-            break;
-        }
-    }
-
-    return result;
 }
 
 static bool parse(char buffer[], char window[], Vertex* result)
@@ -115,9 +82,32 @@ static bool read(FILE* stream, Graph graph)
     return true;
 }
 
-static bool stop(Vertex vertex)
+static int scan(Graph instance, Vertex start, String directions)
 {
-    return vertex == VERTEX_LAST;
+    int result = 0;
+    char* direction = directions;
+
+    while (start != VERTEX_LAST)
+    {
+        switch (*direction)
+        {
+            case 'L':
+                start = instance->vertices[start].left;
+                direction++;
+                result++;
+                break;
+            case 'R':
+                start = instance->vertices[start].right;
+                direction++;
+                result++;
+                break;
+            default:
+                direction = directions;
+                break;
+        }
+    }
+
+    return result;
 }
 
 int main()
@@ -133,7 +123,7 @@ int main()
         return 1;
     }
 
-    int result = graph_walk(&graph, VERTEX_FIRST, directions, stop);
+    int result = scan(&graph, VERTEX_FIRST, directions);
 
     printf("08a %d %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 
