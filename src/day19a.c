@@ -223,19 +223,16 @@ bool function_evaluate(
         {
             case 'A': return true;
             case 'R': return false;
-
-            default:
-            {
-                Function next = function_dictionary_get(dictionary, range->key);
-
-                if (!next)
-                {
-                    return false;
-                }
-
-                return function_evaluate(next, value, dictionary);
-            }
         }
+
+        Function next = function_dictionary_get(dictionary, range->key);
+
+        if (!next)
+        {
+            return false;
+        }
+
+        return function_evaluate(next, value, dictionary);
     }
 
     return false;
