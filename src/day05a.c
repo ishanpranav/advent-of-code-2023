@@ -76,10 +76,13 @@ void function(Function instance)
     instance->count = 0;
 }
 
-void function_add_range(Function instance, struct Range item)
+Range function_new_range(Function instance)
 {
-    instance->ranges[instance->count] = item;
+    Range result = instance->ranges + instance->count;
+
     instance->count++;
+
+    return result;
 }
 
 void function_sort_ranges(Function instance)
@@ -163,9 +166,9 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    struct Range range;
+    Range range = function_new_range(function);
 
-    range.destinationOffset = atoll(token);
+    range->destinationOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
 
     if (!token)
@@ -173,7 +176,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    range.sourceOffset = atoll(token);
+    range->sourceOffset = atoll(token);
     token = strtok(NULL, DELIMITERS);
 
     if (!token)
@@ -181,9 +184,7 @@ static bool read(Function function, char buffer[])
         return false;
     }
 
-    range.length = atoll(token);
-
-    function_add_range(function, range);
+    range->length = atoll(token);
 
     return true;
 }

@@ -332,7 +332,7 @@ int main()
     }
 
     struct Matrix a;
-    struct Dictionary cache;
+    struct Dictionary cache = { 0 };
 
     matrix(&a, n);
 
