@@ -21,7 +21,8 @@ all: \
 	day16a day16b \
 	day17a day17b \
 	day18a day18b \
-	day19a day19b
+	day19a day19b \
+	day20a day20b
 
 test:
 	cat alt01.txt | ./day01a.o > out.txt
@@ -62,6 +63,8 @@ test:
 	cat alt18.txt | ./day18b.o >> out.txt
 	cat alt19.txt | ./day19a.o >> out.txt
 	cat alt19.txt | ./day19b.o >> out.txt
+	cat alt20.txt | ./day20a.o >> out.txt
+	cat alt20.txt | ./day20b.o >> out.txt
 	cat out.txt
 	
 day01a: src/day01a.c
@@ -176,6 +179,12 @@ day19a: src/day19a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day19b: src/day19b.c
+	$(CC) $(CFLAGS) $< -o $@.o
+	
+day20a: src/day20a.c
+	$(CC) $(CFLAGS) $< -o $@.o
+	
+day20b: src/day20b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 clean:

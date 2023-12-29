@@ -33,8 +33,8 @@ struct Range
 
 struct Function
 {
-    struct Range ranges[RANGES_CAPACITY];
     int count;
+    struct Range ranges[RANGES_CAPACITY];
 };
 
 struct FunctionDictionaryEntry
@@ -71,18 +71,6 @@ typedef struct FunctionDictionaryEntry* FunctionDictionaryEntry;
 typedef struct FunctionDictionaryBucket* FunctionDictionaryBucket;
 typedef struct FunctionDictionary* FunctionDictionary;
 typedef struct Tokenizer* Tokenizer;
-
-Property property(char value)
-{
-    switch (value)
-    {
-        case 'a': return PROPERTY_A;
-        case 'm': return PROPERTY_M;
-        case 's': return PROPERTY_S;
-        case 'x': return PROPERTY_X;
-        default: return 0;
-    }
-}
 
 void function(Function instance)
 {
@@ -191,6 +179,18 @@ void function_dictionary_clear(FunctionDictionary instance)
     }
 
     instance->firstBucket = NULL;
+}
+
+Property property(char value)
+{
+    switch (value)
+    {
+        case 'a': return PROPERTY_A;
+        case 'm': return PROPERTY_M;
+        case 's': return PROPERTY_S;
+        case 'x': return PROPERTY_X;
+        default: return 0;
+    }
 }
 
 void tokenizer(Tokenizer instance, String tokens)

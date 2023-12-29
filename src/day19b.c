@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 64
+#define CALL_STACK_CAPACITY 8
 #define DELIMITERS ","
 #define FUNCTION_DICTIONARY_BUCKETS 919
 #define KEY_SIZE 3
@@ -39,7 +40,19 @@ struct Range
 
 struct Function
 {
+    int count;
     struct Range ranges[RANGES_CAPACITY];
+};
+
+struct Call
+{
+    struct Function* function;
+    struct Interval value[PROPERTY_NONE];
+};
+
+struct CallStack
+{
+    struct Call items[CALL_STACK_CAPACITY];
     int count;
 };
 
@@ -74,21 +87,35 @@ typedef struct Interval* Interval;
 typedef struct Interval* BDynamic;
 typedef struct Range* Range;
 typedef struct Function* Function;
+typedef struct Call* Call;
+typedef struct CallStack* CallStack;
 typedef struct FunctionDictionaryEntry* FunctionDictionaryEntry;
 typedef struct FunctionDictionaryBucket* FunctionDictionaryBucket;
 typedef struct FunctionDictionary* FunctionDictionary;
 typedef struct Tokenizer* Tokenizer;
 
-Property property(char value)
+void call_stack(CallStack instance)
 {
-    switch (value)
+    instance->count = 0;
+}
+
+void call_stack_push(CallStack instance, Call item)
+{
+    instance->items[instance->count] = *item;
+    instance->count++;
+}
+
+bool call_stack_try_pop(CallStack instance, Call result)
+{
+    if (!instance->count)
     {
-        case 'a': return PROPERTY_A;
-        case 'm': return PROPERTY_M;
-        case 's': return PROPERTY_S;
-        case 'x': return PROPERTY_X;
-        default: return 0;
+        return false;
     }
+
+    instance->count--;
+    *result = instance->items[instance->count];
+
+    return true;
 }
 
 void b_dynamic(BDynamic instance)
@@ -209,6 +236,18 @@ void function_dictionary_clear(FunctionDictionary instance)
     instance->firstBucket = NULL;
 }
 
+Property property(char value)
+{
+    switch (value)
+    {
+        case 'a': return PROPERTY_A;
+        case 'm': return PROPERTY_M;
+        case 's': return PROPERTY_S;
+        case 'x': return PROPERTY_X;
+        default: return 0;
+    }
+}
+
 void tokenizer(Tokenizer instance, String tokens)
 {
     instance->tokens = tokens;
@@ -327,99 +366,82 @@ static bool parse_function(Tokenizer tokenizer, char key[], Function result)
     return true;
 }
 
-struct Q
+static long long scan(
+    Call current,
+    CallStack stack,
+    FunctionDictionary dictionary)
 {
-    struct Interval d[PROPERTY_NONE];
-    Function f;
-};
-
-static long long scan(FunctionDictionary dictionary)
-{
-    long long result = 0;
-    Function initial = function_dictionary_get(dictionary, "in");
-
-    struct Q q[100];
-    int p = 0;
-
-    b_dynamic(q[p].d);
-
-    q[p].f = initial;
-    p++;
-
-    while (p)
+    for (Range range = current->function->ranges;
+        range < current->function->ranges + current->function->count;
+        range++)
     {
-        p--;
-        struct Q c = q[p];
+        struct Call next;
+        int comparand = range->comparand;
 
-        for (Range range = c.f->ranges;
-            range < c.f->ranges + c.f->count;
-            range++)
+        switch (range->relation)
         {
-            switch (range->relation)
-            {
-                case '<':
-                    if (c.d[range->identifier].min >= range->comparand)
-                    {
-                        continue;
-                    }
-                    // max < f, min < f
-                    // max >= f
-                    if (c.d[range->identifier].max >= range->comparand)
-                    {
-                        q[p] = c;
-                        q[p].d[range->identifier].min = range->comparand;
-                        c.d[range->identifier].max = range->comparand - 1;
-                        p++;
-                    }
-                    break;
-
-                case '>':
-                    if (c.d[range->identifier].max <= range->comparand)
-                    {
-                        continue;
-                    }
-                    // max < f, min < f
-                    // max >= f
-                    if (c.d[range->identifier].min <= range->comparand)
-                    {
-                        q[p] = c;
-                        q[p].d[range->identifier].max = range->comparand;
-                        c.d[range->identifier].min = range->comparand + 1;
-                        p++;
-                    }
-                    break;
-            }
-
-            switch (range->action[0])
-            {
-                case 'A':
+            case '<':
+                if (current->value[range->identifier].min >= comparand)
                 {
-                    long long product = 1;
+                    continue;
+                }
 
-                    for (Property property = 0; property < PROPERTY_NONE; property++)
-                    {
-                        product *= (c.d[property].max - c.d[property].min + 1);
-                    }
+                if (current->value[range->identifier].max >= comparand)
+                {
+                    next = *current;
+                    next.value[range->identifier].min = comparand;
+                    current->value[range->identifier].max = comparand - 1;
 
-                    result += product;
+                    call_stack_push(stack, &next);
                 }
                 break;
 
-                case 'R': break;
+            case '>':
+                if (current->value[range->identifier].max <= comparand)
+                {
+                    continue;
+                }
 
-                default:
-                    q[p] = c;
-                    q[p].f = function_dictionary_get(dictionary, range->action);
-                    p++;
-                    break;
+                if (current->value[range->identifier].min <= comparand)
+                {
+                    next = *current;
+                    next.value[range->identifier].max = comparand;
+                    current->value[range->identifier].min = comparand + 1;
+
+                    call_stack_push(stack, &next);
+                }
+                break;
+        }
+
+        switch (range->action[0])
+        {
+            case 'A':
+            {
+                long long product = 1;
+
+                for (Property i = 0; i < PROPERTY_NONE; i++)
+                {
+                    product *= (
+                        current->value[i].max -
+                        current->value[i].min +
+                        1);
+                }
+
+                return product;
             }
 
-            break;
+            case 'R': return 0;
         }
+
+        next = *current;
+        next.function = function_dictionary_get(dictionary, range->action);
+
+        call_stack_push(stack, &next);
+
+        break;
     }
 
-
-    return result;
+    return 0;
 }
 
 int main()
@@ -452,7 +474,22 @@ int main()
         function_dictionary_set(&dictionary, key, &current);
     }
 
-    long long total = scan(&dictionary);
+    long long total = 0;
+    struct CallStack stack;
+    struct Call current;
+    Function initial = function_dictionary_get(&dictionary, "in");
+
+    b_dynamic(current.value);
+
+    current.function = initial;
+
+    call_stack(&stack);
+    call_stack_push(&stack, &current);
+
+    while (call_stack_try_pop(&stack, &current))
+    {
+        total += scan(&current, &stack, &dictionary);
+    }
 
     printf("19b %lld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
     function_dictionary_clear(&dictionary);
