@@ -475,8 +475,8 @@ int main()
     }
 
     long long total = 0;
-    struct CallStack stack;
     struct Call current;
+    struct CallStack stack;
 
     current.function = function_dictionary_get(&dictionary, "in");
 

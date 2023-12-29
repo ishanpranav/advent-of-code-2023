@@ -34,6 +34,11 @@ typedef struct Coordinate* Coordinate;
 typedef struct Matrix* Matrix;
 typedef struct Polygon* Polygon;
 
+int math_pick_theorem_i(int a, int b)
+{
+    return a - (b / 2) + 1;
+}
+
 void coordinate_empty(Coordinate result)
 {
     result->i = -1;
@@ -82,6 +87,25 @@ void polygon_add(Polygon instance, Coordinate item)
 {
     instance->items[instance->count] = *item;
     instance->count++;
+}
+
+int polygon_get_area(Polygon polygon)
+{
+    int result = 0;
+    int lastIndex = polygon->count - 1;
+    struct Coordinate first = polygon->items[0];
+
+    for (int i = 0; i < lastIndex; i++)
+    {
+        struct Coordinate current = polygon->items[i];
+        struct Coordinate next = polygon->items[i + 1];
+
+        result += (current.i + next.i) * (current.j - next.j);
+    }
+
+    struct Coordinate last = polygon->items[lastIndex];
+
+    return (result + (last.i + first.i) * (last.j - first.j)) / 2;
 }
 
 static bool scan_hi(Matrix matrix, Coordinate previous, Coordinate current)
@@ -208,30 +232,6 @@ static bool scan(Matrix matrix, Coordinate previous, Coordinate current)
     }
 }
 
-int math_shoelace_formula_area(Polygon polygon)
-{
-    int result = 0;
-    int lastIndex = polygon->count - 1;
-    struct Coordinate first = polygon->items[0];
-
-    for (int i = 0; i < lastIndex; i++)
-    {
-        struct Coordinate current = polygon->items[i];
-        struct Coordinate next = polygon->items[i + 1];
-
-        result += (current.i + next.i) * (current.j - next.j);
-    }
-
-    struct Coordinate last = polygon->items[lastIndex];
-
-    return (result + (last.i + first.i) * (last.j - first.j)) / 2;
-}
-
-int math_pick_theorem_i(int a, int b)
-{
-    return a - (b / 2) + 1;
-}
-
 int main()
 {
     char buffer[DIMENSION + 1] = { 0 };
@@ -309,9 +309,7 @@ int main()
         matrix_set(&a, &current, 0);
     }
 
-    int area = math_pick_theorem_i(
-        math_shoelace_formula_area(&path),
-        path.count);
+    int area = math_pick_theorem_i(polygon_get_area(&path), path.count);
 
     printf("10b %d %lf\n", area, (double)(clock() - start) / CLOCKS_PER_SEC);
 
