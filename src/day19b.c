@@ -327,13 +327,99 @@ static bool parse_function(Tokenizer tokenizer, char key[], Function result)
     return true;
 }
 
+struct Q
+{
+    struct Interval d[PROPERTY_NONE];
+    Function f;
+};
+
 static long long scan(FunctionDictionary dictionary)
 {
-    struct Interval dynamic[PROPERTY_NONE];
+    long long result = 0;
+    Function initial = function_dictionary_get(dictionary, "in");
 
-    b_dynamic(dynamic);
+    struct Q q[100];
+    int p = 0;
 
-    return 0;
+    b_dynamic(q[p].d);
+
+    q[p].f = initial;
+    p++;
+
+    while (p)
+    {
+        p--;
+        struct Q c = q[p];
+
+        for (Range range = c.f->ranges;
+            range < c.f->ranges + c.f->count;
+            range++)
+        {
+            switch (range->relation)
+            {
+                case '<':
+                    if (c.d[range->identifier].min >= range->comparand)
+                    {
+                        continue;
+                    }
+                    // max < f, min < f
+                    // max >= f
+                    if (c.d[range->identifier].max >= range->comparand)
+                    {
+                        q[p] = c;
+                        q[p].d[range->identifier].min = range->comparand;
+                        c.d[range->identifier].max = range->comparand - 1;
+                        p++;
+                    }
+                    break;
+
+                case '>':
+                    if (c.d[range->identifier].max <= range->comparand)
+                    {
+                        continue;
+                    }
+                    // max < f, min < f
+                    // max >= f
+                    if (c.d[range->identifier].min <= range->comparand)
+                    {
+                        q[p] = c;
+                        q[p].d[range->identifier].max = range->comparand;
+                        c.d[range->identifier].min = range->comparand + 1;
+                        p++;
+                    }
+                    break;
+            }
+
+            switch (range->action[0])
+            {
+                case 'A':
+                {
+                    long long product = 1;
+
+                    for (Property property = 0; property < PROPERTY_NONE; property++)
+                    {
+                        product *= (c.d[property].max - c.d[property].min + 1);
+                    }
+
+                    result += product;
+                }
+                break;
+
+                case 'R': break;
+
+                default:
+                    q[p] = c;
+                    q[p].f = function_dictionary_get(dictionary, range->action);
+                    p++;
+                    break;
+            }
+
+            break;
+        }
+    }
+
+
+    return result;
 }
 
 int main()
