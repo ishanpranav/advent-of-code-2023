@@ -477,12 +477,10 @@ int main()
     long long total = 0;
     struct CallStack stack;
     struct Call current;
-    Function initial = function_dictionary_get(&dictionary, "in");
+
+    current.function = function_dictionary_get(&dictionary, "in");
 
     b_dynamic(current.value);
-
-    current.function = initial;
-
     call_stack(&stack);
     call_stack_push(&stack, &current);
 
