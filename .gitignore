@@ -3,3 +3,4 @@ a.exe
 *.txt
 *.o
 .vscode/
+.antlr/

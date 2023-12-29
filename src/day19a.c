@@ -11,8 +11,8 @@
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
 #define FUNCTION_DICTIONARY_BUCKETS 919
-#define RANGES_CAPACITY 8
 #define KEY_SIZE 3
+#define RANGES_CAPACITY 8
 
 enum Property
 {
@@ -28,7 +28,7 @@ struct Range
     enum Property identifier;
     int comparand;
     char relation;
-    char key[KEY_SIZE];
+    char action[KEY_SIZE];
 };
 
 struct Function
@@ -219,13 +219,13 @@ bool function_evaluate(
                 break;
         }
 
-        switch (range->key[0])
+        switch (range->action[0])
         {
             case 'A': return true;
             case 'R': return false;
         }
 
-        Function next = function_dictionary_get(dictionary, range->key);
+        Function next = function_dictionary_get(dictionary, range->action);
 
         if (!next)
         {
@@ -319,7 +319,7 @@ static bool parse_range(Tokenizer tokenizer, Range result)
 
         if (!parse_number(tokenizer, &result->comparand) ||
             tokenizer_pop(tokenizer) != ':' ||
-            !parse_action(tokenizer, result->key))
+            !parse_action(tokenizer, result->action))
         {
             return false;
         }
@@ -327,7 +327,7 @@ static bool parse_range(Tokenizer tokenizer, Range result)
         return true;
     }
 
-    if (!parse_action(tokenizer, result->key))
+    if (!parse_action(tokenizer, result->action))
     {
         return false;
     }
