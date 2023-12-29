@@ -77,7 +77,7 @@ void coordinate_queue(CoordinateQueue instance)
     instance->last = -1;
 }
 
-void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate value)
+void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate item)
 {
     if (instance->first == -1)
     {
@@ -93,7 +93,7 @@ void coordinate_queue_enqueue(CoordinateQueue instance, Coordinate value)
         instance->last++;
     }
 
-    instance->items[instance->last] = *value;
+    instance->items[instance->last] = *item;
 }
 
 bool coordinate_queue_try_dequeue(CoordinateQueue instance, Coordinate result)
