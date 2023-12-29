@@ -84,6 +84,20 @@ Property property(char value)
     }
 }
 
+void function(Function instance)
+{
+    instance->count = 0;
+}
+
+Range function_new_range(Function instance)
+{
+    Range result = instance->ranges + instance->count;
+
+    instance->count++;
+
+    return result;
+}
+
 static unsigned int function_dictionary_hash(char key[])
 {
     unsigned int hash = 7;
@@ -177,63 +191,6 @@ void function_dictionary_clear(FunctionDictionary instance)
     }
 
     instance->firstBucket = NULL;
-}
-
-void function(Function instance)
-{
-    instance->count = 0;
-}
-
-Range function_new_range(Function instance)
-{
-    Range result = instance->ranges + instance->count;
-
-    instance->count++;
-
-    return result;
-}
-
-bool function_evaluate(
-    Function instance,
-    Dynamic value,
-    FunctionDictionary dictionary)
-{
-    while (instance) 
-    {
-        for (Range range = instance->ranges;
-            range < instance->ranges + instance->count;
-            range++)
-        {
-            switch (range->relation)
-            {
-                case '<':
-                    if (value[range->identifier] >= range->comparand)
-                    {
-                        continue;
-                    }
-                    break;
-
-                case '>':
-                    if (value[range->identifier] <= range->comparand)
-                    {
-                        continue;
-                    }
-                    break;
-            }
-
-            switch (range->action[0])
-            {
-                case 'A': return true;
-                case 'R': return false;
-            }
-
-            instance = function_dictionary_get(dictionary, range->action);
-            
-            break;
-        }
-    }
-
-    return false;
 }
 
 void tokenizer(Tokenizer instance, String tokens)
@@ -354,6 +311,48 @@ static bool parse_function(Tokenizer tokenizer, char key[], Function result)
     return true;
 }
 
+static bool scan(Dynamic value, FunctionDictionary dictionary)
+{
+    Function current = function_dictionary_get(dictionary, "in");
+
+    while (current)
+    {
+        for (Range range = current->ranges;
+            range < current->ranges + current->count;
+            range++)
+        {
+            switch (range->relation)
+            {
+                case '<':
+                    if (value[range->identifier] >= range->comparand)
+                    {
+                        continue;
+                    }
+                    break;
+
+                case '>':
+                    if (value[range->identifier] <= range->comparand)
+                    {
+                        continue;
+                    }
+                    break;
+            }
+
+            switch (range->action[0])
+            {
+                case 'A': return true;
+                case 'R': return false;
+            }
+
+            current = function_dictionary_get(dictionary, range->action);
+
+            break;
+        }
+    }
+
+    return false;
+}
+
 int main()
 {
     char buffer[BUFFER_SIZE];
@@ -416,16 +415,7 @@ int main()
             property++;
         }
 
-        Function entryPoint = function_dictionary_get(&dictionary, "in");
-
-        if (!entryPoint)
-        {
-            fprintf(stderr, "Error: Key not found.\n");
-
-            return 1;
-        }
-
-        if (function_evaluate(entryPoint, dynamic, &dictionary))
+        if (scan(dynamic, &dictionary))
         {
             sum += localSum;
         }
