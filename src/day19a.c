@@ -84,7 +84,7 @@ Property property(char value)
     }
 }
 
-unsigned int function_dictionary_hash(char key[])
+static unsigned int function_dictionary_hash(char key[])
 {
     unsigned int hash = 7;
 
@@ -198,41 +198,39 @@ bool function_evaluate(
     Dynamic value,
     FunctionDictionary dictionary)
 {
-    for (Range range = instance->ranges;
-        range < instance->ranges + instance->count;
-        range++)
+    while (instance) 
     {
-        switch (range->relation)
+        for (Range range = instance->ranges;
+            range < instance->ranges + instance->count;
+            range++)
         {
-            case '<':
-                if (value[range->identifier] >= range->comparand)
-                {
-                    continue;
-                }
-                break;
+            switch (range->relation)
+            {
+                case '<':
+                    if (value[range->identifier] >= range->comparand)
+                    {
+                        continue;
+                    }
+                    break;
 
-            case '>':
-                if (value[range->identifier] <= range->comparand)
-                {
-                    continue;
-                }
-                break;
+                case '>':
+                    if (value[range->identifier] <= range->comparand)
+                    {
+                        continue;
+                    }
+                    break;
+            }
+
+            switch (range->action[0])
+            {
+                case 'A': return true;
+                case 'R': return false;
+            }
+
+            instance = function_dictionary_get(dictionary, range->action);
+            
+            break;
         }
-
-        switch (range->action[0])
-        {
-            case 'A': return true;
-            case 'R': return false;
-        }
-
-        Function next = function_dictionary_get(dictionary, range->action);
-
-        if (!next)
-        {
-            return false;
-        }
-
-        return function_evaluate(next, value, dictionary);
     }
 
     return false;
