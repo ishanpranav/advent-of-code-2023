@@ -7,46 +7,10 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 16
-#define DELIMITERS " "
-
-typedef char* String;
 
 long long math_pick_theorem_a(long long b, long long i)
 {
     return i + (b / 2) - 1;
-}
-
-static String read(String buffer)
-{
-    if (!strtok(buffer, DELIMITERS) || !strtok(NULL, DELIMITERS))
-    {
-        return NULL;
-    }
-
-    String token = strtok(NULL, DELIMITERS);
-
-    if (!token)
-    {
-        return NULL;
-    }
-
-    char* first = strchr(token, '#');
-
-    if (!first)
-    {
-        return NULL;
-    }
-
-    char* last = strchr(first, ')');
-
-    if (!last)
-    {
-        return NULL;
-    }
-
-    *last = '\0';
-
-    return first + 1;
 }
 
 int main()
@@ -60,7 +24,7 @@ int main()
 
     while (fgets(buffer, sizeof buffer, stdin))
     {
-        String token = read(buffer);
+        char* token = strchr(buffer, '#');
 
         if (!token)
         {
@@ -69,7 +33,7 @@ int main()
             return 1;
         }
 
-        long n = strtol(token, NULL, 16);
+        long n = strtol(token + 1, NULL, 16);
         int length = n >> 4;
 
         switch (n % 16)

@@ -16,26 +16,6 @@ long math_pick_theorem_a(long b, long i)
     return i + (b / 2) - 1;
 }
 
-static String read(String buffer, char* direction)
-{
-    String token = strtok(buffer, DELIMITERS);
-
-    if (!token)
-    {
-        return NULL;
-    }
-
-    *direction = token[0];
-    token = strtok(NULL, DELIMITERS);
-
-    if (!token)
-    {
-        return NULL;
-    }
-
-    return token;
-}
-
 int main()
 {
     int b = 0;
@@ -48,7 +28,17 @@ int main()
     while (fgets(buffer, sizeof buffer, stdin))
     {
         char direction;
-        String token = read(buffer, &direction);
+        String token = strtok(buffer, DELIMITERS);
+
+        if (!token)
+        {
+            fprintf(stderr, "Error: Format.\n");
+
+            return 1;
+        }
+
+        direction = token[0];
+        token = strtok(NULL, DELIMITERS);
 
         if (!token)
         {
