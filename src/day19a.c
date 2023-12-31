@@ -10,6 +10,7 @@
 #include <time.h>
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define FUNCTION_DICTIONARY_BUCKETS 919
 #define KEY_SIZE 3
 #define RANGES_CAPACITY 8
@@ -72,6 +73,18 @@ typedef struct FunctionDictionaryBucket* FunctionDictionaryBucket;
 typedef struct FunctionDictionary* FunctionDictionary;
 typedef struct Tokenizer* Tokenizer;
 
+Property property(char value)
+{
+    switch (value)
+    {
+        case 'a': return PROPERTY_A;
+        case 'm': return PROPERTY_M;
+        case 's': return PROPERTY_S;
+        case 'x': return PROPERTY_X;
+        default: return 0;
+    }
+}
+
 void function(Function instance)
 {
     instance->count = 0;
@@ -133,9 +146,7 @@ bool function_dictionary_set(
         }
     }
 
-    FunctionDictionaryEntry entry = calloc(
-        1,
-        sizeof(struct FunctionDictionaryEntry));
+    FunctionDictionaryEntry entry = malloc(sizeof * entry);
 
     if (!entry)
     {
@@ -153,6 +164,7 @@ bool function_dictionary_set(
     memcpy(entry->key, key, KEY_SIZE);
 
     entry->value = *value;
+    entry->nextEntry = NULL;
     *p = entry;
 
     return true;
@@ -179,18 +191,6 @@ void function_dictionary_clear(FunctionDictionary instance)
     }
 
     instance->firstBucket = NULL;
-}
-
-Property property(char value)
-{
-    switch (value)
-    {
-        case 'a': return PROPERTY_A;
-        case 'm': return PROPERTY_M;
-        case 's': return PROPERTY_S;
-        case 'x': return PROPERTY_X;
-        default: return 0;
-    }
 }
 
 void tokenizer(Tokenizer instance, String tokens)
@@ -375,12 +375,17 @@ int main()
 
         if (!parse_function(&lexer, key, &current))
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
 
-        function_dictionary_set(&dictionary, key, &current);
+        if (!function_dictionary_set(&dictionary, key, &current))
+        {
+            fprintf(stderr, "Error: Out of memory.\n");
+
+            return 1;
+        }
     }
 
     long sum = 0;
@@ -400,7 +405,7 @@ int main()
 
             if (!p)
             {
-                fprintf(stderr, "Error: Format.\n");
+                fprintf(stderr, EXCEPTION_FORMAT);
 
                 return 1;
             }

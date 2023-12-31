@@ -10,6 +10,8 @@
 #include <time.h>
 #define COORDINATE_QUEUE_CAPACITY 32768
 #define DIMENSION 256
+#define EXCEPTION_FORMAT "Error: Format.\n"
+#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define STEP_MIN 1
 #define STEP_MAX 4
 
@@ -284,20 +286,20 @@ static void scan_right(
 
 int main()
 {
-    StateMatrix matrix = malloc(sizeof(struct StateMatrix));
+    StateMatrix matrix = malloc(sizeof * matrix);
 
     if (!matrix)
     {
-        fprintf(stderr, "Error: Out of memory.\n");
+        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
         return 1;
     }
 
-    CoordinateQueue queue = malloc(sizeof(struct CoordinateQueue));
+    CoordinateQueue queue = malloc(sizeof * queue);
 
     if (!queue)
     {
-        fprintf(stderr, "Error: Out of memory.\n");
+        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
         return 1;
     }
@@ -307,7 +309,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -316,7 +318,7 @@ int main()
 
     if (n < 1)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -331,7 +333,7 @@ int main()
         {
             if (!buffer[j])
             {
-                fprintf(stderr, "Error: Format.\n");
+                fprintf(stderr, EXCEPTION_FORMAT);
 
                 return 1;
             }

@@ -10,6 +10,7 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 #define DELIMITERS " "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define INTERVAL_LIST_CAPACITY 32
 #define RANGES_CAPACITY 512
 
@@ -261,7 +262,7 @@ static bool read(Function function, char buffer[])
     {
         return false;
     }
-    
+
     Range range = function_new_range(function);
 
     range->destinationOffset = atoll(token);
@@ -292,7 +293,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -310,7 +311,7 @@ int main()
 
         if (!token)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -363,7 +364,7 @@ int main()
 
         if (!read(&current, buffer))
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -371,7 +372,7 @@ int main()
 
     if (!composite.count)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }

@@ -8,6 +8,7 @@
 #include <time.h>
 #define COORDINATE_STACK_CAPACITY 128
 #define DIMENSION 128
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 enum Direction
 {
@@ -245,7 +246,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -254,7 +255,7 @@ int main()
 
     if (n < 1)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }

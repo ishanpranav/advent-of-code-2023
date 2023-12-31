@@ -17,8 +17,8 @@
 ## Bracing
 
 - Every brace (`{`) or brace-semicolon pair (`};`) should have its own line,
-except during empty initialization or during array initialization when all array
-items are placed on a single line.
+  except during empty initialization or during array initialization when all array
+  items are placed on a single line.
 - Always use braces with control structures, even when optional.
 - Separate functions and control structures by exactly one blank line.
 
@@ -31,7 +31,7 @@ for spacing considerations.
 ## Naming
 
 - Use `UPPER_SNAKE_CASE` for global constants, constant macros, and enumeration
-members.
+  members.
 - Use `PascalCase` for struct names, enumeration names, and type definitions.
 - Use `lower_snake_case` for global functions.
 - Use `lowercase` for static functions.
@@ -43,22 +43,22 @@ abbreviation based on its type. If several values are abitrary, begin with the
 corresponding type-based abbreviation and continue alphabetically. If doing so
 is impractical, use numeric suffixes instead.
 
-|Letter|Appropriate use|
-|:----:|:--------------|
-|`a`   |arbitrary object|
-|`b`   |blue color component|
-|`d`   |change|
-|`g`   |green color component|
-|`hi`  |larger pointer, point above, upper buffer|
-|`i`   |abitrary counter, matrix index in an arbitrary dimension|
-|`k`   |term number|
-|`lo`  |smaller pointer, point below, lower buffer|
-|`m`   |matrix size in an arbitrary dimension|
-|`mid` |middle pointer, middle buffer|
-|`n`   |count|
-|`p`   |arbitrary pointer|
-|`r`   |red color component|
-|`x`   |vector in an arbitrary dimension, position in an arbitrary dimension|
+| Letter | Appropriate use                                                                              |
+| :----: | :------------------------------------------------------------------------------------------- |
+|  `a`   | arbitrary object, area                                                                       |
+|  `b`   | blue color component, boundary points in Pick\'s Theorem                                     |
+|  `dx`  | change in an arbitrary dimension                                                             |
+|  `g`   | green color component                                                                        |
+|  `hi`  | larger pointer, point above, upper buffer                                                    |
+|  `i`   | abitrary counter, matrix index in an arbitrary dimension, interior points in Pick\'s Theorem |
+|  `k`   | term number                                                                                  |
+|  `lo`  | smaller pointer, point below, lower buffer                                                   |
+|  `m`   | matrix size in an arbitrary dimension                                                        |
+| `mid`  | middle pointer, middle buffer                                                                |
+|  `n`   | count                                                                                        |
+|  `p`   | arbitrary pointer                                                                            |
+|  `r`   | red color component                                                                          |
+|  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |
 
 ## Type definitions
 
@@ -69,4 +69,4 @@ is impractical, use numeric suffixes instead.
 
 - Only use macros to define constants.
 - When multiple related integer constants are defined, use an enumeration
-instead.
+  instead.

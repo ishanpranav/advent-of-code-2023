@@ -9,10 +9,14 @@
 #include <time.h>
 #define BUFFER_SIZE 32
 #define DIRECTIONS_CAPACITY 512
-#define LIST_CAPACITY 1024
-#define VERTEX_OFFSET -13330
-#define VERTEX_STOP_MOD 25
-#define VERTEX_LAST 33325
+#define LIST_CAPACITY 1296
+
+enum Vertex
+{
+    VERTEX_OFFSET = -1342,
+    VERTEX_LAST = 46655 + VERTEX_OFFSET,
+    VERTEX_NONE = VERTEX_LAST + 1
+};
 
 struct VertexPair
 {
@@ -22,7 +26,7 @@ struct VertexPair
 
 struct Graph
 {
-    struct VertexPair vertices[VERTEX_LAST + 1];
+    struct VertexPair vertices[VERTEX_NONE];
 };
 
 struct List
@@ -32,7 +36,7 @@ struct List
 };
 
 typedef char* String;
-typedef int Vertex;
+typedef enum Vertex Vertex;
 typedef struct Graph* Graph;
 typedef struct List* List;
 
@@ -129,7 +133,7 @@ static int scan(Graph instance, Vertex start, String directions)
     int result = 0;
     String direction = directions;
 
-    while (start % 36 != VERTEX_STOP_MOD)
+    while (start % 36 != 25)
     {
         switch (*direction)
         {
@@ -154,7 +158,15 @@ static int scan(Graph instance, Vertex start, String directions)
 
 int main()
 {
-    struct Graph graph;
+    Graph graph = malloc(sizeof * graph);
+
+    if (!graph)
+    {
+        fprintf(stderr, "Error: Out of memory.\n");
+
+        return 1;
+    }
+
     struct List starts;
     char directions[DIRECTIONS_CAPACITY];
     clock_t start = clock();
@@ -162,7 +174,7 @@ int main()
     list(&starts);
 
     if (!fgets(directions, sizeof directions, stdin) ||
-        !read(stdin, &graph, &starts))
+        !read(stdin, graph, &starts))
     {
         fprintf(stderr, "Error: Format.\n");
 
@@ -170,11 +182,11 @@ int main()
     }
 
     Vertex* first = starts.items;
-    long long lcm = scan(&graph, *first, directions);
+    long long lcm = scan(graph, *first, directions);
 
     for (Vertex* p = first + 1; p < first + starts.count; p++)
     {
-        lcm = math_lcm(lcm, scan(&graph, *p, directions));
+        lcm = math_lcm(lcm, scan(graph, *p, directions));
     }
 
     printf("08b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);

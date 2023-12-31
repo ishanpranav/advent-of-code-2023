@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #define DIMENSION 141
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define POLYGON_CAPACITY 16384
 
 struct Coordinate
@@ -239,7 +240,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -248,7 +249,7 @@ int main()
 
     if (n < 1)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -273,7 +274,7 @@ int main()
 
     if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -290,7 +291,7 @@ int main()
         !scan_left(&a, &previous, &current) &&
         !scan_right(&a, &previous, &current))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }

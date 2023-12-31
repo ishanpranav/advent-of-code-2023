@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define KEY_CAPACITY 8
 #define ORDERED_DICTIONARY_BUCKETS 256
 
@@ -61,9 +62,7 @@ bool ordered_dictionary_set(
         }
     }
 
-    OrderedDictionaryEntry entry = calloc(
-        1,
-        sizeof(struct OrderedDictionaryEntry));
+    OrderedDictionaryEntry entry = malloc(sizeof * entry);
 
     if (!entry)
     {
@@ -86,6 +85,7 @@ bool ordered_dictionary_set(
     memcpy(entry->key, key, KEY_CAPACITY);
 
     entry->value = value;
+    entry->nextEntry = NULL;
     *p = entry;
 
     return true;
@@ -226,7 +226,7 @@ int main()
 
                     if (!ordered_dictionary_set(&dictionary, key, hash, value))
                     {
-                        fprintf(stderr, "Error: Out of memory.\n");
+                        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
                         return 1;
                     }
@@ -251,7 +251,7 @@ int main()
 
         if (!ordered_dictionary_set(&dictionary, key, hash, value))
         {
-            fprintf(stderr, "Error: Out of memory.\n");
+            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
             return 1;
         }

@@ -36,7 +36,7 @@ int main()
         long n = strtol(token + 1, NULL, 16);
         int length = n >> 4;
 
-        switch (n % 16)
+        switch (n & 0xf)
         {
             case 0:
                 x -= length;

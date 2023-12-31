@@ -9,6 +9,7 @@
 #include <time.h>
 #define DICTIONARY_BUCKETS 197
 #define DIMENSION 101
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define ITERATIONS 1000000000
 
 enum
@@ -115,7 +116,7 @@ Exception dictionary_replace(
         }
     }
 
-    DictionaryEntry entry = calloc(1, sizeof(struct DictionaryEntry));
+    DictionaryEntry entry = malloc(sizeof * entry);
 
     if (!entry)
     {
@@ -133,6 +134,7 @@ Exception dictionary_replace(
     memcpy(entry->key, key, KEY_SIZE);
 
     entry->value = newValue;
+    entry->nextEntry = NULL;
     *p = entry;
 
     return EXCEPTION_NONE;
@@ -317,7 +319,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -326,7 +328,7 @@ int main()
 
     if (n < 1)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }

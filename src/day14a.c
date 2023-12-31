@@ -7,6 +7,7 @@
 #include <string.h>
 #include <time.h>
 #define DIMENSION 101
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 struct Matrix
 {
@@ -41,8 +42,8 @@ void matrix_add_row(Matrix instance, char values[])
     instance->rows = m + 1;
 
     memcpy(
-        instance->items + (instance->columns * m), 
-        values, 
+        instance->items + (instance->columns * m),
+        values,
         instance->columns);
 }
 
@@ -91,7 +92,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -100,7 +101,7 @@ int main()
 
     if (n < 1)
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }

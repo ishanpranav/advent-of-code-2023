@@ -8,6 +8,7 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 #define DELIMITERS ";, "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 enum PossibleResult
 {
@@ -61,7 +62,7 @@ int main()
 
         if (!start || !strtok(start, DELIMITERS))
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -90,7 +91,7 @@ int main()
 
         if (lastPossibleResult == POSSIBLE_RESULT_FORMAT_EXCEPTION)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }

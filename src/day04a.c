@@ -10,6 +10,7 @@
 #include <time.h>
 #define BUFFER_SIZE 128
 #define DECIMAL_SET_CAPACITY 99
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 struct DecimalSet
 {
@@ -52,7 +53,7 @@ int main()
 
         if (!begin)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -65,7 +66,7 @@ int main()
 
         if (!mid)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }

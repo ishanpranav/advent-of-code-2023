@@ -8,6 +8,7 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 #define DELIMITERS ";, "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 typedef char* String;
 
@@ -23,7 +24,7 @@ int main()
 
         if (!start || !strtok(start, DELIMITERS))
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -64,7 +65,7 @@ int main()
                     }
                     break;
                 default:
-                    fprintf(stderr, "Error: Format.\n");
+                    fprintf(stderr, EXCEPTION_FORMAT);
                     return 1;
             }
 

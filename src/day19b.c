@@ -94,6 +94,27 @@ typedef struct FunctionDictionaryBucket* FunctionDictionaryBucket;
 typedef struct FunctionDictionary* FunctionDictionary;
 typedef struct Tokenizer* Tokenizer;
 
+Property property(char value)
+{
+    switch (value)
+    {
+        case 'a': return PROPERTY_A;
+        case 'm': return PROPERTY_M;
+        case 's': return PROPERTY_S;
+        case 'x': return PROPERTY_X;
+        default: return 0;
+    }
+}
+
+void b_dynamic(BDynamic instance)
+{
+    for (Property property = 0; property < PROPERTY_NONE; property++)
+    {
+        instance[property].min = 1;
+        instance[property].max = 4000;
+    }
+}
+
 void call_stack(CallStack instance)
 {
     instance->count = 0;
@@ -116,15 +137,6 @@ bool call_stack_try_pop(CallStack instance, Call result)
     *result = instance->items[instance->count];
 
     return true;
-}
-
-void b_dynamic(BDynamic instance)
-{
-    for (Property property = 0; property < PROPERTY_NONE; property++)
-    {
-        instance[property].min = 1;
-        instance[property].max = 4000;
-    }
 }
 
 void function(Function instance)
@@ -188,9 +200,7 @@ bool function_dictionary_set(
         }
     }
 
-    FunctionDictionaryEntry entry = calloc(
-        1,
-        sizeof(struct FunctionDictionaryEntry));
+    FunctionDictionaryEntry entry = malloc(sizeof * entry);
 
     if (!entry)
     {
@@ -208,6 +218,7 @@ bool function_dictionary_set(
     memcpy(entry->key, key, KEY_SIZE);
 
     entry->value = *value;
+    entry->nextEntry = NULL;
     *p = entry;
 
     return true;
@@ -234,18 +245,6 @@ void function_dictionary_clear(FunctionDictionary instance)
     }
 
     instance->firstBucket = NULL;
-}
-
-Property property(char value)
-{
-    switch (value)
-    {
-        case 'a': return PROPERTY_A;
-        case 'm': return PROPERTY_M;
-        case 's': return PROPERTY_S;
-        case 'x': return PROPERTY_X;
-        default: return 0;
-    }
 }
 
 void tokenizer(Tokenizer instance, String tokens)
@@ -471,7 +470,12 @@ int main()
             return 1;
         }
 
-        function_dictionary_set(&dictionary, key, &current);
+        if (!function_dictionary_set(&dictionary, key, &current))
+        {
+            fprintf(stderr, "Error: Out of memory.\n");
+
+            return 1;
+        }
     }
 
     long long total = 0;

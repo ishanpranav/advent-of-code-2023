@@ -9,6 +9,7 @@
 #include <time.h>
 #define BUFFER_SIZE 64
 #define DELIMITERS " "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define POINTS_CAPACITY 4
 
 struct Point
@@ -27,7 +28,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -43,7 +44,7 @@ int main()
 
     if (!fgets(buffer, sizeof buffer, stdin) || !strtok(buffer, DELIMITERS))
     {
-        fprintf(stderr, "Error: Format.\n");
+        fprintf(stderr, EXCEPTION_FORMAT);
 
         return 1;
     }
@@ -54,7 +55,7 @@ int main()
 
         if (!token)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }

@@ -9,9 +9,13 @@
 #include <time.h>
 #define BUFFER_SIZE 32
 #define DIRECTIONS_CAPACITY 512
-#define VERTEX_OFFSET -13330
-#define VERTEX_FIRST 0
-#define VERTEX_LAST 33325
+
+enum Vertex
+{
+    VERTEX_OFFSET = -13330,
+    VERTEX_LAST = 46655 + VERTEX_OFFSET,
+    VERTEX_NONE = VERTEX_LAST + 1
+};
 
 struct VertexPair
 {
@@ -21,11 +25,11 @@ struct VertexPair
 
 struct Graph
 {
-    struct VertexPair vertices[VERTEX_LAST + 1];
+    struct VertexPair vertices[VERTEX_NONE];
 };
 
 typedef char* String;
-typedef int Vertex;
+typedef enum Vertex Vertex;
 typedef struct Graph* Graph;
 
 void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
@@ -112,18 +116,26 @@ static int scan(Graph instance, Vertex start, String directions)
 
 int main()
 {
-    struct Graph graph;
+    Graph graph = malloc(sizeof * graph);
+
+    if (!graph)
+    {
+        fprintf(stderr, "Error: Out of memory.\n");
+
+        return 1;
+    }
+
     char directions[DIRECTIONS_CAPACITY];
     clock_t start = clock();
 
-    if (!fgets(directions, sizeof directions, stdin) || !read(stdin, &graph))
+    if (!fgets(directions, sizeof directions, stdin) || !read(stdin, graph))
     {
         fprintf(stderr, "Error: Format.\n");
 
         return 1;
     }
 
-    int result = scan(&graph, VERTEX_FIRST, directions);
+    int result = scan(graph, 0, directions);
 
     printf("08a %d %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 

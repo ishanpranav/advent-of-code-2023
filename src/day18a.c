@@ -8,6 +8,7 @@
 #include <time.h>
 #define BUFFER_SIZE 16
 #define DELIMITERS " "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 
 typedef char* String;
 
@@ -32,7 +33,7 @@ int main()
 
         if (!token)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -42,7 +43,7 @@ int main()
 
         if (!token)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }

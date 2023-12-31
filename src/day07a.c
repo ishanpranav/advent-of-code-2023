@@ -9,6 +9,7 @@
 #include <time.h>
 #define BUFFER_SIZE 16
 #define DELIMITERS " "
+#define EXCEPTION_FORMAT "Error: Format.\n"
 #define HAND_SIZE 5
 #define PLAYER_LIST_CAPACITY 1024
 
@@ -89,6 +90,50 @@ Card card(char symbol)
     return CARD_NONE;
 }
 
+void hand_add(Hand instance, Card item)
+{
+    int frequency = instance->frequencies[item];
+
+    if (!frequency)
+    {
+        instance->count++;
+    }
+
+    frequency++;
+    instance->frequencies[item] = frequency;
+
+    if (frequency > instance->maxFrequency)
+    {
+        instance->maxFrequency = frequency;
+    }
+}
+
+HandType hand_get_type(Hand instance)
+{
+    switch (instance->count)
+    {
+        case 1: return HAND_TYPE_FIVE_OF_A_KIND;
+        case 2:
+            switch (instance->maxFrequency)
+            {
+                case 3: return HAND_TYPE_FULL_HOUSE;
+                case 4: return HAND_TYPE_FOUR_OF_A_KIND;
+            }
+            break;
+        case 3:
+            switch (instance->maxFrequency)
+            {
+                case 2: return HAND_TYPE_TWO_PAIR;
+                case 3: return HAND_TYPE_THREE_OF_A_KIND;
+            }
+            break;
+        case 4: return HAND_TYPE_ONE_PAIR;
+        case 5: return HAND_TYPE_HIGH_CARD;
+    }
+
+    return HAND_TYPE_NONE;
+}
+
 int player_compare(Object left, Object right)
 {
     if (!left && !right)
@@ -151,50 +196,6 @@ void player_list_sort(PlayerList instance)
         player_compare);
 }
 
-void hand_add(Hand instance, Card item)
-{
-    int frequency = instance->frequencies[item];
-
-    if (!frequency)
-    {
-        instance->count++;
-    }
-
-    frequency++;
-    instance->frequencies[item] = frequency;
-
-    if (frequency > instance->maxFrequency)
-    {
-        instance->maxFrequency = frequency;
-    }
-}
-
-HandType hand_get_type(Hand instance)
-{
-    switch (instance->count)
-    {
-        case 1: return HAND_TYPE_FIVE_OF_A_KIND;
-        case 2:
-            switch (instance->maxFrequency)
-            {
-                case 3: return HAND_TYPE_FULL_HOUSE;
-                case 4: return HAND_TYPE_FOUR_OF_A_KIND;
-            }
-            break;
-        case 3:
-            switch (instance->maxFrequency)
-            {
-                case 2: return HAND_TYPE_TWO_PAIR;
-                case 3: return HAND_TYPE_THREE_OF_A_KIND;
-            }
-            break;
-        case 4: return HAND_TYPE_ONE_PAIR;
-        case 5: return HAND_TYPE_HIGH_CARD;
-    }
-
-    return HAND_TYPE_NONE;
-}
-
 int main()
 {
     struct PlayerList players;
@@ -209,7 +210,7 @@ int main()
 
         if (!token)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
@@ -223,7 +224,7 @@ int main()
 
             if (drawn == CARD_NONE)
             {
-                fprintf(stderr, "Error: Format.\n");
+                fprintf(stderr, EXCEPTION_FORMAT);
 
                 return 1;
             }
@@ -239,7 +240,7 @@ int main()
 
         if (!token || handType == HAND_TYPE_NONE)
         {
-            fprintf(stderr, "Error: Format.\n");
+            fprintf(stderr, EXCEPTION_FORMAT);
 
             return 1;
         }
