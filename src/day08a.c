@@ -19,8 +19,8 @@ enum Vertex
 
 struct VertexPair
 {
-    int left;
-    int right;
+    enum Vertex left;
+    enum Vertex right;
 };
 
 struct Graph
@@ -138,6 +138,7 @@ int main()
     int result = scan(graph, 0, directions);
 
     printf("08a %d %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
+    free(garph);
 
     return 0;
 }

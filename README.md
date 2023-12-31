@@ -71,7 +71,7 @@ time between 0.00005 seconds and 0.00050 seconds.
 
 ## Constraints
 
-I am adhering to the following constraints to ensure high code quality.
+I am working within the following constraints to ensure high code quality.
 
 - Adhere to the [project style guide](cstyle.md).
 - Final solutions must be implemented in the C programming language following
@@ -82,12 +82,6 @@ I am adhering to the following constraints to ensure high code quality.
   must be implemented separately.
 - The solution must produce the correct result for the **examples**, not just
   the personalized puzzle input.
-- Dynamic memory allocation is discouraged. The following should be avoided:
-  - `malloc`
-  - `calloc`
-  - `realloc`
-  - `aligned_alloc`
-  - `free`
 - Bounds checking is not required for data structures whose capacity is defined
   by a macro.
 - The first and second problems for a given day may share the same data

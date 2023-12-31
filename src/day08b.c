@@ -20,8 +20,8 @@ enum Vertex
 
 struct VertexPair
 {
-    int left;
-    int right;
+    enum Vertex left;
+    enum Vertex right;
 };
 
 struct Graph
@@ -29,16 +29,16 @@ struct Graph
     struct VertexPair vertices[VERTEX_NONE];
 };
 
-struct List
+struct VertexList
 {
-    int items[LIST_CAPACITY];
+    enum Vertex items[LIST_CAPACITY];
     int count;
 };
 
 typedef char* String;
 typedef enum Vertex Vertex;
 typedef struct Graph* Graph;
-typedef struct List* List;
+typedef struct VertexList* VertexList;
 
 long long math_gcd(long long a, long long b)
 {
@@ -64,12 +64,12 @@ void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
     instance->vertices[vertex].right = right;
 }
 
-void list(List instance)
+void vertex_list(VertexList instance)
 {
     instance->count = 0;
 }
 
-void list_add(List instance, Vertex item)
+void vertex_list_add(VertexList instance, Vertex item)
 {
     instance->items[instance->count] = item;
     instance->count++;
@@ -93,7 +93,7 @@ static bool parse(char buffer[], char window[], Vertex* result)
     return true;
 }
 
-static bool read(FILE* stream, Graph graph, List starts)
+static bool read(FILE* stream, Graph graph, VertexList starts)
 {
     char buffer[BUFFER_SIZE];
 
@@ -167,11 +167,11 @@ int main()
         return 1;
     }
 
-    struct List starts;
+    struct VertexList starts;
     char directions[DIRECTIONS_CAPACITY];
     clock_t start = clock();
 
-    list(&starts);
+    vertex_list(&starts);
 
     if (!fgets(directions, sizeof directions, stdin) ||
         !read(stdin, graph, &starts))
@@ -190,6 +190,7 @@ int main()
     }
 
     printf("08b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
+    free(graph);
 
     return 0;
 }
