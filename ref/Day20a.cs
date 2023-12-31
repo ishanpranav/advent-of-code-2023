@@ -114,15 +114,13 @@ internal static class Program
 
             Module module;
 
-            switch (line[0])
+            if (line[0] == '%')
             {
-                case '%':
-                    module = new FlipFlopModule(line.Substring(1, mid - 1));
-                    break;
-
-                default:
-                    module = new ConjunctionModule(line.Substring(1, mid - 1));
-                    break;
+                module = new FlipFlopModule(line.Substring(1, mid - 1));
+            }
+            else
+            {   
+                module = new ConjunctionModule(line.Substring(1, mid - 1));
             }
 
             modules.Add(module.Name, module);

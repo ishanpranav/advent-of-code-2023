@@ -2,6 +2,7 @@
 
 // Pulse Propagation Part 1
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,111 +11,127 @@
 #define DELIMITERS ", "
 #define EXCEPTION_FORMAT "Error: Format.\n"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
-#define GRAPH_MAX_DEGREE 5
+#define MESSAGE_QUEUE_CAPACITY 64
+#define MODULE_COLLECTION_ENTRIES 89
+#define MODULE_NAME_CAPACITY 12
+#define MODULE_TARGETS_CAPACITY 5
 
-struct Graph
+struct Message
 {
-    int edges[VERTEX_NONE][GRAPH_MAX_DEGREE];
+    char source[MODULE_NAME_CAPACITY];
+    char target[MODULE_NAME_CAPACITY];
+    bool pulse;
 };
 
-union IModule
+struct MessageQueue
 {
-    struct ConjunctionModule conjunction;
-    struct FlipFlopModule flipFlop;
+    int first;
+    int last;
+    struct Message items[MESSAGE_QUEUE_CAPACITY];
 };
 
 struct Module
 {
-    char type;
-    union IModule implementation;
+    struct Module* next;
+    int targetCount;
+    char name[MODULE_NAME_CAPACITY];
+    char targets[MODULE_TARGETS_CAPACITY][MODULE_NAME_CAPACITY];
+    bool flipFlop;
+};
+
+struct ConjunctionModuleEntry
+{
+    char name[MODULE_NAME_CAPACITY];
+    bool pulse;
+};
+
+struct ConjunctionModuleBucket
+{
+    struct ConjunctionModuleEntry* firstEntry;
+    struct ConjunctionModuleBucket* nextBucket;
 };
 
 struct ConjunctionModule
 {
-    struct
+    struct ConjunctionModuleBucket* pulseFirstBucket;
+    struct ConjunctionModuleBucket pulseBuckets[MODULE_COLLECTION_ENTRIES];
+    struct Module base;
 };
 
 struct FlipFlopModule
 {
-
+    struct Module base;
+    bool pulse;
 };
 
-struct Set
+struct ModuleCollectionEntry
 {
-    long values[VERTEX_NONE];
+    struct Module* first;
+    struct ModuleCollectionEntry* nextEntry;
+};
+
+struct ModuleCollection
+{
+    struct ModuleCollectionEntry* firstEntry;
+    struct ModuleCollectionEntry entries[MODULE_COLLECTION_ENTRIES];
 };
 
 typedef char* String;
-typedef enum Vertex Vertex;
-typedef struct Graph* Graph;
-typedef struct Dictionary* Dictionary;
+typedef struct Message* Message;
+typedef struct MessageQueue* MessageQueue;
+typedef struct Module* Module;
+typedef struct ConjunctionModuleEntry* ConjunctionModuleEntry;
+typedef struct ConjunctionModuleBucket* ConjunctionModuleBucket;
+typedef struct ConjunctionModule* ConjunctionModule;
+typedef struct FlipFlopModule* FlipFlopModule;
+typedef struct ModuleCollectionEntry* ModuleCollectionEntry;
+typedef struct ModuleCollection* ModuleCollection;
 
-Vertex vertex_from_string(String value)
+void module(Module instance, String name)
 {
-    if (strcmp(value, "output") == 0)
-    {
-        return VERTEX_LAST;
-    }
+    instance->next = NULL;
+    instance->targetCount = 0;
 
-    return strtol(value, NULL, 36) + VERTEX_OFFSET;
+    strcpy(instance->name, name);
 }
 
-void graph_add_vertex(Graph instance, Vertex item)
+void conjunction_module(ConjunctionModule instance, String name)
 {
-    instance->vertices[instance->vertexCount] = item;
-    instance->vertexCount++;
+    module(instance, name);
+
+    instance->base.flipFlop = false;
 }
 
-void graph_add_edge(Graph instance, Vertex source, Vertex target)
+void conjunction_module_send(
+    ConjunctionModule instance,
+    bool pulse,
+    MessageQueue queue)
 {
-    int i = 0;
 
-    while (instance->edges[source][i])
-    {
-        i++;
-    }
+}
 
-    instance->edges[source][i] = target;
+void flip_flop_module(FlipFlopModule instance, String name)
+{
+    module(instance, name);
+
+    instance->base.flipFlop = true;
+}
+
+void module_add_target(Module instance, String item)
+{
+    strcpy(instance->targets[instance->targetCount], item);
+
+    instance->targetCount++;
 }
 
 int main()
 {
-    Graph graph = malloc(sizeof * graph);
-
-    if (!graph)
-    {
-        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-        return 1;
-    }
-
-    Dictionary flipFlops = malloc(sizeof * flipFlops);
-
-    if (!flipFlops)
-    {
-        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-        return 1;
-    }
-
-    Dictionary conjunctions = malloc(sizeof * conjunctions);
-
-    if (!conjunctions)
-    {
-        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-        return 1;
-    }
-
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
-
-    dictionary(flipFlops);
-    dictionary(conjunctions);
+    struct ModuleCollection modules = { 0 };
 
     while (fgets(buffer, sizeof buffer, stdin))
     {
-        Vertex source;
         char* mid = strstr(buffer, " -> ");
 
         if (!mid)
@@ -126,31 +143,88 @@ int main()
 
         *mid = '\0';
 
-        switch (buffer[0])
+        Module current;
+
+        if (buffer[0] == '%')
         {
-            case '%':
-                source = vertex_from_string(buffer + 1);
-                break;
+            current = malloc(sizeof(struct FlipFlopModule));
 
-            case '&':
-                source = vertex_from_string(buffer + 1);
-                break;
+            if (!current)
+            {
+                fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
-            default:
-                source = 0;
-                break;
+                return 1;
+            }
+
+            flip_flop_module(current, buffer + 1);
+        }
+        else
+        {
+            current = malloc(sizeof(struct ConjunctionModule));
+
+            if (!current)
+            {
+                fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+                return 1;
+            }
+
+            if (buffer[0] = '&')
+            {
+                conjunction_module(current, buffer + 1);
+            }
+            else
+            {
+                conjunction_module(current, buffer);
+            }
         }
 
-        graph_add_vertex(graph, source);
+        module_collection_add(&modules, current);
 
-        for (String token = strtok(mid + 4, DELIMITERS);
-            token;
-            token = strtok(NULL, DELIMITERS))
+        for (String target = strtok(mid + 4, DELIMITERS);
+            target;
+            target = strtok(NULL, DELIMITERS))
         {
-            graph_add_edge(graph, source, vertex_from_string(token));
+            module_add_target(current, target);
         }
+    }
 
+    for (ModuleCollectionEntry entry = modules.firstEntry;
+        entry;
+        entry = entry->nextEntry)
+    {
+        for (Module module = entry->first; module; module = module->next)
+        {
+            for (int i = 0; i < module->targetCount; i++)
+            {
+                Module target = module_collection_find(module->targets[i]);
 
+                if (target && !target->flipFlop)
+                {
+                    ConjunctionModule conjunctionModule = target;
+
+                    conjunction_module_set_pulse(module->name, false);
+                }
+            }
+        }
+    }
+
+    int counts[2] = { 0, 1000 };
+    struct MessageQueue queue;
+    ConjunctionModule broadcaster = module_collection_find("broadcaster");
+
+    if (!broadcaster)
+    {
+        fprintf(stderr, "Error: Key not found.\n");
+
+        return 1;
+    }
+
+    message_queue(&queue);
+
+    for (int i = 0; i < 1000; i++)
+    {
+        conjunction_module_send(broadcaster, false, &queue);
     }
 
     int result = 0;
