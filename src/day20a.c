@@ -12,13 +12,6 @@
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define GRAPH_MAX_DEGREE 5
 
-enum Vertex
-{
-    VERTEX_OFFSET = -369,
-    VERTEX_LAST = 24187,
-    VERTEX_NONE = VERTEX_LAST + 1
-};
-
 struct Graph
 {
     int edges[VERTEX_NONE][GRAPH_MAX_DEGREE];
@@ -38,7 +31,7 @@ struct Module
 
 struct ConjunctionModule
 {
-
+    struct
 };
 
 struct FlipFlopModule
@@ -148,7 +141,7 @@ int main()
                 break;
         }
 
-        graph_add_vertex(source, source);
+        graph_add_vertex(graph, source);
 
         for (String token = strtok(mid + 4, DELIMITERS);
             token;
