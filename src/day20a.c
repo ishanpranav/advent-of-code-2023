@@ -8,7 +8,7 @@
 #include <string.h>
 #include <time.h>
 #define BUFFER_SIZE 32
-#define DELIMITERS ", "
+#define DELIMITERS ", \n"
 #define EXCEPTION_FORMAT "Error: Format.\n"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
@@ -141,31 +141,6 @@ bool message_queue_try_dequeue(MessageQueue instance, Message result)
     return true;
 }
 
-void module(Module instance, bool isConjunction, String name)
-{
-    instance->firstBucket = NULL;
-    instance->isConjunction = isConjunction;
-    instance->nextModule = NULL;
-    instance->pulse = false;
-    instance->targetCount = 0;
-
-    strcpy(instance->name, name);
-}
-
-void module_send(Module instance, bool pulse, MessageQueue queue)
-{
-    for (int i = 0; i < instance->targetCount; i++)
-    {
-        struct Message message;
-
-        message.pulse = pulse;
-
-        strcpy(message.source, instance->name);
-        strcpy(message.target, instance->targets[i]);
-        message_queue_enqueue(queue, &message);
-    }
-}
-
 void module_add_target(Module instance, String item)
 {
     strcpy(instance->targets[instance->targetCount], item);
@@ -214,10 +189,22 @@ bool module_set_pulse(Module instance, String name, bool value)
     return true;
 }
 
+void module_send(Module instance, bool pulse, MessageQueue queue)
+{
+    for (int i = 0; i < instance->targetCount; i++)
+    {
+        struct Message message;
+
+        message.pulse = pulse;
+
+        strcpy(message.source, instance->name);
+        strcpy(message.target, instance->targets[i]);
+        message_queue_enqueue(queue, &message);
+    }
+}
+
 bool module_respond(Module instance, Message message, MessageQueue queue)
 {
-    bool result;
-
     if (instance->isConjunction)
     {
         if (!module_set_pulse(instance, message->source, message->pulse))
@@ -225,7 +212,7 @@ bool module_respond(Module instance, Message message, MessageQueue queue)
             return false;
         }
 
-        result = false;
+        bool result = false;
 
         for (PulseBucket bucket = instance->buckets;
             bucket;
@@ -243,37 +230,45 @@ bool module_respond(Module instance, Message message, MessageQueue queue)
                 }
             }
         }
-    }
-    else if (!message->pulse)
-    {
-        instance->pulse = !instance->pulse;
-        result = instance->pulse;
-    }
-    else
-    {
+
+        module_send(instance, result, queue);
+
         return true;
     }
 
-    module_send(instance, result, queue);
+    if (!message->pulse)
+    {
+        instance->pulse = !instance->pulse;
+
+        module_send(instance, instance->pulse, queue);
+    }
 
     return true;
 }
 
-void module_collection_add(ModuleCollection instance, Module item)
+Module module_collection_add_new_module(
+    ModuleCollection instance,
+    bool isConjunction,
+    String name)
 {
     Module* p;
-    unsigned int hash = string_get_hash_code(item->name);
+    unsigned int hash = string_get_hash_code(name);
 
     hash %= MODULE_COLLECTION_ENTRIES;
 
     for (p = &instance->entries[hash].firstModule; *p; p = &(*p)->nextModule)
     {
-        if (strcmp(item->name, (*p)->name) == 0)
+        if (strcmp(name, (*p)->name) == 0)
         {
-            *p = item;
-
-            return;
+            return NULL;
         }
+    }
+
+    Module result = malloc(sizeof * result);
+
+    if (!result)
+    {
+        return NULL;
     }
 
     if (!instance->entries[hash].firstModule)
@@ -284,7 +279,23 @@ void module_collection_add(ModuleCollection instance, Module item)
         instance->firstEntry = instance->entries + hash;
     }
 
-    *p = item;
+    result->firstBucket = NULL;
+    result->isConjunction = isConjunction;
+    result->nextModule = NULL;
+    result->pulse = false;
+    result->targetCount = 0;
+
+    for (int i = 0; i < MODULE_COLLECTION_ENTRIES; i++)
+    {
+        result->buckets[i].firstEntry = NULL;
+        result->buckets[i].nextBucket = NULL;
+    }
+
+    strcpy(result->name, name);
+
+    *p = result;
+
+    return result;
 }
 
 Module module_collection_find(ModuleCollection instance, String name)
@@ -348,15 +359,6 @@ int main()
 
         *mid = '\0';
 
-        Module current = malloc(sizeof * current);
-
-        if (!current)
-        {
-            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-            return 1;
-        }
-
         String name;
 
         if (buffer[0] == '&' || buffer[0] == '%')
@@ -368,8 +370,17 @@ int main()
             name = buffer;
         }
 
-        module(current, buffer[0] == '%', name);
-        module_collection_add(&modules, current);
+        Module current = module_collection_add_new_module(
+            &modules,
+            buffer[0] == '%',
+            name);
+
+        if (!current)
+        {
+            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+            return 1;
+        }
 
         for (String target = strtok(mid + 4, DELIMITERS);
             target;
@@ -418,16 +429,22 @@ int main()
         return 1;
     }
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 1; i++)
     {
+        printf("Iteration %d\n", i);
+
         struct MessageQueue queue;
         struct Message currentMessage;
 
         message_queue(&queue);
         module_send(broadcaster, false, &queue);
 
+        int k = 0;
+
         while (message_queue_try_dequeue(&queue, &currentMessage))
         {
+            printf("%s -> %s : %d\n", currentMessage.source, currentMessage.target, currentMessage.pulse);
+
             counts[currentMessage.pulse]++;
 
             Module target = module_collection_find(
@@ -440,10 +457,12 @@ int main()
             }
 
             module_respond(target, &currentMessage, &queue);
+
+            if (k > 6) {
+                break;
+            }k++;
         }
     }
-
-    printf("%d, %d\n", counts[0], counts[1]);
 
     long result = counts[0] * counts[1];
 
