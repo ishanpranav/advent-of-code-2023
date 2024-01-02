@@ -12,8 +12,8 @@
 #define CALL_STACK_CAPACITY 8
 #define DELIMITERS ","
 #define FUNCTION_DICTIONARY_BUCKETS 919
+#define FUNCTION_RANGES_CAPACITY 8
 #define KEY_SIZE 3
-#define RANGES_CAPACITY 8
 
 enum Property
 {
@@ -41,7 +41,7 @@ struct Range
 struct Function
 {
     int count;
-    struct Range ranges[RANGES_CAPACITY];
+    struct Range ranges[FUNCTION_RANGES_CAPACITY];
 };
 
 struct Call

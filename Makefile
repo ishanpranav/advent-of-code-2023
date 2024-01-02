@@ -23,49 +23,6 @@ all: \
 	day18a day18b \
 	day19a day19b \
 	day20a day20b
-
-test:
-	cat alt01.txt | ./day01a.o > out.txt
-	cat alt01.txt | ./day01b.o >> out.txt
-	cat alt02.txt | ./day02a.o >> out.txt
-	cat alt02.txt | ./day02b.o >> out.txt
-	cat alt03.txt | ./day03a.o >> out.txt
-	cat alt03.txt | ./day03b.o >> out.txt
-	cat alt04.txt | ./day04a.o >> out.txt
-	cat alt04.txt | ./day04b.o >> out.txt
-	cat alt05.txt | ./day05a.o >> out.txt
-	cat alt05.txt | ./day05b.o >> out.txt
-	cat alt06.txt | ./day06a.o >> out.txt
-	cat alt06.txt | ./day06b.o >> out.txt
-	cat alt07.txt | ./day07a.o >> out.txt
-	cat alt07.txt | ./day07b.o >> out.txt
-	cat alt08.txt | ./day08a.o >> out.txt
-	cat alt08.txt | ./day08b.o >> out.txt
-	cat alt09.txt | ./day09a.o >> out.txt
-	cat alt09.txt | ./day09b.o >> out.txt
-	cat alt10.txt | ./day10a.o >> out.txt
-	cat alt10.txt | ./day10b.o >> out.txt
-	cat alt11.txt | ./day11a.o >> out.txt
-	cat alt11.txt | ./day11b.o >> out.txt
-	cat alt12.txt | ./day12a.o >> out.txt
-	cat alt12.txt | ./day12b.o >> out.txt
-	cat alt13.txt | ./day13a.o >> out.txt
-	cat alt13.txt | ./day13b.o >> out.txt
-	cat alt14.txt | ./day14a.o >> out.txt
-	cat alt14.txt | ./day14b.o >> out.txt
-	cat alt15.txt | ./day15a.o >> out.txt
-	cat alt15.txt | ./day15b.o >> out.txt
-	cat alt16.txt | ./day16a.o >> out.txt
-	cat alt16.txt | ./day16b.o >> out.txt
-	cat alt17.txt | ./day17a.o >> out.txt
-	cat alt17.txt | ./day17b.o >> out.txt
-	cat alt18.txt | ./day18a.o >> out.txt
-	cat alt18.txt | ./day18b.o >> out.txt
-	cat alt19.txt | ./day19a.o >> out.txt
-	cat alt19.txt | ./day19b.o >> out.txt
-	cat alt20.txt | ./day20a.o >> out.txt
-	cat alt20.txt | ./day20b.o >> out.txt
-	cat out.txt
 	
 day01a: src/day01a.c
 	$(CC) $(CFLAGS) $< -o $@.o

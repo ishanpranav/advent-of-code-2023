@@ -10,8 +10,8 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 #define DELIMITERS " "
+#define FUNCTION_RANGES_CAPACITY 64
 #define LIST_CAPACITY 32
-#define RANGES_CAPACITY 64
 
 struct Range
 {
@@ -22,7 +22,7 @@ struct Range
 
 struct Function
 {
-    struct Range ranges[RANGES_CAPACITY];
+    struct Range ranges[FUNCTION_RANGES_CAPACITY];
     int count;
 };
 

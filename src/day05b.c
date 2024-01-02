@@ -11,8 +11,8 @@
 #define BUFFER_SIZE 256
 #define DELIMITERS " "
 #define EXCEPTION_FORMAT "Error: Format.\n"
+#define FUNCTION_RANGES_CAPACITY 512
 #define INTERVAL_LIST_CAPACITY 32
-#define RANGES_CAPACITY 512
 
 struct Range
 {
@@ -23,7 +23,7 @@ struct Range
 
 struct Function
 {
-    struct Range ranges[RANGES_CAPACITY];
+    struct Range ranges[FUNCTION_RANGES_CAPACITY];
     int count;
 };
 
@@ -165,7 +165,7 @@ void function_fill_ranges(Function instance)
         return;
     }
 
-    struct Range view[RANGES_CAPACITY];
+    struct Range view[FUNCTION_RANGES_CAPACITY];
 
     function_sort_ranges(instance);
     function_get_ranges(instance, view);
@@ -211,7 +211,7 @@ void function_fill_ranges(Function instance)
 
 void function_compose(Function instance, Function other)
 {
-    struct Range view[RANGES_CAPACITY];
+    struct Range view[FUNCTION_RANGES_CAPACITY];
     Range last = view + instance->count - 1;
 
     function_get_ranges(instance, view);

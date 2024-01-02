@@ -10,14 +10,15 @@
 #define BUCKETS 131
 #define BUFFER_SIZE 32
 #define DELIMITERS ", \n"
-#define KEY_CAPACITY 12
+#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
-#define TARGETS_CAPACITY 8
+#define MODULE_NAME_CAPACITY 12
+#define MODULE_TARGETS_CAPACITY 8
 
 struct DictionaryEntry
 {
     struct DictionaryEntry* nextEntry;
-    char key[KEY_CAPACITY];
+    char key[MODULE_NAME_CAPACITY];
     bool value;
 };
 
@@ -35,8 +36,8 @@ struct Dictionary
 
 struct Message
 {
-    char source[KEY_CAPACITY];
-    char target[KEY_CAPACITY];
+    char source[MODULE_NAME_CAPACITY];
+    char target[MODULE_NAME_CAPACITY];
     bool pulse;
 };
 
@@ -58,8 +59,8 @@ struct Module
     struct Module* nextModule;
     union ModuleType child;
     int targetCount;
-    char name[KEY_CAPACITY];
-    char targets[TARGETS_CAPACITY][KEY_CAPACITY];
+    char name[MODULE_NAME_CAPACITY];
+    char targets[MODULE_TARGETS_CAPACITY][MODULE_NAME_CAPACITY];
     bool isConjunction;
 };
 
@@ -189,26 +190,6 @@ void dictionary_clear(Dictionary instance)
     instance->firstBucket = NULL;
 }
 
-void module(Module instance, bool isConjunction, String name)
-{
-    instance->isConjunction = isConjunction;
-    instance->nextModule = NULL;
-    instance->targetCount = 0;
-
-    if (isConjunction)
-    {
-        instance->child.pulses = malloc(sizeof * instance->child.pulses);
-
-        dictionary(instance->child.pulses);
-    }
-    else
-    {
-        instance->child.pulse = false;
-    }
-
-    strcpy(instance->name, name);
-}
-
 void message_queue(MessageQueue instance)
 {
     instance->first = -1;
@@ -256,6 +237,33 @@ bool message_queue_try_dequeue(MessageQueue instance, Message result)
     {
         instance->first++;
     }
+
+    return true;
+}
+
+bool module(Module instance, bool isConjunction, String name)
+{
+    instance->isConjunction = isConjunction;
+    instance->nextModule = NULL;
+    instance->targetCount = 0;
+
+    if (isConjunction)
+    {
+        instance->child.pulses = malloc(sizeof * instance->child.pulses);
+
+        if (!instance->child.pulses)
+        {
+            return false;
+        }
+
+        dictionary(instance->child.pulses);
+    }
+    else
+    {
+        instance->child.pulse = false;
+    }
+
+    strcpy(instance->name, name);
 
     return true;
 }
@@ -318,18 +326,9 @@ Module module_collection_get(ModuleCollection instance, String name)
     return NULL;
 }
 
-bool module_collection_add(ModuleCollection instance, Module item)
+void module_collection_add(ModuleCollection instance, Module item)
 {
-    Module* p;
     unsigned int hash = string_get_hash_code(item->name) % BUCKETS;
-
-    for (p = &instance->buckets[hash].firstModule; *p; p = &(*p)->nextModule)
-    {
-        if (strcmp(item->name, (*p)->name) == 0)
-        {
-            return false;
-        }
-    }
 
     if (!instance->buckets[hash].firstModule)
     {
@@ -339,24 +338,8 @@ bool module_collection_add(ModuleCollection instance, Module item)
         instance->firstBucket = instance->buckets + hash;
     }
 
-    *p = item;
-
-    return true;
-}
-
-static void scan(Module module, Message message, MessageQueue queue)
-{
-    if (module->isConjunction)
-    {
-        dictionary_set(module->child.pulses, message->source, message->pulse);
-        module_send(module, queue, !module_all_pulses(module));
-    }
-    else if (!message->pulse)
-    {
-        module->child.pulse = !module->child.pulse;
-
-        module_send(module, queue, module->child.pulse);
-    }
+    item->nextModule = instance->buckets[hash].firstModule;
+    instance->buckets[hash].firstModule = item;
 }
 
 int main()
@@ -380,7 +363,13 @@ int main()
 
         Module next = malloc(sizeof * next);
 
-        module(next, buffer[0] != '%', buffer + 1);
+        if (!next || !module(next, buffer[0] != '%', buffer + 1))
+        {
+            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+            return 1;
+        }
+        
         module_collection_add(&modules, next);
 
         for (String target = strtok(mid + 4, DELIMITERS);
@@ -405,9 +394,16 @@ int main()
                     &modules,
                     module->targets[i]);
 
-                if (target && target->isConjunction)
+                if (!target || !target->isConjunction)
                 {
-                    dictionary_set(target->child.pulses, module->name, false);
+                    continue;
+                }
+
+                if (!dictionary_set(target->child.pulses, module->name, false))
+                {
+                    fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+                    return 1;
                 }
             }
         }
@@ -417,12 +413,16 @@ int main()
 
     if (!broadcaster)
     {
-        fprintf(stderr, "Error: Key not found.");
+        fprintf(stderr, "Error: Key not found.\n");
 
         return 1;
     }
 
-    int counts[2] = { 1000, 0 };
+    int counts[2] = 
+    { 
+        [true] = 0,
+        [false] = 1000
+    };
 
     for (int i = 0; i < 1000; i++)
     {
@@ -438,9 +438,35 @@ int main()
 
             Module target = module_collection_get(&modules, current.target);
 
-            if (target)
+            if (!target)
             {
-                scan(target, &current, &queue);
+                continue;
+            }
+
+            if (target->isConjunction)
+            {
+                if (!dictionary_set(
+                    target->child.pulses,
+                    current.source,
+                    current.pulse))
+                {
+                    fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+                    return 1;
+                }
+
+                module_send(target, &queue, !module_all_pulses(target));
+            }
+            else
+            {
+                if (current.pulse)
+                {
+                    continue;
+                }
+                
+                target->child.pulse = !target->child.pulse;
+
+                module_send(target, &queue, target->child.pulse);
             }
         }
     }
@@ -448,7 +474,7 @@ int main()
     long result = counts[true] * counts[false];
 
     printf("20a %ld %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
-    
+
     for (ModuleCollectionBucket bucket = modules.firstBucket;
         bucket;
         bucket = bucket->nextBucket)
@@ -470,6 +496,6 @@ int main()
             module = next;
         }
     }
-    
+
     return 0;
 }
