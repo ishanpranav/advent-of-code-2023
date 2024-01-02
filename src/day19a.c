@@ -101,11 +101,11 @@ Range function_new_range(Function instance)
 
 static unsigned int function_dictionary_hash(char key[])
 {
-    unsigned int hash = 7;
+    unsigned int hash = 0;
 
     for (int i = 0; i < KEY_SIZE; i++)
     {
-        hash = (hash * 31) + key[i];
+        hash = (hash * 36) + key[i] - 97;
     }
 
     return hash % FUNCTION_DICTIONARY_BUCKETS;
@@ -189,7 +189,7 @@ void function_dictionary_clear(FunctionDictionary instance)
 
         bucket->firstEntry = NULL;
     }
-
+    
     instance->firstBucket = NULL;
 }
 

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BUCKETS 89
+#define BUCKETS 131
 #define BUFFER_SIZE 32
 #define DELIMITERS ", \n"
 #define KEY_CAPACITY 12
@@ -87,11 +87,11 @@ typedef struct ModuleCollection* ModuleCollection;
 
 unsigned int string_get_hash_code(String instance)
 {
-    unsigned int hash = 7;
+    unsigned int hash = 0;
 
     for (char* p = instance; *p; p++)
     {
-        hash = (hash * 31) + *p;
+        hash = (hash * 36) + *p - 97;
     }
 
     return hash;
@@ -470,6 +470,6 @@ int main()
             module = next;
         }
     }
-
+    
     return 0;
 }

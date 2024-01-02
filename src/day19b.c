@@ -111,7 +111,7 @@ void b_dynamic(BDynamic instance)
     for (Property property = 0; property < PROPERTY_NONE; property++)
     {
         instance[property].min = 1;
-        instance[property].max = 4000;
+        instance[property].max = 4001;
     }
 }
 
@@ -155,11 +155,11 @@ Range function_new_range(Function instance)
 
 static unsigned int function_dictionary_hash(char key[])
 {
-    unsigned int hash = 7;
+    unsigned int hash = 0;
 
     for (int i = 0; i < KEY_SIZE; i++)
     {
-        hash = (hash * 31) + key[i];
+        hash = (hash * 36) + key[i] - 97;
     }
 
     return hash % FUNCTION_DICTIONARY_BUCKETS;
@@ -385,18 +385,18 @@ static long long scan(
                     continue;
                 }
 
-                if (current->value[range->identifier].max >= comparand)
+                if (current->value[range->identifier].max > comparand)
                 {
                     next = *current;
                     next.value[range->identifier].min = comparand;
-                    current->value[range->identifier].max = comparand - 1;
+                    current->value[range->identifier].max = comparand;
 
                     call_stack_push(stack, &next);
                 }
                 break;
 
             case '>':
-                if (current->value[range->identifier].max <= comparand)
+                if (current->value[range->identifier].max <= comparand + 1)
                 {
                     continue;
                 }
@@ -404,7 +404,7 @@ static long long scan(
                 if (current->value[range->identifier].min <= comparand)
                 {
                     next = *current;
-                    next.value[range->identifier].max = comparand;
+                    next.value[range->identifier].max = comparand + 1;
                     current->value[range->identifier].min = comparand + 1;
 
                     call_stack_push(stack, &next);
@@ -420,10 +420,7 @@ static long long scan(
 
                 for (Property i = 0; i < PROPERTY_NONE; i++)
                 {
-                    product *= (
-                        current->value[i].max -
-                        current->value[i].min +
-                        1);
+                    product *= current->value[i].max - current->value[i].min;
                 }
 
                 return product;
