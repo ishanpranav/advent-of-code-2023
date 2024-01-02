@@ -138,7 +138,7 @@ int main()
     int result = scan(graph, 0, directions);
 
     printf("08a %d %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
-    free(garph);
+    free(graph);
 
     return 0;
 }

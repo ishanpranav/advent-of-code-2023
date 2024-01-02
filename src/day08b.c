@@ -119,7 +119,7 @@ static bool read(FILE* stream, Graph graph, VertexList starts)
 
         if (buffer[2] == 'A')
         {
-            list_add(starts, vertex);
+            vertex_list_add(starts, vertex);
         }
 
         graph_add(graph, vertex, left, right);
