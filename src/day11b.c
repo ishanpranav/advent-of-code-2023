@@ -35,7 +35,7 @@ static long long scan(long long vector[], int max, int galaxies)
     return result;
 }
 
-int main()
+int main(void)
 {
     int n = 0;
     int galaxies = 0;

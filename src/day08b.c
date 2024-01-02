@@ -156,7 +156,7 @@ static int scan(Graph instance, Vertex start, String directions)
     return result;
 }
 
-int main()
+int main(void)
 {
     Graph graph = malloc(sizeof * graph);
 

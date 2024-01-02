@@ -17,7 +17,7 @@ static int parse(char digit)
     return digit - '0';
 }
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     long sum = 0;

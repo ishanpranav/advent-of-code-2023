@@ -49,7 +49,7 @@ static PossibleResult possible(char token, int number)
     return POSSIBLE_RESULT_POSSIBLE;
 }
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     long sum = 0;

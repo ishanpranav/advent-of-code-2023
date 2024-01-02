@@ -284,7 +284,7 @@ static void scan_right(
     }
 }
 
-int main()
+int main(void)
 {
     StateMatrix matrix = malloc(sizeof * matrix);
 

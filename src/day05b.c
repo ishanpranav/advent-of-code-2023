@@ -291,7 +291,7 @@ static bool read(Function function, char buffer[])
     return true;
 }
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     clock_t start = clock();

@@ -35,7 +35,7 @@ static bool read(FILE* stream, long long* result)
     return true;
 }
 
-int main()
+int main(void)
 {
     long long t;
     long long dx;

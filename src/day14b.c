@@ -312,7 +312,7 @@ static Exception roll_many(Matrix matrix, Dictionary cache)
     return EXCEPTION_NONE;
 }
 
-int main()
+int main(void)
 {
     char buffer[DIMENSION + 1];
     clock_t start = clock();

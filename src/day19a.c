@@ -353,7 +353,7 @@ static bool scan(Dynamic value, FunctionDictionary dictionary)
     return false;
 }
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     struct FunctionDictionary dictionary = { 0 };

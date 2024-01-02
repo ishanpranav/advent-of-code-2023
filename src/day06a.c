@@ -20,7 +20,7 @@ struct Point
 
 typedef char* String;
 
-int main()
+int main(void)
 {
     String token;
     char buffer[BUFFER_SIZE];

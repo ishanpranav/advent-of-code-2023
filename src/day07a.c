@@ -196,7 +196,7 @@ void player_list_sort(PlayerList instance)
         player_compare);
 }
 
-int main()
+int main(void)
 {
     struct PlayerList players;
     char buffer[BUFFER_SIZE];

@@ -71,7 +71,7 @@ static int realize_xy(BitMatrix x, BitMatrix y)
     return realize(x);
 }
 
-int main()
+int main(void)
 {
     int i = 0;
     long total = 0;

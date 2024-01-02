@@ -342,7 +342,7 @@ void module_collection_add(ModuleCollection instance, Module item)
     instance->buckets[hash].firstModule = item;
 }
 
-int main()
+int main(void)
 {
     clock_t start = clock();
     char buffer[BUFFER_SIZE];

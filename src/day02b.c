@@ -12,7 +12,7 @@
 
 typedef char* String;
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     long sum = 0;

@@ -271,7 +271,7 @@ static void scan_horizontal(
     }
 }
 
-int main()
+int main(void)
 {
     char buffer[DIMENSION + 1];
     clock_t start = clock();

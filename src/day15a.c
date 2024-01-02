@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
-int main()
+int main(void)
 {
     long sum = 0;
     int hash = 0;

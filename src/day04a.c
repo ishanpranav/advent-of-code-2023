@@ -41,7 +41,7 @@ bool decimal_set_contains(DecimalSet instance, char tens, char ones)
     return instance->set[decimal_set_index(tens, ones)];
 }
 
-int main()
+int main(void)
 {
     long sum = 0;
     char buffer[BUFFER_SIZE];

@@ -239,7 +239,7 @@ static int scan(Table table, Coordinate current)
     return result;
 }
 
-int main()
+int main(void)
 {
     char buffer[DIMENSION + 1];
     clock_t start = clock();

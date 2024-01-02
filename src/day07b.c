@@ -209,7 +209,7 @@ void b_player_list_sort(BPlayerList instance)
         b_player_compare);
 }
 
-int main()
+int main(void)
 {
     struct BPlayerList players;
     char buffer[BUFFER_SIZE];

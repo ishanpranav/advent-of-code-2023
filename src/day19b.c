@@ -440,7 +440,7 @@ static long long scan(
     return 0;
 }
 
-int main()
+int main(void)
 {
     char buffer[BUFFER_SIZE];
     struct FunctionDictionary dictionary = { 0 };

@@ -65,7 +65,7 @@ long series_lagrange_previous(Series instance)
     return series_lagrange_extrapolate(instance, -1);
 }
 
-int main()
+int main(void)
 {
     long sum = 0;
     char buffer[BUFFER_SIZE];

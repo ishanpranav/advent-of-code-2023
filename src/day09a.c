@@ -63,7 +63,7 @@ long series_lagrange_next(Series instance)
     return series_lagrange_extrapolate(instance, instance->count);
 }
 
-int main()
+int main(void)
 {
     long sum = 0;
     char buffer[BUFFER_SIZE];

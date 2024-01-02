@@ -181,7 +181,7 @@ String string_builder_to_string(StringBuilder instance)
     return instance->buffer;
 }
 
-int main()
+int main(void)
 {
     int hash = 0;
     int value = 0;

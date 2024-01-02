@@ -189,7 +189,7 @@ static bool scan(Matrix matrix, Coordinate previous, Coordinate current)
     }
 }
 
-int main()
+int main(void)
 {
     char buffer[DIMENSION + 1] = { 0 };
     clock_t start = clock();

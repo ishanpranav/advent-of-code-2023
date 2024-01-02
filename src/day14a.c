@@ -85,7 +85,7 @@ static void roll_hi(Matrix matrix)
     }
 }
 
-int main()
+int main(void)
 {
     char buffer[DIMENSION + 1];
     clock_t start = clock();

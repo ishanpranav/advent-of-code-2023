@@ -103,7 +103,7 @@ static void aggregate(String a, String b, long* sum, Validator validator)
     }
 }
 
-int main()
+int main(void)
 {
     char hi[DIMENSION + 1] = { 0 };
     clock_t start = clock();

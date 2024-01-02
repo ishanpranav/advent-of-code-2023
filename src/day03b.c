@@ -198,7 +198,7 @@ static void aggregate(String hi, String mid, String lo, Case cases[], long* sum)
     }
 }
 
-int main()
+int main(void)
 {
     char hi[DIMENSION + 1] = { 0 };
     char mid[DIMENSION + 1] = { 0 };

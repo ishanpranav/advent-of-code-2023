@@ -161,7 +161,7 @@ static void scan(Pattern text, Pattern pattern, Dictionary current)
     }
 }
 
-int main()
+int main(void)
 {
     long long total = 0;
     char buffer[BUFFER_SIZE];

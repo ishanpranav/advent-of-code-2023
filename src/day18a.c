@@ -17,12 +17,11 @@ long math_pick_theorem_a(long b, long i)
     return i + (b / 2) - 1;
 }
 
-int main()
+int main(void)
 {
     int b = 0;
     int i = 0;
     int x = 0;
-    int y = 0;
     char buffer[BUFFER_SIZE];
     clock_t start = clock();
 
@@ -53,12 +52,10 @@ int main()
         switch (direction)
         {
             case 'U':
-                y += length;
                 i += x * length;
                 break;
 
             case 'D':
-                y -= length;
                 i -= x * length;
                 break;
 
