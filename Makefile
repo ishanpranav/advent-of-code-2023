@@ -13,7 +13,7 @@ all: \
 	day07a day07b \
 	day08a day08b \
 	day09a day09b \
-	day10a day10b \
+	day10a \
 	day11a day11b \
 	day12a day12b \
 	day13a day13b \
@@ -82,9 +82,6 @@ day09b: src/day09b.c
 day10a: src/day10a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
-day10b: src/day10b.c
-	$(CC) $(CFLAGS) $< -o $@.o
-	
 day11a: src/day11a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
