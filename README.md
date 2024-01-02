@@ -76,24 +76,18 @@ I am working within the following constraints to ensure high code quality.
 - Adhere to the [project style guide](cstyle.md).
 - Final solutions must be implemented in the C programming language following
   the C99 standard.
+  - Assume signed integer overflow is defined based on two\'s complement.
 - All solutions must be standalone files with no user-defined headers and no
   external dependencies beyond the C standard library (`libc`) and the C
   mathematics library (`libm`). The first and second problems for a given day
   must be implemented separately.
 - The solution must produce the correct result for the [examples](data/), not
-  just the personalized puzzle input.
+  just the personalized puzzle input. This means that efficient solutions to
+  Day 10(b) and Day 21(b) are unfeasible.
 - Bounds checking is not required for data structures whose capacity is defined
   by a macro.
-- The first and second problems for a given day may share the same data
-  structures and algorithms, but the second problem may only add to (and never
-  remove from) the public API of the first.
 - The return values of all C standard library functions must be checked, except
   for those returned from the following:
   - `fprintf`
   - `memcpy`
   - `printf`
-- Only the `main` entry point can do the following:
-  - Write to the standard output stream (i.e., call `printf`)
-  - Write to the standard error stream (i.e., call `fprintf` with `stderr` as
-    the first argument)
-  - Terminate the program
