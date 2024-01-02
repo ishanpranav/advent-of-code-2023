@@ -1,6 +1,7 @@
 CC = gcc
 CFLAGS = -O3 -pedantic -std=c99 -Wall -Wextra
 LIBM = -lm
+TWOS_COMPLEMENT = -fno-strict-overflow -fwrapv
 
 all: \
 	day01a day01b \
@@ -52,7 +53,7 @@ day05a: src/day05a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day05b: src/day05b.c
-	$(CC) $(CFLAGS) $< -o $@.o
+	$(CC) $(CFLAGS) $(TWOS_COMPLEMENT) $< -o $@.o
 	
 day06a: src/day06a.c
 	$(CC) $(CFLAGS) $< -o $@.o $(LIBM)

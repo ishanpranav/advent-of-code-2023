@@ -2,16 +2,11 @@
 // Copyright (c) 2023 Ishan Pranav. All rights reserved.
 // Licensed under the MIT License.
 
-// This is the reference (high-level) implementation.
-// Please see /src/day05b.c for the final solution.
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Day5;
 

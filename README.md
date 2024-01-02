@@ -57,7 +57,7 @@ time between 0.00005 seconds and 0.00050 seconds.
 |  7  |           [Camel Cards](src/day07b.c)           |          Statistics, Dictionaries, Sorting algorithms          |          Sum          | 0.0001 | Frequency map with mode-tracking                                                                                                                                                                                  |
 |  8  |        [Haunted Wasteland](src/day08b.c)        |           Graph theory, Number theory, Dictionaries            | Least Common Multiple | 0.0001 | [Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph, base-36 encoding                                                                                                       |
 |  9  |       [Mirage Maintenance](src/day09b.c)        |                       Numerical analysis                       |          Sum          | 0.0001 | [Lagrange polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial)                                                                                                                                          |
-| 10  |            [Pipe Maze](src/day10b.c)            |         Geometry, Graph theory, Pathfinding algorithms         |         Area          | 0.0001 | [Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem), matrix-based graph |
+| 10  |            [Pipe Maze](src/day10a.c)            |         Geometry, Graph theory, Pathfinding algorithms         |         Area          | 0.0001 | [Flood-fill](https://en.wikipedia.org/wiki/Flood_fill), matrix-based graph |
 | 11  |        [Cosmic Expansion](src/day11b.c)         |                            Geometry                            |          Sum          | 0.0001 | [Taxicab geometry](https://en.wikipedia.org/wiki/Taxicab_geometry)                                                                                                                                                |
 | 12  |           [Hot Springs](src/day12b.c)           |       Automata theory, Regular expressions, Dictionaries       |          Sum          |  0.01  | [Non-deterministic finite automaton](https://en.m.wikipedia.org/wiki/Nondeterministic_finite_automaton), iterable dictionary                                                                                      |
 | 13  |       [Point of Incidence](src/day13b.c)        |                       Binary arithmetic                        |          Sum          | 0.0001 | Bit array, bit matrix                                                                                                                                                                                             |
@@ -80,8 +80,8 @@ I am working within the following constraints to ensure high code quality.
   external dependencies beyond the C standard library (`libc`) and the C
   mathematics library (`libm`). The first and second problems for a given day
   must be implemented separately.
-- The solution must produce the correct result for the **examples**, not just
-  the personalized puzzle input.
+- The solution must produce the correct result for the [examples](data/), not
+  just the personalized puzzle input.
 - Bounds checking is not required for data structures whose capacity is defined
   by a macro.
 - The first and second problems for a given day may share the same data

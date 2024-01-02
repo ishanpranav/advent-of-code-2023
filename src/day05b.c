@@ -2,7 +2,12 @@
 
 // If You Give A Seed A Fertilizer Part 2
 
-#include <limits.h>
+// This code relies on two's complement for signed integer overflow, which leads
+// to undefined behavior in the general case.
+
+// Compile with:                                    -fno-strict-overflow -fwrapv
+
+#include <limits.h> 
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -412,6 +417,6 @@ int main()
             }
         }
     }
-
+    
     printf("05b %lld %lf\n", min, (double)(clock() - start) / CLOCKS_PER_SEC);
 }

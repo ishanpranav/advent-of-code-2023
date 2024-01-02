@@ -7,7 +7,7 @@
 #include <time.h>
 #define BUFFER_SIZE 256
 
-static int numeric(char digit)
+static int parse(char digit)
 {
     if (!digit)
     {
@@ -43,7 +43,7 @@ int main()
             ones = *p;
         }
 
-        sum += (numeric(tens) * 10) + numeric(ones);
+        sum += (parse(tens) * 10) + parse(ones);
     }
 
     printf("01a %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);

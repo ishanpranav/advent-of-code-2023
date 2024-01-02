@@ -1,6 +1,6 @@
 a.out
 a.exe
-*.txt
+alt*.txt
 *.o
 .vscode/
 .antlr/
