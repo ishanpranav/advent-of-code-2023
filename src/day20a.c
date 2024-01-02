@@ -453,7 +453,7 @@ int main()
         bucket;
         bucket = bucket->nextBucket)
     {
-        Module module = NULL;
+        Module module = bucket->firstModule;
 
         while (module)
         {
