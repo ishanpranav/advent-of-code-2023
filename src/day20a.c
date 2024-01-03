@@ -13,7 +13,7 @@
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
 #define MODULE_TARGETS_CAPACITY 8
-#define STRING_CAPACITY 12
+#define STRING_CAPACITY 16
 
 struct String
 {
@@ -198,6 +198,26 @@ bool dictionary_set(Dictionary instance, String key, bool value)
     return true;
 }
 
+bool dictionary_all(Dictionary instance)
+{
+    for (DictionaryBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
+    {
+        for (DictionaryEntry entry = bucket->firstEntry;
+            entry;
+            entry = entry->nextEntry)
+        {
+            if (!entry->value)
+            {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void dictionary_clear(Dictionary instance)
 {
     for (DictionaryBucket bucket = instance->firstBucket;
@@ -299,31 +319,13 @@ bool module(Module instance, bool isConjunction, ZString name)
     return true;
 }
 
-bool module_all_pulses(Module instance)
+String module_new_target(Module instance)
 {
-    for (DictionaryBucket bucket = instance->child.pulses->firstBucket;
-        bucket;
-        bucket = bucket->nextBucket)
-    {
-        for (DictionaryEntry entry = bucket->firstEntry;
-            entry;
-            entry = entry->nextEntry)
-        {
-            if (!entry->value)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-void module_add_target(Module instance, ZString item)
-{
-    string(&instance->targets[instance->targetCount], item);
+    String result = instance->targets + instance->targetCount;
 
     instance->targetCount++;
+
+    return result;
 }
 
 void module_send(Module module, MessageQueue queue, bool pulse)
@@ -335,8 +337,39 @@ void module_send(Module module, MessageQueue queue, bool pulse)
         message->pulse = pulse;
 
         string_copy(&message->source, &module->name);
-        string_copy(&message->target, &module->targets[i]);
+        string_copy(&message->target, module->targets + i);
     }
+}
+
+bool module_respond(Module instance, Message message, MessageQueue queue)
+{
+    if (instance->isConjunction)
+    {
+        if (!dictionary_set(
+            instance->child.pulses,
+            &message->source,
+            message->pulse))
+        {
+            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+            return false;
+        }
+
+        module_send(instance, queue, !dictionary_all(instance->child.pulses));
+    }
+    else
+    {
+        if (message->pulse)
+        {
+            return true;
+        }
+
+        instance->child.pulse = !instance->child.pulse;
+
+        module_send(instance, queue, instance->child.pulse);
+    }
+
+    return true;
 }
 
 Module module_collection_get(ModuleCollection instance, String name)
@@ -402,11 +435,11 @@ int main(void)
 
         module_collection_add(&modules, next);
 
-        for (char* target = strtok(mid + 4, DELIMITERS);
-            target;
-            target = strtok(NULL, DELIMITERS))
+        for (ZString token = strtok(mid + 4, DELIMITERS);
+            token;
+            token = strtok(NULL, DELIMITERS))
         {
-            module_add_target(next, target);
+            string(module_new_target(next), token);
         }
     }
 
@@ -422,7 +455,7 @@ int main(void)
             {
                 Module target = module_collection_get(
                     &modules,
-                    &module->targets[i]);
+                    module->targets + i);
 
                 if (!target || !target->isConjunction)
                 {
@@ -439,7 +472,7 @@ int main(void)
         }
     }
 
-    struct String broadcasterKey = 
+    struct String broadcasterKey =
     {
         .length = 10,
         .buffer = { 'r', 'o', 'a', 'd', 'c', 'a', 's', 't', 'e', 'r' }
@@ -478,31 +511,7 @@ int main(void)
                 continue;
             }
 
-            if (target->isConjunction)
-            {
-                if (!dictionary_set(
-                    target->child.pulses,
-                    &current.source,
-                    current.pulse))
-                {
-                    fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-                    return 1;
-                }
-
-                module_send(target, &queue, !module_all_pulses(target));
-            }
-            else
-            {
-                if (current.pulse)
-                {
-                    continue;
-                }
-
-                target->child.pulse = !target->child.pulse;
-
-                module_send(target, &queue, target->child.pulse);
-            }
+            module_respond(target, &current, &queue);
         }
     }
 
