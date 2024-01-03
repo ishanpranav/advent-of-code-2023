@@ -29,3 +29,4 @@ done
 
 cat ../data/201.txt | ./../day20a.o
 cat ../data/202.txt | ./../day20a.o
+cat ../data/211.txt | ./../day21a.o

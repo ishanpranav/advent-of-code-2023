@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define DICTIONARY_BUCKETS 197
+#define DICTIONARY_BUCKETS 193
 #define DIMENSION 101
 #define EXCEPTION_FORMAT "Error: Format.\n"
 #define ITERATIONS 1000000000

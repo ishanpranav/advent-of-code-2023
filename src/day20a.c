@@ -7,11 +7,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BUCKETS 131
 #define BUFFER_SIZE 32
 #define DELIMITERS ", \n"
+#define DICTIONARY_BUCKETS 53
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
+#define MODULE_COLLECTION_BUCKETS 97
 #define MODULE_TARGETS_CAPACITY 8
 #define STRING_CAPACITY 16
 
@@ -37,7 +38,7 @@ struct DictionaryBucket
 struct Dictionary
 {
     struct DictionaryBucket* firstBucket;
-    struct DictionaryBucket buckets[BUCKETS];
+    struct DictionaryBucket buckets[DICTIONARY_BUCKETS];
 };
 
 struct Message
@@ -79,7 +80,7 @@ struct ModuleCollectionBucket
 struct ModuleCollection
 {
     struct ModuleCollectionBucket* firstBucket;
-    struct ModuleCollectionBucket buckets[BUCKETS];
+    struct ModuleCollectionBucket buckets[MODULE_COLLECTION_BUCKETS];
 };
 
 typedef char* ZString;
@@ -133,7 +134,7 @@ void dictionary(Dictionary instance)
 {
     instance->firstBucket = NULL;
 
-    for (int i = 0; i < BUCKETS; i++)
+    for (int i = 0; i < DICTIONARY_BUCKETS; i++)
     {
         instance->buckets[i].firstEntry = NULL;
         instance->buckets[i].nextBucket = NULL;
@@ -142,7 +143,7 @@ void dictionary(Dictionary instance)
 
 bool dictionary_try_get_value(Dictionary instance, String key, bool* result)
 {
-    unsigned int hash = string_get_hash_code(key) % BUCKETS;
+    unsigned int hash = string_get_hash_code(key) % DICTIONARY_BUCKETS;
 
     for (DictionaryEntry entry = instance->buckets[hash].firstEntry;
         entry;
@@ -162,7 +163,7 @@ bool dictionary_try_get_value(Dictionary instance, String key, bool* result)
 bool dictionary_set(Dictionary instance, String key, bool value)
 {
     DictionaryEntry* p;
-    unsigned int hash = string_get_hash_code(key) % BUCKETS;
+    unsigned int hash = string_get_hash_code(key) % DICTIONARY_BUCKETS;
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
@@ -374,7 +375,7 @@ bool module_respond(Module instance, Message message, MessageQueue queue)
 
 Module module_collection_get(ModuleCollection instance, String name)
 {
-    unsigned int hash = string_get_hash_code(name) % BUCKETS;
+    unsigned int hash = string_get_hash_code(name) % MODULE_COLLECTION_BUCKETS;
 
     for (Module module = instance->buckets[hash].firstModule;
         module;
@@ -391,7 +392,8 @@ Module module_collection_get(ModuleCollection instance, String name)
 
 void module_collection_add(ModuleCollection instance, Module item)
 {
-    unsigned int hash = string_get_hash_code(&item->name) % BUCKETS;
+    unsigned int hash = string_get_hash_code(&item->name) %
+        MODULE_COLLECTION_BUCKETS;
 
     if (!instance->buckets[hash].firstModule)
     {

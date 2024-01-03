@@ -7,9 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_SET_BUCKETS 6151
+#define COORDINATE_SET_BUCKETS 24593
 #define DIMENSION 256
 #define EXCEPTION_FORMAT "Error: Format.\n"
+#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define STATE_QUEUE_CAPACITY 2048
 
 enum AddResult
@@ -84,10 +85,22 @@ bool coordinate_is_empty(Coordinate instance)
     return instance->i < 0 || instance->j < 0;
 }
 
+void coordinate_set(CoordinateSet instance)
+{
+    instance->firstBucket = NULL;
+
+    for (int i = 0; i < COORDINATE_SET_BUCKETS; i++)
+    {
+        instance->buckets[i].firstEntry = NULL;
+        instance->buckets[i].nextBucket = NULL;
+    }
+}
+
 AddResult coordinate_set_add(CoordinateSet instance, Coordinate item)
 {
     CoordinateSetEntry* p;
-    unsigned int hash = (item->i ^ item->j) % COORDINATE_SET_BUCKETS;
+    unsigned int hash = (item->i * DIMENSION + item->j) %
+        COORDINATE_SET_BUCKETS;
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
@@ -276,7 +289,7 @@ static void scan_right(Matrix matrix, State current, StateQueue queue)
 {
     int j = current->coordinate.j + 1;
 
-    if (j >= matrix->columns || 
+    if (j >= matrix->columns ||
         matrix_get(matrix, current->coordinate.i, j) == '#')
     {
         return;
@@ -335,23 +348,32 @@ int main(void)
         return 1;
     }
 
+    CoordinateSet visited = malloc(sizeof * visited);
+
+    if (!visited)
+    {
+        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+        return 1;
+    }
+
     int total = 0;
-    struct CoordinateSet visited = { 0 };
     struct StateQueue queue;
     struct State current;
 
+    coordinate_set(visited);
     state_queue(&queue);
     state(state_queue_enqueue(&queue), &a.origin);
 
     while (state_queue_try_dequeue(&queue, &current))
     {
-        switch (coordinate_set_add(&visited, &current.coordinate))
+        switch (coordinate_set_add(visited, &current.coordinate))
         {
             case ADD_RESULT_ADDED: break;
             case ADD_RESULT_NOT_ADDED: continue;
 
-            case ADD_RESULT_OUT_OF_MEMORY: 
-                fprintf(stderr, "Error: Out of memory.\n");
+            case ADD_RESULT_OUT_OF_MEMORY:
+                fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
                 return 1;
         }
@@ -373,5 +395,6 @@ int main(void)
     }
 
     printf("21a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
-    coordinate_set_clear(&visited);
+    coordinate_set_clear(visited);
+    free(visited);
 }

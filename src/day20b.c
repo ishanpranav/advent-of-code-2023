@@ -7,14 +7,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BUCKETS 131
 #define BUFFER_SIZE 32
+#define DICTIONARY_BUCKETS 53
 #define DELIMITERS ", \n"
 #define EXCEPTION_FORMAT "Error: Format.\n"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
+#define MODULE_COLLECTION_BUCKETS 97
 #define MODULE_TARGETS_CAPACITY 8
+#define SET_BUCKETS 53
 #define STRING_CAPACITY 16
+
+enum AddResult
+{
+    ADD_RESULT_ADDED,
+    ADD_RESULT_NOT_ADDED,
+    ADD_RESULT_OUT_OF_MEMORY
+};
 
 struct String
 {
@@ -38,7 +47,7 @@ struct DictionaryBucket
 struct Dictionary
 {
     struct DictionaryBucket* firstBucket;
-    struct DictionaryBucket buckets[BUCKETS];
+    struct DictionaryBucket buckets[DICTIONARY_BUCKETS];
 };
 
 struct Message
@@ -80,10 +89,30 @@ struct ModuleCollectionBucket
 struct ModuleCollection
 {
     struct ModuleCollectionBucket* firstBucket;
-    struct ModuleCollectionBucket buckets[BUCKETS];
+    struct ModuleCollectionBucket buckets[MODULE_COLLECTION_BUCKETS];
+};
+
+struct SetEntry
+{
+    struct SetEntry* nextEntry;
+    struct String item;
+};
+
+struct SetBucket
+{
+    struct SetEntry* firstEntry;
+    struct SetBucket* nextBucket;
+};
+
+struct Set
+{
+    struct SetBucket* firstBucket;
+    struct SetBucket buckets[DICTIONARY_BUCKETS];
+    int count;
 };
 
 typedef char* ZString;
+typedef enum AddResult AddResult;
 typedef struct String* String;
 typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct DictionaryBucket* DictionaryBucket;
@@ -93,6 +122,9 @@ typedef struct MessageQueue* MessageQueue;
 typedef struct Module* Module;
 typedef struct ModuleCollectionBucket* ModuleCollectionBucket;
 typedef struct ModuleCollection* ModuleCollection;
+typedef struct SetEntry* SetEntry;
+typedef struct SetBucket* SetBucket;
+typedef struct Set* Set;
 
 long long math_gcd(long long a, long long b)
 {
@@ -142,7 +174,7 @@ unsigned int string_get_hash_code(String instance)
 
     for (int i = 0; i < instance->length; i++)
     {
-        hash = (hash * 36) + instance->buffer[i] - 97;
+        hash = (hash * 33) + instance->buffer[i];
     }
 
     return hash;
@@ -152,7 +184,7 @@ void dictionary(Dictionary instance)
 {
     instance->firstBucket = NULL;
 
-    for (int i = 0; i < BUCKETS; i++)
+    for (int i = 0; i < DICTIONARY_BUCKETS; i++)
     {
         instance->buckets[i].firstEntry = NULL;
         instance->buckets[i].nextBucket = NULL;
@@ -161,7 +193,7 @@ void dictionary(Dictionary instance)
 
 bool dictionary_try_get_value(Dictionary instance, String key, bool* result)
 {
-    unsigned int hash = string_get_hash_code(key) % BUCKETS;
+    unsigned int hash = string_get_hash_code(key) % DICTIONARY_BUCKETS;
 
     for (DictionaryEntry entry = instance->buckets[hash].firstEntry;
         entry;
@@ -181,7 +213,7 @@ bool dictionary_try_get_value(Dictionary instance, String key, bool* result)
 bool dictionary_set(Dictionary instance, String key, int value)
 {
     DictionaryEntry* p;
-    unsigned int hash = string_get_hash_code(key) % BUCKETS;
+    unsigned int hash = string_get_hash_code(key) % DICTIONARY_BUCKETS;
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
@@ -347,19 +379,6 @@ String module_new_target(Module instance)
     return result;
 }
 
-bool module_contains_target(Module instance, String item)
-{
-    for (int i = 0; i < instance->targetCount; i++)
-    {
-        if (string_equals(instance->targets + i, item))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void module_send(Module module, MessageQueue queue, bool pulse)
 {
     for (int i = 0; i < module->targetCount; i++)
@@ -406,7 +425,7 @@ bool module_respond(Module instance, Message message, MessageQueue queue)
 
 Module module_collection_get(ModuleCollection instance, String name)
 {
-    unsigned int hash = string_get_hash_code(name) % BUCKETS;
+    unsigned int hash = string_get_hash_code(name) % MODULE_COLLECTION_BUCKETS;
 
     for (Module module = instance->buckets[hash].firstModule;
         module;
@@ -423,7 +442,8 @@ Module module_collection_get(ModuleCollection instance, String name)
 
 void module_collection_add(ModuleCollection instance, Module item)
 {
-    unsigned int hash = string_get_hash_code(&item->name) % BUCKETS;
+    unsigned int hash = string_get_hash_code(&item->name) %
+        MODULE_COLLECTION_BUCKETS;
 
     if (!instance->buckets[hash].firstModule)
     {
@@ -437,35 +457,78 @@ void module_collection_add(ModuleCollection instance, Module item)
     instance->buckets[hash].firstModule = item;
 }
 
-bool scan(
-    ModuleCollection modules,
-    Dictionary visited,
-    Module broadcaster, 
-    Module sender,
-    long long* result)
+AddResult set_add(Set instance, String item)
 {
-    for (ModuleCollectionBucket bucket = modules->buckets;
-        bucket;
-        bucket = bucket->nextBucket)
-    {
-        for (Module module = bucket->firstModule;
-            module;
-            module = module->nextModule)
-        {
-            if (!module_contains_target(module, &sender->name))
-            {
-                continue;
-            }
+    SetEntry* p;
+    unsigned int hash = string_get_hash_code(item) % SET_BUCKETS;
 
-            dictionary_set(visited, &module->name, false);
+    for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
+    {
+        if (string_equals(item, &(*p)->item))
+        {
+            return ADD_RESULT_NOT_ADDED;
         }
     }
 
+    SetEntry entry = malloc(sizeof * entry);
+
+    if (!entry)
+    {
+        return ADD_RESULT_OUT_OF_MEMORY;
+    }
+
+    if (!instance->buckets[hash].firstEntry)
+    {
+        SetBucket first = instance->firstBucket;
+
+        instance->buckets[hash].nextBucket = first;
+        instance->firstBucket = instance->buckets + hash;
+    }
+
+    string_copy(&entry->item, item);
+
+    entry->nextEntry = NULL;
+    *p = entry;
+    instance->count++;
+
+    return ADD_RESULT_ADDED;
+}
+
+void set_clear(Set instance)
+{
+    for (SetBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
+    {
+        SetEntry entry = bucket->firstEntry;
+
+        while (entry)
+        {
+            SetEntry nextEntry = entry->nextEntry;
+
+            free(entry);
+
+            entry = nextEntry;
+        }
+
+        bucket->firstEntry = NULL;
+    }
+
+    instance->firstBucket = NULL;
+}
+
+static bool scan(
+    ModuleCollection modules,
+    Set visited,
+    Module broadcaster,
+    Module sender,
+    long long* result)
+{
     *result = 1;
 
     int iterations = 0;
 
-    while (!dictionary_all(visited))
+    while (visited->count < 4)
     {
         iterations++;
 
@@ -486,7 +549,12 @@ bool scan(
 
             if (target == sender && current.pulse)
             {
-                dictionary_set(visited, &current.source, true);
+                AddResult status = set_add(visited, &current.source);
+
+                if (status == ADD_RESULT_OUT_OF_MEMORY)
+                {
+                    return false;
+                }
 
                 *result = math_lcm(*result, iterations);
             }
@@ -602,9 +670,9 @@ int main(void)
         return 1;
     }
 
-    struct Dictionary visited = { 0 };
+    struct Set visited = { 0 };
     long long lcm;
-    
+
     if (!scan(&modules, &visited, broadcaster, sender, &lcm))
     {
         fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
@@ -613,8 +681,8 @@ int main(void)
     }
 
     printf("20b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
-    dictionary_clear(&visited);
-    
+    set_clear(&visited);
+
     for (ModuleCollectionBucket bucket = modules.firstBucket;
         bucket;
         bucket = bucket->nextBucket)

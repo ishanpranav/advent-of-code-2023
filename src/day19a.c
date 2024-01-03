@@ -11,7 +11,7 @@
 #define BUFFER_SIZE 64
 #define DELIMITERS ","
 #define EXCEPTION_FORMAT "Error: Format.\n"
-#define FUNCTION_DICTIONARY_BUCKETS 919
+#define FUNCTION_DICTIONARY_BUCKETS 1543
 #define FUNCTION_RANGES_CAPACITY 8
 #define KEY_SIZE 3
 
@@ -189,7 +189,7 @@ void function_dictionary_clear(FunctionDictionary instance)
 
         bucket->firstEntry = NULL;
     }
-    
+
     instance->firstBucket = NULL;
 }
 
