@@ -511,7 +511,12 @@ int main(void)
                 continue;
             }
 
-            module_respond(target, &current, &queue);
+            if (!module_respond(target, &current, &queue))
+            {
+                fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+                return 1;
+            }
         }
     }
 

@@ -437,11 +437,12 @@ void module_collection_add(ModuleCollection instance, Module item)
     instance->buckets[hash].firstModule = item;
 }
 
-long long scan(
+bool scan(
     ModuleCollection modules,
     Dictionary visited,
     Module broadcaster, 
-    Module sender)
+    Module sender,
+    long long* result)
 {
     for (ModuleCollectionBucket bucket = modules->buckets;
         bucket;
@@ -460,7 +461,8 @@ long long scan(
         }
     }
 
-    long long result = 1;
+    *result = 1;
+
     int iterations = 0;
 
     while (!dictionary_all(visited))
@@ -486,14 +488,17 @@ long long scan(
             {
                 dictionary_set(visited, &current.source, true);
 
-                result = math_lcm(result, iterations);
+                *result = math_lcm(*result, iterations);
             }
 
-            module_respond(target, &current, &queue);
+            if (!module_respond(target, &current, &queue))
+            {
+                return false;
+            }
         }
     }
 
-    return result;
+    return true;
 }
 
 int main(void)
@@ -598,7 +603,14 @@ int main(void)
     }
 
     struct Dictionary visited = { 0 };
-    long long lcm = scan(&modules, &visited, broadcaster, sender);
+    long long lcm;
+    
+    if (!scan(&modules, &visited, broadcaster, sender, &lcm))
+    {
+        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+        return 1;
+    }
 
     printf("20b %lld %lf\n", lcm, (double)(clock() - start) / CLOCKS_PER_SEC);
     dictionary_clear(&visited);
