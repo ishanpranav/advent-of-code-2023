@@ -23,7 +23,8 @@ all: \
 	day17a day17b \
 	day18a day18b \
 	day19a day19b \
-	day20a day20b
+	day20a day20b \
+	day21a
 	
 day01a: src/day01a.c
 	$(CC) $(CFLAGS) $< -o $@.o
@@ -142,5 +143,8 @@ day20a: src/day20a.c
 day20b: src/day20b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
+day21a: src/day21a.c
+	$(CC) $(CFLAGS) $< -o $@.o
+
 clean:
 	rm -rf *.o

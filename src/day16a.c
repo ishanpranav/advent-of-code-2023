@@ -241,7 +241,7 @@ static int scan(Table table, Coordinate current)
 
 int main(void)
 {
-    char buffer[DIMENSION + 1];
+    char buffer[DIMENSION + 2];
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))

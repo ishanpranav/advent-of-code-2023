@@ -51,11 +51,11 @@ is impractical, use numeric suffixes instead.
 |  `g`   | green color component                                                                        |
 |  `hi`  | larger pointer, point above, upper buffer                                                    |
 |  `i`   | abitrary counter, matrix index in an arbitrary dimension, interior points in Pick\'s Theorem |
-|  `k`   | term number                                                                                  |
+|  `k`   | term number, arbitrary constant                                                              |
 |  `lo`  | smaller pointer, point below, lower buffer                                                   |
 |  `m`   | matrix size in an arbitrary dimension                                                        |
 | `mid`  | middle pointer, middle buffer                                                                |
-|  `n`   | count                                                                                        |
+|  `n`   | count, arbitrary integer                                                                     |
 |  `p`   | arbitrary pointer                                                                            |
 |  `r`   | red color component                                                                          |
 |  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |

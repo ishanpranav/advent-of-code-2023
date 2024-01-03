@@ -37,8 +37,8 @@ struct Coordinate
 struct CoordinateQueue
 {
     struct Coordinate items[COORDINATE_QUEUE_CAPACITY];
-    long first;
-    long last;
+    int first;
+    int last;
 };
 
 struct State
@@ -304,7 +304,7 @@ int main(void)
         return 1;
     }
 
-    char buffer[DIMENSION + 1];
+    char buffer[DIMENSION + 2];
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))

@@ -33,6 +33,11 @@ void coordinate_empty(Coordinate result)
     result->j = -1;
 }
 
+bool coordinate_is_empty(Coordinate instance)
+{
+    return instance->i < 0 || instance->j < 0;
+}
+
 void matrix(Matrix instance, int n)
 {
     coordinate_empty(&instance->origin);
@@ -191,7 +196,7 @@ static bool scan(Matrix matrix, Coordinate previous, Coordinate current)
 
 int main(void)
 {
-    char buffer[DIMENSION + 1] = { 0 };
+    char buffer[DIMENSION + 1];
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))
@@ -228,7 +233,7 @@ int main(void)
     }
     while (fgets(buffer, n + 2, stdin));
 
-    if (!a.rows || a.origin.i < 0 || a.origin.j < 0)
+    if (coordinate_is_empty(&a.origin))
     {
         fprintf(stderr, EXCEPTION_FORMAT);
 
@@ -252,7 +257,7 @@ int main(void)
 
     int total = 1;
 
-    while (previous.i >= 0 && previous.j >= 0)
+    while (!coordinate_is_empty(&previous))
     {
         current = previous;
         total++;

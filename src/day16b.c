@@ -273,7 +273,7 @@ static void scan_horizontal(
 
 int main(void)
 {
-    char buffer[DIMENSION + 1];
+    char buffer[DIMENSION + 2];
     clock_t start = clock();
 
     if (!fgets(buffer, sizeof buffer, stdin))

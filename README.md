@@ -52,6 +52,7 @@ time between 0.00005 seconds and 0.00050 seconds.
 | 18  |         [Lavaduct Lagoon](src/day18b.c)         |                            Geometry                            |         Area          | 0.0001 | [Shoelace formula](https://en.wikipedia.org/wiki/Shoelace_formula), [Pick\'s theorem](https://en.wikipedia.org/wiki/Pick%27s_theorem)                         |
 | 19  |             [Aplenty](src/day19b.c)             | Parsing algorithms, Recursion, Stacks, Functions, Dictionaries |         Count         | 0.0001 | [Recursive descent parser](https://en.wikipedia.org/wiki/Recursive_descent_parser), dictionary                                                                |
 | 20  |        [Pulse Propagation](src/day20b.c)        |   Graph theory, Number theory, Dictionaries, Circuit design    |        Product        | 0.001  | [Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph, length-prefixed string                                             |
+| 21  |          [Step Counter](src/day21a.c)           |                               .                                |         Count         |   0    | [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)                                                                                    |
 
 ## Constraints
 
@@ -66,7 +67,7 @@ I am working within the following constraints to ensure high code quality.
   mathematics library (`libm`). The first and second problems for a given day
   must be implemented separately.
 - The solution must produce the correct result for the [examples](data/), not
-  just the personalized puzzle input. This means that efficient solutions to
+  just the personalized puzzle input. This means that the efficient solutions to
   Day 10(b) and Day 21(b) are unfeasible.
 - Bounds checking is not required for data structures whose capacity is defined
   by a macro.
