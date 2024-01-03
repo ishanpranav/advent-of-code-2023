@@ -4,12 +4,20 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define COORDINATE_SET_CAPACITY 8192
+#define COORDINATE_SET_BUCKETS 6151
 #define DIMENSION 256
 #define EXCEPTION_FORMAT "Error: Format.\n"
 #define STATE_QUEUE_CAPACITY 2048
+
+enum AddResult
+{
+    ADD_RESULT_ADDED,
+    ADD_RESULT_NOT_ADDED,
+    ADD_RESULT_OUT_OF_MEMORY
+};
 
 struct Coordinate
 {
@@ -17,10 +25,22 @@ struct Coordinate
     int j;
 };
 
+struct CoordinateSetEntry
+{
+    struct CoordinateSetEntry* nextEntry;
+    struct Coordinate item;
+};
+
+struct CoordinateSetBucket
+{
+    struct CoordinateSetEntry* firstEntry;
+    struct CoordinateSetBucket* nextBucket;
+};
+
 struct CoordinateSet
 {
-    struct Coordinate items[COORDINATE_SET_CAPACITY];
-    int count;
+    struct CoordinateSetBucket* firstBucket;
+    struct CoordinateSetBucket buckets[COORDINATE_SET_BUCKETS];
 };
 
 struct Matrix
@@ -44,7 +64,10 @@ struct StateQueue
     int last;
 };
 
+typedef enum AddResult AddResult;
 typedef struct Coordinate* Coordinate;
+typedef struct CoordinateSetEntry* CoordinateSetEntry;
+typedef struct CoordinateSetBucket* CoordinateSetBucket;
 typedef struct CoordinateSet* CoordinateSet;
 typedef struct Matrix* Matrix;
 typedef struct State* State;
@@ -61,27 +84,62 @@ bool coordinate_is_empty(Coordinate instance)
     return instance->i < 0 || instance->j < 0;
 }
 
-void coordinate_set(CoordinateSet instance)
+AddResult coordinate_set_add(CoordinateSet instance, Coordinate item)
 {
-    instance->count = 0;
-}
+    CoordinateSetEntry* p;
+    unsigned int hash = (item->i ^ item->j) % COORDINATE_SET_BUCKETS;
 
-bool coordinate_set_try_add(CoordinateSet instance, Coordinate item)
-{
-    for (Coordinate other = instance->items;
-        other < instance->items + instance->count;
-        other++)
+    for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
-        if (item->i == other->i && item->j == other->j)
+        if (item->i == (*p)->item.i && item->j == (*p)->item.j)
         {
-            return false;
+            return ADD_RESULT_NOT_ADDED;
         }
     }
 
-    instance->items[instance->count] = *item;
-    instance->count++;
+    CoordinateSetEntry entry = malloc(sizeof * entry);
 
-    return true;
+    if (!entry)
+    {
+        return ADD_RESULT_OUT_OF_MEMORY;
+    }
+
+    if (!instance->buckets[hash].firstEntry)
+    {
+        CoordinateSetBucket first = instance->firstBucket;
+
+        instance->buckets[hash].nextBucket = first;
+        instance->firstBucket = instance->buckets + hash;
+    }
+
+    entry->item = *item;
+    entry->nextEntry = NULL;
+    *p = entry;
+
+    return ADD_RESULT_ADDED;
+}
+
+void coordinate_set_clear(CoordinateSet instance)
+{
+    for (CoordinateSetBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
+    {
+        CoordinateSetEntry entry = bucket->firstEntry;
+
+        while (entry)
+        {
+            CoordinateSetEntry nextEntry = entry->nextEntry;
+
+            free(entry);
+
+            entry = nextEntry;
+        }
+
+        bucket->firstEntry = NULL;
+    }
+
+    instance->firstBucket = NULL;
 }
 
 void matrix(Matrix instance, int n)
@@ -231,43 +289,6 @@ static void scan_right(Matrix matrix, State current, StateQueue queue)
     state->priority = current->priority + 1;
 }
 
-static long scan(Matrix matrix, long steps)
-{
-    long total = 0;
-    struct CoordinateSet visited;
-    struct StateQueue queue;
-    struct State current;
-
-    coordinate_set(&visited);
-    state_queue(&queue);
-    state(state_queue_enqueue(&queue), &matrix->origin);
-
-    while (state_queue_try_dequeue(&queue, &current))
-    {
-        if (!coordinate_set_try_add(&visited, &current.coordinate))
-        {
-            continue;
-        }
-
-        if (current.priority % 2 == steps % 2)
-        {
-            total++;
-        }
-
-        if (current.priority > steps)
-        {
-            continue;
-        }
-
-        scan_hi(matrix, &current, &queue);
-        scan_lo(matrix, &current, &queue);
-        scan_left(matrix, &current, &queue);
-        scan_right(matrix, &current, &queue);
-    }
-
-    return total;
-}
-
 int main(void)
 {
     char buffer[DIMENSION + 2];
@@ -314,7 +335,43 @@ int main(void)
         return 1;
     }
 
-    long total = scan(&a, 64);
+    int total = 0;
+    struct CoordinateSet visited = { 0 };
+    struct StateQueue queue;
+    struct State current;
 
-    printf("21a %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    state_queue(&queue);
+    state(state_queue_enqueue(&queue), &a.origin);
+
+    while (state_queue_try_dequeue(&queue, &current))
+    {
+        switch (coordinate_set_add(&visited, &current.coordinate))
+        {
+            case ADD_RESULT_ADDED: break;
+            case ADD_RESULT_NOT_ADDED: continue;
+
+            case ADD_RESULT_OUT_OF_MEMORY: 
+                fprintf(stderr, "Error: Out of memory.\n");
+
+                return 1;
+        }
+
+        if (current.priority % 2 == 0)
+        {
+            total++;
+        }
+
+        if (current.priority > 64)
+        {
+            continue;
+        }
+
+        scan_hi(&a, &current, &queue);
+        scan_lo(&a, &current, &queue);
+        scan_left(&a, &current, &queue);
+        scan_right(&a, &current, &queue);
+    }
+
+    printf("21a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    coordinate_set_clear(&visited);
 }

@@ -17,12 +17,6 @@ enum
     KEY_SIZE = (DIMENSION - 1) * (DIMENSION - 1)
 };
 
-enum Exception
-{
-    EXCEPTION_NONE = 0,
-    EXCEPTION_OUT_OF_MEMORY
-};
-
 struct DictionaryEntry
 {
     struct DictionaryEntry* nextEntry;
@@ -50,7 +44,6 @@ struct Matrix
 };
 
 typedef char* Row;
-typedef enum Exception Exception;
 typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct DictionaryBucket* DictionaryBucket;
 typedef struct Dictionary* Dictionary;
@@ -89,7 +82,7 @@ void matrix_to_char_array(Matrix instance, char result[])
     memcpy(result, instance->items, instance->rows * instance->columns);
 }
 
-Exception dictionary_replace(
+bool dictionary_replace(
     Dictionary instance,
     char key[],
     long* existingValue,
@@ -112,7 +105,7 @@ Exception dictionary_replace(
             *existingValue = (*p)->value;
             (*p)->value = newValue;
 
-            return EXCEPTION_NONE;
+            return true;
         }
     }
 
@@ -120,7 +113,7 @@ Exception dictionary_replace(
 
     if (!entry)
     {
-        return EXCEPTION_OUT_OF_MEMORY;
+        return false;
     }
 
     if (!instance->buckets[hash].firstEntry)
@@ -137,7 +130,7 @@ Exception dictionary_replace(
     entry->nextEntry = NULL;
     *p = entry;
 
-    return EXCEPTION_NONE;
+    return true;
 }
 
 void dictionary_clear(Dictionary instance)
@@ -273,7 +266,7 @@ static void roll(Matrix matrix)
     roll_right(matrix);
 }
 
-static Exception roll_many(Matrix matrix, Dictionary cache)
+static bool roll_many(Matrix matrix, Dictionary cache)
 {
     long i = 0;
 
@@ -285,11 +278,9 @@ static Exception roll_many(Matrix matrix, Dictionary cache)
         roll(matrix);
         matrix_to_char_array(matrix, key);
 
-        Exception exception = dictionary_replace(cache, key, &previous, i);
-
-        if (exception)
+        if (!dictionary_replace(cache, key, &previous, i))
         {
-            return exception;
+            return false;
         }
 
         if (previous != -1)
@@ -309,7 +300,7 @@ static Exception roll_many(Matrix matrix, Dictionary cache)
         i++;
     }
 
-    return EXCEPTION_NONE;
+    return true;
 }
 
 int main(void)
@@ -344,13 +335,11 @@ int main(void)
     }
     while (fgets(buffer, n + 2, stdin));
 
-    switch (roll_many(&a, &cache))
+    if (!roll_many(&a, &cache))
     {
-        case EXCEPTION_OUT_OF_MEMORY:
-            fprintf(stderr, "Error: Out of memory.\n");
-            return 1;
+        fprintf(stderr, "Error: Out of memory.\n");
 
-        default: break;
+        return 1;
     }
 
     long total = scan(&a);
