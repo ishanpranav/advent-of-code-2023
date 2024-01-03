@@ -571,7 +571,7 @@ int main(void)
             {
                 Module target = module_collection_get(
                     &modules,
-                    &module->targets[i]);
+                    module->targets + i);
 
                 if (!target || !target->isConjunction)
                 {
