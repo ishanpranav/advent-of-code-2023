@@ -9,14 +9,20 @@
 #include <string.h>
 #include <time.h>
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
-#define KEY_CAPACITY 8
 #define ORDERED_DICTIONARY_BUCKETS 256
+#define STRING_CAPACITY 8
+
+struct String
+{
+    int length;
+    char buffer[STRING_CAPACITY];
+};
 
 struct OrderedDictionaryEntry
 {
     struct OrderedDictionaryEntry* nextEntry;
     int value;
-    char key[KEY_CAPACITY];
+    struct String key;
 };
 
 struct OrderedDictionaryBucket
@@ -32,17 +38,38 @@ struct OrderedDictionary
     struct OrderedDictionaryBucket buckets[ORDERED_DICTIONARY_BUCKETS];
 };
 
-struct StringBuilder
-{
-    char* buffer;
-    int length;
-};
-
-typedef char* String;
+typedef struct String* String;
 typedef struct OrderedDictionaryEntry* OrderedDictionaryEntry;
 typedef struct OrderedDictionaryBucket* OrderedDictionaryBucket;
 typedef struct OrderedDictionary* OrderedDictionary;
-typedef struct StringBuilder* StringBuilder;
+
+void string(String instance)
+{
+    instance->length = 0;
+}
+
+void string_append(String instance, char value)
+{
+    instance->buffer[instance->length] = value;
+    instance->length++;
+}
+
+void string_copy(String destination, String source)
+{
+    destination->length = source->length;
+
+    memcpy(destination->buffer, source->buffer, source->length);
+}
+
+bool string_equals(String instance, String other)
+{
+    if (instance->length != other->length)
+    {
+        return false;
+    }
+
+    return memcmp(instance->buffer, other->buffer, instance->length) == 0;
+}
 
 bool ordered_dictionary_set(
     OrderedDictionary instance,
@@ -54,7 +81,7 @@ bool ordered_dictionary_set(
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
-        if (strcmp(key, (*p)->key) == 0)
+        if (string_equals(key, &(*p)->key))
         {
             (*p)->value = value;
 
@@ -82,7 +109,7 @@ bool ordered_dictionary_set(
         }
     }
 
-    memcpy(entry->key, key, KEY_CAPACITY);
+    string_copy(&entry->key, key);
 
     entry->value = value;
     entry->nextEntry = NULL;
@@ -99,7 +126,7 @@ void ordered_dictionary_remove(OrderedDictionary instance, String key, int hash)
         current;
         current = current->nextEntry)
     {
-        if (strcmp(key, current->key) == 0)
+        if (string_equals(key, &current->key))
         {
             if (previous)
             {
@@ -163,37 +190,16 @@ void ordered_dictionary_clear(OrderedDictionary instance)
     instance->firstBucket = NULL;
 }
 
-void string_builder(StringBuilder instance)
-{
-    instance->length = 0;
-}
-
-void string_builder_append(StringBuilder instance, char value)
-{
-    instance->buffer[instance->length] = value;
-    instance->length++;
-}
-
-String string_builder_to_string(StringBuilder instance)
-{
-    instance->buffer[instance->length] = '\0';
-
-    return instance->buffer;
-}
-
 int main(void)
 {
     int hash = 0;
     int value = 0;
     char current;
-    char buffer[KEY_CAPACITY];
-    struct StringBuilder keyBuilder;
+    struct String key;
     struct OrderedDictionary dictionary = { 0 };
     clock_t start = clock();
 
-    string_builder(&keyBuilder);
-
-    keyBuilder.buffer = buffer;
+    string(&key);
 
     while ((current = getc(stdin)) != EOF)
     {
@@ -212,9 +218,7 @@ int main(void)
 
             case '-':
             {
-                String key = string_builder_to_string(&keyBuilder);
-
-                ordered_dictionary_remove(&dictionary, key, hash);
+                ordered_dictionary_remove(&dictionary, &key, hash);
             }
             continue;
 
@@ -222,9 +226,7 @@ int main(void)
             {
                 if (value)
                 {
-                    String key = string_builder_to_string(&keyBuilder);
-
-                    if (!ordered_dictionary_set(&dictionary, key, hash, value))
+                    if (!ordered_dictionary_set(&dictionary, &key, hash, value))
                     {
                         fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
@@ -235,21 +237,19 @@ int main(void)
                 hash = 0;
                 value = 0;
 
-                string_builder(&keyBuilder);
+                string(&key);
             }
             continue;
         }
 
         hash = ((hash + current) * 17) % ORDERED_DICTIONARY_BUCKETS;
 
-        string_builder_append(&keyBuilder, current);
+        string_append(&key, current);
     }
 
     if (value)
     {
-        String key = string_builder_to_string(&keyBuilder);
-
-        if (!ordered_dictionary_set(&dictionary, key, hash, value))
+        if (!ordered_dictionary_set(&dictionary, &key, hash, value))
         {
             fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 

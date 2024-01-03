@@ -12,13 +12,19 @@
 #define DELIMITERS ", \n"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 #define MESSAGE_QUEUE_CAPACITY 64
-#define MODULE_NAME_CAPACITY 12
 #define MODULE_TARGETS_CAPACITY 8
+#define STRING_CAPACITY 12
+
+struct String
+{
+    int length;
+    char buffer[STRING_CAPACITY];
+};
 
 struct DictionaryEntry
 {
     struct DictionaryEntry* nextEntry;
-    char key[MODULE_NAME_CAPACITY];
+    struct String key;
     bool value;
 };
 
@@ -36,8 +42,8 @@ struct Dictionary
 
 struct Message
 {
-    char source[MODULE_NAME_CAPACITY];
-    char target[MODULE_NAME_CAPACITY];
+    struct String source;
+    struct String target;
     bool pulse;
 };
 
@@ -59,8 +65,8 @@ struct Module
     struct Module* nextModule;
     union ModuleType child;
     int targetCount;
-    char name[MODULE_NAME_CAPACITY];
-    char targets[MODULE_TARGETS_CAPACITY][MODULE_NAME_CAPACITY];
+    struct String name;
+    struct String targets[MODULE_TARGETS_CAPACITY];
     bool isConjunction;
 };
 
@@ -76,7 +82,8 @@ struct ModuleCollection
     struct ModuleCollectionBucket buckets[BUCKETS];
 };
 
-typedef char* String;
+typedef char* ZString;
+typedef struct String* String;
 typedef struct DictionaryEntry* DictionaryEntry;
 typedef struct DictionaryBucket* DictionaryBucket;
 typedef struct Dictionary* Dictionary;
@@ -86,13 +93,37 @@ typedef struct Module* Module;
 typedef struct ModuleCollectionBucket* ModuleCollectionBucket;
 typedef struct ModuleCollection* ModuleCollection;
 
+void string(String instance, ZString buffer)
+{
+    instance->length = strlen(buffer);
+
+    memcpy(instance->buffer, buffer, instance->length);
+}
+
+void string_copy(String destination, String source)
+{
+    destination->length = source->length;
+
+    memcpy(destination->buffer, source->buffer, source->length);
+}
+
+bool string_equals(String instance, String other)
+{
+    if (instance->length != other->length)
+    {
+        return false;
+    }
+
+    return memcmp(instance->buffer, other->buffer, instance->length) == 0;
+}
+
 unsigned int string_get_hash_code(String instance)
 {
     unsigned int hash = 0;
 
-    for (char* p = instance; *p; p++)
+    for (int i = 0; i < instance->length; i++)
     {
-        hash = (hash * 36) + *p - 97;
+        hash = (hash * 36) + instance->buffer[i] - 97;
     }
 
     return hash;
@@ -117,7 +148,7 @@ bool dictionary_try_get_value(Dictionary instance, String key, bool* result)
         entry;
         entry = entry->nextEntry)
     {
-        if (strcmp(key, entry->key) == 0)
+        if (string_equals(key, &entry->key))
         {
             *result = entry->value;
 
@@ -135,7 +166,7 @@ bool dictionary_set(Dictionary instance, String key, bool value)
 
     for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
-        if (strcmp(key, (*p)->key) == 0)
+        if (string_equals(key, &(*p)->key))
         {
             (*p)->value = value;
 
@@ -158,7 +189,7 @@ bool dictionary_set(Dictionary instance, String key, bool value)
         instance->firstBucket = instance->buckets + hash;
     }
 
-    strcpy(entry->key, key);
+    string_copy(&entry->key, key);
 
     entry->value = value;
     entry->nextEntry = NULL;
@@ -196,7 +227,7 @@ void message_queue(MessageQueue instance)
     instance->last = -1;
 }
 
-void message_queue_enqueue(MessageQueue instance, Message item)
+Message message_queue_enqueue(MessageQueue instance)
 {
     if (instance->first == -1)
     {
@@ -212,7 +243,7 @@ void message_queue_enqueue(MessageQueue instance, Message item)
         instance->last++;
     }
 
-    instance->items[instance->last] = *item;
+    return instance->items + instance->last;
 }
 
 bool message_queue_try_dequeue(MessageQueue instance, Message result)
@@ -241,7 +272,7 @@ bool message_queue_try_dequeue(MessageQueue instance, Message result)
     return true;
 }
 
-bool module(Module instance, bool isConjunction, String name)
+bool module(Module instance, bool isConjunction, ZString name)
 {
     instance->isConjunction = isConjunction;
     instance->nextModule = NULL;
@@ -263,7 +294,7 @@ bool module(Module instance, bool isConjunction, String name)
         instance->child.pulse = false;
     }
 
-    strcpy(instance->name, name);
+    string(&instance->name, name);
 
     return true;
 }
@@ -288,9 +319,9 @@ bool module_all_pulses(Module instance)
     return true;
 }
 
-void module_add_target(Module instance, String item)
+void module_add_target(Module instance, ZString item)
 {
-    strcpy(instance->targets[instance->targetCount], item);
+    string(&instance->targets[instance->targetCount], item);
 
     instance->targetCount++;
 }
@@ -299,13 +330,12 @@ void module_send(Module module, MessageQueue queue, bool pulse)
 {
     for (int i = 0; i < module->targetCount; i++)
     {
-        struct Message message;
+        Message message = message_queue_enqueue(queue);
 
-        message.pulse = pulse;
+        message->pulse = pulse;
 
-        strcpy(message.source, module->name);
-        strcpy(message.target, module->targets[i]);
-        message_queue_enqueue(queue, &message);
+        string_copy(&message->source, &module->name);
+        string_copy(&message->target, &module->targets[i]);
     }
 }
 
@@ -317,7 +347,7 @@ Module module_collection_get(ModuleCollection instance, String name)
         module;
         module = module->nextModule)
     {
-        if (strcmp(name, module->name) == 0)
+        if (string_equals(name, &module->name))
         {
             return module;
         }
@@ -328,7 +358,7 @@ Module module_collection_get(ModuleCollection instance, String name)
 
 void module_collection_add(ModuleCollection instance, Module item)
 {
-    unsigned int hash = string_get_hash_code(item->name) % BUCKETS;
+    unsigned int hash = string_get_hash_code(&item->name) % BUCKETS;
 
     if (!instance->buckets[hash].firstModule)
     {
@@ -369,10 +399,10 @@ int main(void)
 
             return 1;
         }
-        
+
         module_collection_add(&modules, next);
 
-        for (String target = strtok(mid + 4, DELIMITERS);
+        for (char* target = strtok(mid + 4, DELIMITERS);
             target;
             target = strtok(NULL, DELIMITERS))
         {
@@ -392,14 +422,14 @@ int main(void)
             {
                 Module target = module_collection_get(
                     &modules,
-                    module->targets[i]);
+                    &module->targets[i]);
 
                 if (!target || !target->isConjunction)
                 {
                     continue;
                 }
 
-                if (!dictionary_set(target->child.pulses, module->name, false))
+                if (!dictionary_set(target->child.pulses, &module->name, false))
                 {
                     fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
 
@@ -409,7 +439,12 @@ int main(void)
         }
     }
 
-    Module broadcaster = module_collection_get(&modules, "roadcaster");
+    struct String broadcasterKey = 
+    {
+        .length = 10,
+        .buffer = { 'r', 'o', 'a', 'd', 'c', 'a', 's', 't', 'e', 'r' }
+    };
+    Module broadcaster = module_collection_get(&modules, &broadcasterKey);
 
     if (!broadcaster)
     {
@@ -418,8 +453,8 @@ int main(void)
         return 1;
     }
 
-    int counts[2] = 
-    { 
+    int counts[2] =
+    {
         [true] = 0,
         [false] = 1000
     };
@@ -436,7 +471,7 @@ int main(void)
         {
             counts[current.pulse]++;
 
-            Module target = module_collection_get(&modules, current.target);
+            Module target = module_collection_get(&modules, &current.target);
 
             if (!target)
             {
@@ -447,7 +482,7 @@ int main(void)
             {
                 if (!dictionary_set(
                     target->child.pulses,
-                    current.source,
+                    &current.source,
                     current.pulse))
                 {
                     fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
@@ -463,7 +498,7 @@ int main(void)
                 {
                     continue;
                 }
-                
+
                 target->child.pulse = !target->child.pulse;
 
                 module_send(target, &queue, target->child.pulse);
