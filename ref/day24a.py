@@ -13,8 +13,8 @@ def bounded(rx, x, dx) -> bool:
     return (rx > x and dx > 0) or (rx < x and dx < 0)
 
 items = []
-lo = 200000000000000
-hi = 400000000000000
+min = 200000000000000
+max = 400000000000001
 start = time()
 
 for line in input():
@@ -35,7 +35,7 @@ for (p, dp), (q, dq) in combinations(items, 2):
 
     rx, ry = intersection[0]
     
-    if lo <= rx <= hi and lo <= ry <= hi and \
+    if min <= rx < max and min <= ry < max and \
         bounded(rx, x1, dx1) and bounded(rx, x2, dx2):
         count += 1
 
