@@ -52,11 +52,14 @@ is impractical, use numeric suffixes instead.
 |  `hi`  | larger pointer, point above, upper buffer                                                    |
 |  `i`   | abitrary counter, matrix index in an arbitrary dimension, interior points in Pick\'s Theorem |
 |  `k`   | term number, arbitrary constant                                                              |
+|  `l`   | arbitrary line                                                                               |
 |  `lo`  | smaller pointer, point below, lower buffer                                                   |
 |  `m`   | matrix size in an arbitrary dimension                                                        |
+| `max`  | inclusive maximum, exclusive interval upper bound                                            |
 | `mid`  | middle pointer, middle buffer                                                                |
+| `min`  | inclusive minimum, inclusive interval lower bound                                            |
 |  `n`   | count, arbitrary integer                                                                     |
-|  `p`   | arbitrary pointer                                                                            |
+|  `p`   | arbitrary pointer, arbitrary point                                                           |
 |  `r`   | red color component                                                                          |
 |  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |
 

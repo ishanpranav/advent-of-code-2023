@@ -80,11 +80,6 @@ void coordinate_empty(Coordinate result)
     result->j = -1;
 }
 
-bool coordinate_is_empty(Coordinate instance)
-{
-    return instance->i < 0 || instance->j < 0;
-}
-
 void coordinate_set(CoordinateSet instance)
 {
     instance->firstBucket = NULL;
@@ -341,7 +336,7 @@ int main(void)
     }
     while (fgets(buffer, n + 2, stdin));
 
-    if (coordinate_is_empty(&a.origin))
+    if (a.origin.i < 0 || a.origin.j < 0)
     {
         fprintf(stderr, EXCEPTION_FORMAT);
 

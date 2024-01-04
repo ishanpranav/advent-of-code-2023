@@ -24,7 +24,8 @@ all: \
 	day18a day18b \
 	day19a day19b \
 	day20a day20b \
-	day21a
+	day21a \
+	day22a day22b
 	
 day01a: src/day01a.c
 	$(CC) $(CFLAGS) $< -o $@.o
@@ -144,6 +145,9 @@ day20b: src/day20b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 	
 day21a: src/day21a.c
+	$(CC) $(CFLAGS) $< -o $@.o
+
+day22a: src/day22a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
 clean:
