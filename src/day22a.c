@@ -85,22 +85,11 @@ void space_3(Space3 space, int sizeX, int sizeY)
 {
     space->sizeX = sizeX;
     space->sizeY = sizeY;
-    space->sizeZ = 0;
-
-    for (int y = 0; y < sizeY; y++)
-    {
-        int offset = y * sizeX;
-
-        for (int x = 0; x < sizeX; x++)
-        {
-            space->items[offset + x] = -1;
-        }
-    }
+    space->sizeZ = 1;
 }
 
 int main(void)
 {
-    int scan;
     int maxX = 0;
     int maxY = 0;
     clock_t start = clock();
@@ -111,8 +100,7 @@ int main(void)
     for (;;)
     {
         struct Line3 l;
-
-        scan = scanf(
+        int scan = scanf(
             "%d,%d,%d~%d,%d,%d\n",
             &l.p.x,
             &l.p.y,
@@ -150,14 +138,49 @@ int main(void)
         line_3_collection_add(&lines, &l);
     }
 
-    struct Space3 space;
+    struct Space3 space = { 0 };
 
-    space_3(&space, maxX + 1, maxY + 1);
+    space_3(&space);
+    
+    space.sizeX = maxX + 1;
+    space.sizeY = maxY + 1;
+    space.sizeZ = 1;
+
+    for (int y = 0; y < space.sizeY; y++)
+    {
+        int yOffset = y * space.sizeX;
+
+        for (int x = 0; x < space.sizeX; x++)
+        {
+            space.items[yOffset + x] = -1;
+        }
+    }
+
     line_3_collection_sort(&lines);
 
     for (Line3 l = lines.items; l < lines.items + lines.count; l++)
     {
+        int supportZ = -1;
 
+        printf("rest = set()\n");
+
+        struct Point3 min;
+        struct Point3 max;
+
+        for (int z = 0; z < space.sizeZ; z++)
+        {
+            int zOffset = z * space.sizeX * space.sizeY;
+
+            for (int y = 0; y < space.sizeY; y++)
+            {
+                int yOffset = y * space.sizeX;
+
+                for (int x = 0; x < space.sizeX; x++)
+                {
+                    if ()
+                }
+            }
+        }
     }
 
     printf("22a %d %lf\n", 0, (double)(clock() - start) / CLOCKS_PER_SEC);
