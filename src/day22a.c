@@ -1,12 +1,16 @@
+// Licensed under the MIT License.
+
+// Sand Slabs Part 1
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define BRICK_CHILDREN_CAPACITY 4
-#define BRICK_PARENTS_CAPACITY 4
-#define BRICKS_CAPACITY 2048
+#define BRICK_BUFFER_CAPACITY 2048
+#define BRICK_CHILDREN_CAPACITY 10
+#define BRICK_PARENTS_CAPACITY 10
 #define BUFFER_SIZE 32
 #define DELIMITERS ",~"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
@@ -22,7 +26,7 @@ struct Brick;
 
 struct BrickCollection
 {
-    struct Brick* items;
+    struct Brick** items;
     int count;
 };
 
@@ -50,19 +54,22 @@ int math_min(int a, int b)
     return b;
 }
 
-bool brick_collection(BrickCollection instance, int capacity);
-void finalize_brick_collection(BrickCollection instance);
+void brick_collection(BrickCollection, Brick items[]);
 
 bool brick(Brick instance, Point p, Point q)
 {
-    if (!brick_collection(&instance->parents, BRICK_PARENTS_CAPACITY))
+    Brick* parents = malloc(BRICK_PARENTS_CAPACITY * sizeof * parents);
+
+    if (!parents)
     {
         return false;
     }
 
-    if (!brick_collection(&instance->children, BRICK_CHILDREN_CAPACITY))
+    Brick* children = malloc(BRICK_CHILDREN_CAPACITY * sizeof * children);
+
+    if (!children)
     {
-        finalize_brick_collection(&instance->parents);
+        free(parents);
 
         return false;
     }
@@ -71,37 +78,36 @@ bool brick(Brick instance, Point p, Point q)
     instance->q = *q;
     instance->floor = math_min(p->z, q->z);
 
+    brick_collection(&instance->parents, parents);
+    brick_collection(&instance->children, children);
+
     return true;
 }
 
-int brick_compare(Object left, Object right)
+void finalize_brick(Brick instance)
 {
-    const struct Brick* l = (const struct Brick*)left;
-    const struct Brick* m = (const struct Brick*)right;
-
-    return l->p.z - m->p.z;
+    free(instance->parents.items);
+    free(instance->children.items);
 }
 
-bool brick_collection(BrickCollection instance, int capacity)
+void brick_collection(BrickCollection instance, Brick items[])
 {
     instance->count = 0;
-    instance->items = malloc(capacity * sizeof * instance->items);
-
-    return instance->items;
+    instance->items = items;
 }
 
-void finalize_brick_collection(BrickCollection instance)
+void brick_collection_add(BrickCollection instance, Brick item)
 {
-    free(instance->items);
-}
-
-Brick brick_collection_new_brick(BrickCollection instance)
-{
-    Brick result = instance->items + instance->count;
-
+    instance->items[instance->count] = item;
     instance->count++;
+}
 
-    return result;
+static int brick_collection_compare_bricks(Object left, Object right)
+{
+    const struct Brick* leftBrick = *(const struct Brick**)left;
+    const struct Brick* rightBrick = *(const struct Brick**)right;
+
+    return leftBrick->p.z - rightBrick->p.z;
 }
 
 void brick_collection_sort(BrickCollection instance)
@@ -110,49 +116,44 @@ void brick_collection_sort(BrickCollection instance)
         instance->items,
         instance->count,
         sizeof * instance->items,
-        brick_compare);
+        brick_collection_compare_bricks);
+}
+
+bool brick_collection_all_has_multiparent(BrickCollection instance)
+{
+    for (Brick* p = instance->items; p < instance->items + instance->count; p++)
+    {
+        if ((*p)->parents.count < 2)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void brick_collection_clear(BrickCollection instance)
+{
+    instance->count = 0;
 }
 
 int main(void)
 {
+    struct Point p;
+    struct Point q;
+    struct Brick* brickBuffer[BRICK_BUFFER_CAPACITY];
+    struct Brick* supportedBuffer[BRICK_BUFFER_CAPACITY];
     struct BrickCollection bricks;
+    struct BrickCollection supported;
+    int floor = INT_MAX;
     clock_t start = clock();
 
-    if (!brick_collection(&bricks, BRICKS_CAPACITY))
+    brick_collection(&bricks, brickBuffer);
+    brick_collection(&supported, supportedBuffer);
+
+    while (scanf("%d,%d,%d~%d,%d,%d\n", &p.x, &p.y, &p.z, &q.x, &q.y, &q.z) > 0)
     {
-        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
-
-        return 1;
-    }
-
-    int floor = INT_MAX;
-
-    for (;;)
-    {
-        struct Point p;
-        struct Point q;
-        int scan = scanf(
-            "%d,%d,%d~%d,%d,%d\n",
-            &p.x,
-            &p.y,
-            &p.z,
-            &q.x,
-            &q.y,
-            &q.z);
-
-        if (scan == EOF)
-        {
-            break;
-        }
-
-        if (scan < 6)
-        {
-            fprintf(stderr, "Error: Format.\n");
-
-            return 1;
-        }
-
-        Brick current = brick_collection_new_brick(&bricks);
+        Brick current = malloc(sizeof * current);
 
         if (!brick(current, &p, &q))
         {
@@ -161,6 +162,8 @@ int main(void)
             return 1;
         }
 
+        brick_collection_add(&bricks, current);
+
         if (current->floor < floor)
         {
             floor = current->floor;
@@ -168,7 +171,64 @@ int main(void)
     }
 
     brick_collection_sort(&bricks);
-    printf("22a %d %lf\n", 0, (double)(clock() - start) / CLOCKS_PER_SEC);
+
+    for (Brick* p = bricks.items; p < bricks.items + bricks.count; p++)
+    {
+        if ((*p)->floor == floor)
+        {
+            brick_collection_add(&supported, *p);
+
+            continue;
+        }
+
+        brick_collection_clear(&(*p)->parents);
+
+        (*p)->floor = 1;
+
+        for (Brick* q = supported.items;
+            q < supported.items + supported.count;
+            q++)
+        {
+            if ((*q)->p.x <= (*p)->q.x && (*p)->p.x <= (*q)->q.x &&
+                (*q)->p.y <= (*p)->q.y && (*p)->p.y <= (*q)->q.y)
+            {
+                int z = (*q)->floor + abs((*q)->p.z - (*q)->q.z) + 1;
+
+                if (z > (*p)->floor)
+                {
+                    brick_collection_clear(&(*p)->parents);
+
+                    (*p)->floor = z;
+                }
+
+                if (z == (*p)->floor)
+                {
+                    brick_collection_add(&(*p)->parents, *q);
+                }
+            }
+        }
+
+        brick_collection_add(&supported, *p);
+
+        for (Brick* parent = (*p)->parents.items;
+            parent < (*p)->parents.items + (*p)->parents.count;
+            parent++)
+        {
+            brick_collection_add(&(*parent)->children, *p);
+        }
+    }
+
+    int total = 0;
+
+    for (Brick* q = supported.items; q < supported.items + supported.count; q++)
+    {
+        if (brick_collection_all_has_multiparent(&(*q)->children))
+        {
+            total++;
+        }
+    }
+
+    printf("22a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
