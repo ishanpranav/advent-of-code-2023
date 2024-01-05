@@ -60,6 +60,7 @@ is impractical, use numeric suffixes instead.
 | `min`  | inclusive minimum, inclusive interval lower bound                                            |
 |  `n`   | count, arbitrary integer                                                                     |
 |  `p`   | arbitrary pointer, arbitrary point                                                           |
+|  `q`   | arbitrary rational number                                                                    |
 |  `r`   | red color component                                                                          |
 |  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |
 

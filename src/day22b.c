@@ -1,6 +1,6 @@
 // Licensed under the MIT License.
 
-// Sand Slabs Part 1
+// Sand Slabs Part 2
 
 #include <limits.h>
 #include <stdbool.h>
@@ -141,7 +141,7 @@ void brick_collection_add(BrickCollection instance, Brick item)
     instance->count++;
 }
 
-Brick brick_collection_pop(BrickCollection instance)
+Brick brick_collection_remove_first(BrickCollection instance)
 {
     if (!instance->count)
     {
@@ -351,7 +351,7 @@ int main(void)
         }
     }
 
-    int total = 0;
+    long total = 0;
     struct BrickSet visited = { 0 };
     struct BrickCollection stack;
     struct Brick* stackBuffer[BRICK_BUFFER_CAPACITY];
@@ -374,7 +374,7 @@ int main(void)
 
         Brick current;
 
-        while ((current = brick_collection_pop(&stack)))
+        while ((current = brick_collection_remove_first(&stack)))
         {
             switch (brick_set_add(&visited, current))
             {
@@ -403,7 +403,7 @@ int main(void)
         brick_set_clear(&visited);
     }
 
-    printf("22b %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("22b %ld %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     for (Brick* p = bricks.items; p < bricks.items + bricks.count; p++)
     {
