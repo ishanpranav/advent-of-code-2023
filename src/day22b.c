@@ -405,5 +405,11 @@ int main(void)
 
     printf("22b %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
 
+    for (Brick* p = bricks.items; p < bricks.items + bricks.count; p++)
+    {
+        finalize_brick(*p);
+        free(*p);
+    }
+
     return 0;
 }
