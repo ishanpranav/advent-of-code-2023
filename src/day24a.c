@@ -2,6 +2,7 @@
 
 // Never Tell Me The Odds Part 1
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
@@ -37,7 +38,6 @@ struct Line2
 
 typedef struct Body3* Body3;
 typedef struct Body3Collection* Body3Collection;
-typedef struct Rational* Rational;
 typedef struct Point2* Point2;
 typedef struct Line2* Line2;
 
@@ -54,25 +54,17 @@ void body_3_collection_add(Body3Collection instance, Body3 item)
 
 bool line_2_point_intersection(Line2 l, Line2 m, Point2 result)
 {
-    long double x1 = l->p.x;
-    long double x2 = l->q.x;
-    long double x3 = m->p.x;
-    long double x4 = m->q.x;
-    long double y1 = l->p.y;
-    long double y2 = l->q.y;
-    long double y3 = m->p.y;
-    long double y4 = m->q.y;
-    long double r = x1 * y2 - y1 * x2;
-    long double s = x3 * y4 - y3 * x4;
-    long double ldx = x1 - x2;
-    long double ldy = y1 - y2;
-    long double mdx = x3 - x4;
-    long double mdy = y3 - y4;
+    long double ldx = l->p.x - l->q.x;
+    long double ldy = l->p.y - l->q.y;
+    long double mdx = m->p.x - m->q.x;
+    long double mdy = m->p.y - m->q.y;
+    long double r = l->p.x * l->q.y - l->p.y * l->q.x;
+    long double s = m->p.x * m->q.y - m->p.y * m->q.x;
     long double x = r * mdx - s * ldx;
     long double y = r * mdy - s * ldy;
     long double b = ldx * mdy - mdx * ldy;
 
-    if (b == 0)
+    if (fpclassify(b) == FP_ZERO)
     {
         return false;
     }

@@ -61,7 +61,7 @@ is impractical, use numeric suffixes instead.
 |  `n`   | count, arbitrary integer                                                                     |
 |  `p`   | arbitrary pointer, arbitrary point                                                           |
 |  `q`   | arbitrary rational number                                                                    |
-|  `r`   | red color component                                                                          |
+|  `r`   | red color component, arbitrary real number                                                   |
 |  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |
 
 ## Type definitions
