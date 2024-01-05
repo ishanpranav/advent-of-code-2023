@@ -25,8 +25,8 @@ struct Body3Collection
 
 struct Point2
 {
-    double x;
-    double y;
+    long double x;
+    long double y;
 };
 
 struct Line2
@@ -54,23 +54,23 @@ void body_3_collection_add(Body3Collection instance, Body3 item)
 
 bool line_2_point_intersection(Line2 l, Line2 m, Point2 result)
 {
-    double x1 = l->p.x;
-    double x2 = l->q.x;
-    double x3 = m->p.x;
-    double x4 = m->q.x;
-    double y1 = l->p.y;
-    double y2 = l->q.y;
-    double y3 = m->p.y;
-    double y4 = m->q.y;
-    double r = x1 * y2 - y1 * x2;
-    double s = x3 * y4 - y3 * x4;
-    double ldx = x1 - x2;
-    double ldy = y1 - y2;
-    double mdx = x3 - x4;
-    double mdy = y3 - y4;
-    double x = r * mdx - s * ldx;
-    double y = r * mdy - s * ldy;
-    double b = ldx * mdy - mdx * ldy;
+    long double x1 = l->p.x;
+    long double x2 = l->q.x;
+    long double x3 = m->p.x;
+    long double x4 = m->q.x;
+    long double y1 = l->p.y;
+    long double y2 = l->q.y;
+    long double y3 = m->p.y;
+    long double y4 = m->q.y;
+    long double r = x1 * y2 - y1 * x2;
+    long double s = x3 * y4 - y3 * x4;
+    long double ldx = x1 - x2;
+    long double ldy = y1 - y2;
+    long double mdx = x3 - x4;
+    long double mdy = y3 - y4;
+    long double x = r * mdx - s * ldx;
+    long double y = r * mdy - s * ldy;
+    long double b = ldx * mdy - mdx * ldy;
 
     if (b == 0)
     {
@@ -102,8 +102,6 @@ int main(void)
         body_3_collection_add(&bodies, &body);
     }
 
-    double min = 200000000000000;
-    double max = 400000000000001;
     int total = 0;
 
     for (int i = 0; i < bodies.count - 1; i++)
@@ -113,8 +111,8 @@ int main(void)
             struct Line2 l;
             struct Line2 m;
             struct Point2 p;
-            int ldx = bodies.items[i].dx;
-            int mdx = bodies.items[j].dx;
+            long long ldx = bodies.items[i].dx;
+            long long mdx = bodies.items[j].dx;
 
             l.p.x = bodies.items[i].x;
             l.p.y = bodies.items[i].y;
@@ -126,7 +124,7 @@ int main(void)
             m.q.y = m.p.y + bodies.items[j].dy;
 
             if (line_2_point_intersection(&l, &m, &p) &&
-                p.x >= min && p.x < max && p.y >= min && p.y < max &&
+                p.x >= 2e14 && p.x <= 4e14 && p.y >= 2e14 && p.y <= 4e14 &&
                 ((p.x > l.p.x && ldx > 0) || (p.x < l.p.x && ldx < 0)) &&
                 ((p.x > m.p.x && mdx > 0) || (p.x < m.p.x && mdx < 0)))
             {
