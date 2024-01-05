@@ -29,4 +29,9 @@ done
 
 cat ../data/201.txt | ./../day20a.o
 cat ../data/202.txt | ./../day20a.o
-cat ../data/211.txt | ./../day21a.o
+
+for i in {22..22};
+do
+    cat ../data/${i}1.txt | ./../day${i}a.o
+    cat ../data/${i}1.txt | ./../day${i}b.o
+done

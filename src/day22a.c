@@ -41,8 +41,8 @@ struct Brick
 
 typedef const void* Object;
 typedef struct Point* Point;
-typedef struct BrickCollection* BrickCollection;
 typedef struct Brick* Brick;
+typedef struct BrickCollection* BrickCollection;
 
 int math_min(int a, int b)
 {
@@ -229,6 +229,12 @@ int main(void)
     }
 
     printf("22a %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);
+
+    for (Brick* p = bricks.items; p < bricks.items + bricks.count; p++)
+    {
+        finalize_brick(*p);
+        free(*p);
+    }
 
     return 0;
 }

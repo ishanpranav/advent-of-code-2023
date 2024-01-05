@@ -14,7 +14,7 @@ done
 
 cat ../alt21.txt | ./../day21a.o
 
-for i in {22..22};
+for i in {22..25};
 do
     cat ../alt${i}.txt | ./../day${i}a.o
     cat ../alt${i}.txt | ./../day${i}b.o

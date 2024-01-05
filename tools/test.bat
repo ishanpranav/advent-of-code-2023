@@ -13,3 +13,8 @@ For /l %%i In (11,1,20) Do (
 )
 
 ..\day21a.exe < ..\alt21.txt
+
+For /l %%i In (22,1,25) Do (
+    ..\day%%ia.exe < ..\alt%%i.txt
+    ..\day%%ib.exe < ..\alt%%i.txt
+)
