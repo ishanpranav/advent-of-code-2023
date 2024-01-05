@@ -440,6 +440,15 @@ Module module_collection_get(ModuleCollection instance, String name)
     return NULL;
 }
 
+void finalize_module(Module instance)
+{
+    if (instance->isConjunction)
+    {
+        dictionary_clear(instance->child.pulses);
+        free(instance->child.pulses);
+    }
+}
+
 void module_collection_add(ModuleCollection instance, Module item)
 {
     unsigned int hash = string_get_hash_code(&item->name) %
@@ -691,14 +700,9 @@ int main(void)
 
         while (module)
         {
-            if (module->isConjunction)
-            {
-                dictionary_clear(module->child.pulses);
-                free(module->child.pulses);
-            }
-
             Module next = module->nextModule;
 
+            finalize_module(module);
             free(module);
 
             module = next;

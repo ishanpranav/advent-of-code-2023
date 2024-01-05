@@ -205,7 +205,7 @@ void b_player_list_sort(BPlayerList instance)
     qsort(
         instance->items,
         instance->count,
-        sizeof(struct BPlayer),
+        sizeof * instance->items,
         b_player_compare);
 }
 

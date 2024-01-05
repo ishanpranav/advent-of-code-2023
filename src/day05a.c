@@ -90,7 +90,7 @@ void function_sort_ranges(Function instance)
     qsort(
         instance->ranges,
         instance->count,
-        sizeof(struct Range),
+        sizeof * instance->ranges,
         range_compare);
 }
 

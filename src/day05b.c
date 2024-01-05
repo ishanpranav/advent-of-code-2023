@@ -146,13 +146,16 @@ void function_sort_ranges(Function instance)
     qsort(
         instance->ranges,
         instance->count,
-        sizeof(struct Range),
+        sizeof * instance->ranges,
         range_compare);
 }
 
 void function_get_ranges(Function instance, RangeArray results)
 {
-    memcpy(results, instance->ranges, instance->count * sizeof(struct Range));
+    memcpy(
+        results,
+        instance->ranges, 
+        instance->count * sizeof * instance->ranges);
 }
 
 void function_fill_ranges(Function instance)

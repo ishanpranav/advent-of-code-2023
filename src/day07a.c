@@ -192,7 +192,7 @@ void player_list_sort(PlayerList instance)
     qsort(
         instance->items,
         instance->count,
-        sizeof(struct Player),
+        sizeof * instance->items,
         player_compare);
 }
 

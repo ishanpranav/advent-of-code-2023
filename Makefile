@@ -150,5 +150,8 @@ day21a: src/day21a.c
 day22a: src/day22a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
+day22b: src/day22b.c
+	$(CC) $(CFLAGS) $< -o $@.o
+
 clean:
 	rm -rf *.o

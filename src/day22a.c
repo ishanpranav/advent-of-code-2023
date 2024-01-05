@@ -1,51 +1,48 @@
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#define BRICK_CHILDREN_CAPACITY 4
+#define BRICK_PARENTS_CAPACITY 4
+#define BRICKS_CAPACITY 2048
 #define BUFFER_SIZE 32
 #define DELIMITERS ",~"
-#define LINE_3_COLLECTION_CAPACITY 8
-#define MAX_X 10
-#define MAX_Y 10
-#define MAX_Z 10
+#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 
-struct Point3
+struct Point
 {
     int x;
     int y;
     int z;
 };
 
-struct Line3
-{
-    struct Point3 p;
-    struct Point3 q;
-};
+struct Brick;
 
-struct Line3Collection
+struct BrickCollection
 {
-    struct Line3 items[LINE_3_COLLECTION_CAPACITY];
+    struct Brick* items;
     int count;
 };
 
-struct Space3
+struct Brick
 {
-    int sizeX;
-    int sizeY;
-    int sizeZ;
-    int items[(MAX_Z + 1) * (MAX_Y + 1) * (MAX_X + 1)];
+    struct BrickCollection parents;
+    struct BrickCollection children;
+    struct Point p;
+    struct Point q;
+    int floor;
 };
 
 typedef const void* Object;
-typedef struct Point3* Point3;
-typedef struct Line3* Line3;
-typedef struct Line3Collection* Line3Collection;
-typedef struct Space3* Space3;
+typedef struct Point* Point;
+typedef struct BrickCollection* BrickCollection;
+typedef struct Brick* Brick;
 
-int math_max(int a, int b)
+int math_min(int a, int b)
 {
-    if (a > b)
+    if (a < b)
     {
         return a;
     }
@@ -53,61 +50,95 @@ int math_max(int a, int b)
     return b;
 }
 
-int line_3_compare(Object left, Object right)
+bool brick_collection(BrickCollection instance, int capacity);
+void finalize_brick_collection(BrickCollection instance);
+
+bool brick(Brick instance, Point p, Point q)
 {
-    const struct Line3* l = (const struct Line3*)left;
-    const struct Line3* m = (const struct Line3*)right;
+    if (!brick_collection(&instance->parents, BRICK_PARENTS_CAPACITY))
+    {
+        return false;
+    }
+
+    if (!brick_collection(&instance->children, BRICK_CHILDREN_CAPACITY))
+    {
+        finalize_brick_collection(&instance->parents);
+
+        return false;
+    }
+
+    instance->p = *p;
+    instance->q = *q;
+    instance->floor = math_min(p->z, q->z);
+
+    return true;
+}
+
+int brick_compare(Object left, Object right)
+{
+    const struct Brick* l = (const struct Brick*)left;
+    const struct Brick* m = (const struct Brick*)right;
 
     return l->p.z - m->p.z;
 }
 
-void line_3_collection(Line3Collection instance)
+bool brick_collection(BrickCollection instance, int capacity)
 {
     instance->count = 0;
+    instance->items = malloc(capacity * sizeof * instance->items);
+
+    return instance->items;
 }
 
-void line_3_collection_add(Line3Collection instance, Line3 item)
+void finalize_brick_collection(BrickCollection instance)
 {
-    instance->items[instance->count] = *item;
-    instance->count++;
+    free(instance->items);
 }
 
-void line_3_collection_sort(Line3Collection instance)
+Brick brick_collection_new_brick(BrickCollection instance)
+{
+    Brick result = instance->items + instance->count;
+
+    instance->count++;
+
+    return result;
+}
+
+void brick_collection_sort(BrickCollection instance)
 {
     qsort(
         instance->items,
         instance->count,
-        sizeof(struct Line3),
-        line_3_compare);
-}
-
-void space_3(Space3 space, int sizeX, int sizeY)
-{
-    space->sizeX = sizeX;
-    space->sizeY = sizeY;
-    space->sizeZ = 1;
+        sizeof * instance->items,
+        brick_compare);
 }
 
 int main(void)
 {
-    int maxX = 0;
-    int maxY = 0;
+    struct BrickCollection bricks;
     clock_t start = clock();
-    struct Line3Collection lines;
 
-    line_3_collection(&lines);
+    if (!brick_collection(&bricks, BRICKS_CAPACITY))
+    {
+        fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+        return 1;
+    }
+
+    int floor = INT_MAX;
 
     for (;;)
     {
-        struct Line3 l;
+        struct Point p;
+        struct Point q;
         int scan = scanf(
             "%d,%d,%d~%d,%d,%d\n",
-            &l.p.x,
-            &l.p.y,
-            &l.p.z,
-            &l.q.x,
-            &l.q.y,
-            &l.q.z);
+            &p.x,
+            &p.y,
+            &p.z,
+            &q.x,
+            &q.y,
+            &q.z);
 
         if (scan == EOF)
         {
@@ -121,68 +152,22 @@ int main(void)
             return 1;
         }
 
-        int x = math_max(l.p.x, l.q.x);
+        Brick current = brick_collection_new_brick(&bricks);
 
-        if (x > maxX)
+        if (!brick(current, &p, &q))
         {
-            maxX = x;
+            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+            return 1;
         }
 
-        int y = math_max(l.p.y, l.q.y);
-
-        if (y > maxY)
+        if (current->floor < floor)
         {
-            maxY = y;
-        }
-
-        line_3_collection_add(&lines, &l);
-    }
-
-    struct Space3 space = { 0 };
-
-    space_3(&space);
-    
-    space.sizeX = maxX + 1;
-    space.sizeY = maxY + 1;
-    space.sizeZ = 1;
-
-    for (int y = 0; y < space.sizeY; y++)
-    {
-        int yOffset = y * space.sizeX;
-
-        for (int x = 0; x < space.sizeX; x++)
-        {
-            space.items[yOffset + x] = -1;
+            floor = current->floor;
         }
     }
 
-    line_3_collection_sort(&lines);
-
-    for (Line3 l = lines.items; l < lines.items + lines.count; l++)
-    {
-        int supportZ = -1;
-
-        printf("rest = set()\n");
-
-        struct Point3 min;
-        struct Point3 max;
-
-        for (int z = 0; z < space.sizeZ; z++)
-        {
-            int zOffset = z * space.sizeX * space.sizeY;
-
-            for (int y = 0; y < space.sizeY; y++)
-            {
-                int yOffset = y * space.sizeX;
-
-                for (int x = 0; x < space.sizeX; x++)
-                {
-                    if ()
-                }
-            }
-        }
-    }
-
+    brick_collection_sort(&bricks);
     printf("22a %d %lf\n", 0, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;

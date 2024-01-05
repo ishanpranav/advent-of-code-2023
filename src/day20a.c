@@ -373,6 +373,15 @@ bool module_respond(Module instance, Message message, MessageQueue queue)
     return true;
 }
 
+void finalize_module(Module instance)
+{
+    if (instance->isConjunction)
+    {
+        dictionary_clear(instance->child.pulses);
+        free(instance->child.pulses);
+    }
+}
+
 Module module_collection_get(ModuleCollection instance, String name)
 {
     unsigned int hash = string_get_hash_code(name) % MODULE_COLLECTION_BUCKETS;
@@ -534,14 +543,9 @@ int main(void)
 
         while (module)
         {
-            if (module->isConjunction)
-            {
-                dictionary_clear(module->child.pulses);
-                free(module->child.pulses);
-            }
-
             Module next = module->nextModule;
 
+            finalize_module(module);
             free(module);
 
             module = next;
