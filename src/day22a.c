@@ -100,7 +100,7 @@ void brick_collection_add(BrickCollection instance, Brick item)
     instance->count++;
 }
 
-static int brick_collection_compare_bricks(Object left, Object right)
+static int brick_collection_compare_items(Object left, Object right)
 {
     const struct Brick* leftBrick = *(const struct Brick**)left;
     const struct Brick* rightBrick = *(const struct Brick**)right;
@@ -114,7 +114,7 @@ void brick_collection_sort(BrickCollection instance)
         instance->items,
         instance->count,
         sizeof * instance->items,
-        brick_collection_compare_bricks);
+        brick_collection_compare_items);
 }
 
 void brick_collection_clear(BrickCollection instance)

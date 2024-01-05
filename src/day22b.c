@@ -153,7 +153,7 @@ Brick brick_collection_pop(BrickCollection instance)
     return instance->items[instance->count];
 }
 
-static int brick_collection_compare_bricks(Object left, Object right)
+static int brick_collection_compare_items(Object left, Object right)
 {
     const struct Brick* leftBrick = *(const struct Brick**)left;
     const struct Brick* rightBrick = *(const struct Brick**)right;
@@ -167,7 +167,7 @@ void brick_collection_sort(BrickCollection instance)
         instance->items,
         instance->count,
         sizeof * instance->items,
-        brick_collection_compare_bricks);
+        brick_collection_compare_items);
 }
 
 void brick_collection_clear(BrickCollection instance)
@@ -212,7 +212,7 @@ AddResult brick_set_add(BrickSet instance, Brick item)
 }
 
 bool brick_set_contains(BrickSet instance, Brick item)
-{        
+{
     unsigned int hash = brick_get_hash_code(item) % BRICK_SET_BUCKETS;
 
     for (BrickSetEntry entry = instance->buckets[hash].firstEntry;
@@ -276,7 +276,6 @@ int main(void)
     struct Point q;
     struct Brick* brickBuffer[BRICK_BUFFER_CAPACITY];
     struct Brick* supportedBuffer[BRICK_BUFFER_CAPACITY];
-    struct Brick* stackBuffer[BRICK_BUFFER_CAPACITY];
     struct BrickCollection bricks;
     struct BrickCollection supported;
     int floor = INT_MAX;
@@ -355,6 +354,7 @@ int main(void)
     int total = 0;
     struct BrickSet visited = { 0 };
     struct BrickCollection stack;
+    struct Brick* stackBuffer[BRICK_BUFFER_CAPACITY];
 
     brick_collection(&stack, stackBuffer);
 
