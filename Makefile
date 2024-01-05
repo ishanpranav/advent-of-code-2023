@@ -25,7 +25,10 @@ all: \
 	day19a day19b \
 	day20a day20b \
 	day21a \
-	day22a day22b
+	day22a day22b \
+	day23a day23b \
+	day24a day24b \
+	day25a day25b
 	
 day01a: src/day01a.c
 	$(CC) $(CFLAGS) $< -o $@.o

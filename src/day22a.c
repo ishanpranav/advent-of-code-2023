@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #define BRICK_BUFFER_CAPACITY 2048
 #define BRICK_CHILDREN_CAPACITY 10
@@ -119,7 +118,12 @@ void brick_collection_sort(BrickCollection instance)
         brick_collection_compare_bricks);
 }
 
-bool brick_collection_all_has_multiparent(BrickCollection instance)
+void brick_collection_clear(BrickCollection instance)
+{
+    instance->count = 0;
+}
+
+static bool scan(BrickCollection instance)
 {
     for (Brick* p = instance->items; p < instance->items + instance->count; p++)
     {
@@ -130,11 +134,6 @@ bool brick_collection_all_has_multiparent(BrickCollection instance)
     }
 
     return true;
-}
-
-void brick_collection_clear(BrickCollection instance)
-{
-    instance->count = 0;
 }
 
 int main(void)
@@ -222,7 +221,7 @@ int main(void)
 
     for (Brick* q = supported.items; q < supported.items + supported.count; q++)
     {
-        if (brick_collection_all_has_multiparent(&(*q)->children))
+        if (scan(&(*q)->children))
         {
             total++;
         }
