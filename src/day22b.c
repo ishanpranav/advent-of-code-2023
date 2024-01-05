@@ -10,9 +10,19 @@
 #define BRICK_BUFFER_CAPACITY 2048
 #define BRICK_CHILDREN_CAPACITY 10
 #define BRICK_PARENTS_CAPACITY 10
+#define BRICK_SET_BUCKETS 3079
 #define BUFFER_SIZE 32
 #define DELIMITERS ",~"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
+#define SIZE_X 10
+#define SIZE_Y 10
+
+enum AddResult
+{
+    ADD_RESULT_ADDED,
+    ADD_RESULT_NOT_ADDED,
+    ADD_RESULT_OUT_OF_MEMORY
+};
 
 struct Point
 {
@@ -38,10 +48,33 @@ struct Brick
     int floor;
 };
 
+struct BrickSetEntry
+{
+    struct BrickSetEntry* nextEntry;
+    struct Brick* item;
+};
+
+struct BrickSetBucket
+{
+    struct BrickSetEntry* firstEntry;
+    struct BrickSetBucket* nextBucket;
+};
+
+struct BrickSet
+{
+    struct BrickSetBucket* firstBucket;
+    struct BrickSetBucket buckets[BRICK_SET_BUCKETS];
+    int count;
+};
+
 typedef const void* Object;
+typedef enum AddResult AddResult;
 typedef struct Point* Point;
 typedef struct Brick* Brick;
 typedef struct BrickCollection* BrickCollection;
+typedef struct BrickSetEntry* BrickSetEntry;
+typedef struct BrickSetBucket* BrickSetBucket;
+typedef struct BrickSet* BrickSet;
 
 int math_min(int a, int b)
 {
@@ -81,6 +114,13 @@ bool brick(Brick instance, Point p, Point q)
     brick_collection(&instance->children, children);
 
     return true;
+}
+
+unsigned int brick_get_hash_code(Brick instance)
+{
+    return ((unsigned int)instance->p.z * SIZE_X * SIZE_Y) +
+        ((unsigned int)instance->p.y * SIZE_X) +
+        (unsigned int)instance->p.x;
 }
 
 void finalize_brick(Brick instance)
@@ -130,16 +170,56 @@ void brick_collection_sort(BrickCollection instance)
         brick_collection_compare_bricks);
 }
 
-bool brick_collection_contains(BrickCollection instance, Brick item)
+void brick_collection_clear(BrickCollection instance)
 {
-    for (Brick* p = instance->items; p < instance->items + instance->count; p++)
+    instance->count = 0;
+}
+
+AddResult brick_set_add(BrickSet instance, Brick item)
+{
+    BrickSetEntry* p;
+    unsigned int hash = brick_get_hash_code(item) % BRICK_SET_BUCKETS;
+
+    for (p = &instance->buckets[hash].firstEntry; *p; p = &(*p)->nextEntry)
     {
-        if ((*p)->p.x == item->p.x &&
-            (*p)->p.y == item->p.y &&
-            (*p)->p.z == item->p.z &&
-            (*p)->q.x == item->q.x &&
-            (*p)->q.y == item->q.y &&
-            (*p)->q.z == item->q.z)
+        if ((*p)->item == item)
+        {
+            return ADD_RESULT_NOT_ADDED;
+        }
+    }
+
+    BrickSetEntry entry = malloc(sizeof * entry);
+
+    if (!entry)
+    {
+        return ADD_RESULT_OUT_OF_MEMORY;
+    }
+
+    if (!instance->buckets[hash].firstEntry)
+    {
+        BrickSetBucket first = instance->firstBucket;
+
+        instance->buckets[hash].nextBucket = first;
+        instance->firstBucket = instance->buckets + hash;
+    }
+
+    entry->item = item;
+    entry->nextEntry = NULL;
+    *p = entry;
+    instance->count++;
+
+    return ADD_RESULT_ADDED;
+}
+
+bool brick_set_contains(BrickSet instance, Brick item)
+{        
+    unsigned int hash = brick_get_hash_code(item) % BRICK_SET_BUCKETS;
+
+    for (BrickSetEntry entry = instance->buckets[hash].firstEntry;
+        entry;
+        entry = entry->nextEntry)
+    {
+        if (entry->item == item)
         {
             return true;
         }
@@ -148,21 +228,16 @@ bool brick_collection_contains(BrickCollection instance, Brick item)
     return false;
 }
 
-void brick_collection_add_unique(BrickCollection instance, Brick item)
+bool brick_set_is_superset(BrickSet instance, BrickCollection other)
 {
-    if (brick_collection_contains(instance, item))
+    if (instance->count < other->count)
     {
-        return;
+        return false;
     }
 
-    brick_collection_add(instance, item);
-}
-
-bool brick_collection_is_superset(BrickCollection instance, BrickCollection other)
-{
     for (Brick* p = other->items; p < other->items + other->count; p++)
     {
-        if (!brick_collection_contains(instance, *p))
+        if (!brick_set_contains(instance, *p))
         {
             return false;
         }
@@ -171,8 +246,27 @@ bool brick_collection_is_superset(BrickCollection instance, BrickCollection othe
     return true;
 }
 
-void brick_collection_clear(BrickCollection instance)
+void brick_set_clear(BrickSet instance)
 {
+    for (BrickSetBucket bucket = instance->firstBucket;
+        bucket;
+        bucket = bucket->nextBucket)
+    {
+        BrickSetEntry entry = bucket->firstEntry;
+
+        while (entry)
+        {
+            BrickSetEntry nextEntry = entry->nextEntry;
+
+            free(entry);
+
+            entry = nextEntry;
+        }
+
+        bucket->firstEntry = NULL;
+    }
+
+    instance->firstBucket = NULL;
     instance->count = 0;
 }
 
@@ -183,7 +277,6 @@ int main(void)
     struct Brick* brickBuffer[BRICK_BUFFER_CAPACITY];
     struct Brick* supportedBuffer[BRICK_BUFFER_CAPACITY];
     struct Brick* stackBuffer[BRICK_BUFFER_CAPACITY];
-    struct Brick* visitedBuffer[BRICK_BUFFER_CAPACITY];
     struct BrickCollection bricks;
     struct BrickCollection supported;
     int floor = INT_MAX;
@@ -260,16 +353,14 @@ int main(void)
     }
 
     int total = 0;
+    struct BrickSet visited = { 0 };
     struct BrickCollection stack;
-    struct BrickCollection visited;
 
     brick_collection(&stack, stackBuffer);
-    brick_collection(&visited, visitedBuffer);
 
     for (Brick* q = supported.items; q < supported.items + supported.count; q++)
     {
         brick_collection_clear(&stack);
-        brick_collection_clear(&visited);
 
         for (Brick* child = (*q)->children.items;
             child < (*q)->children.items + (*q)->children.count;
@@ -285,20 +376,31 @@ int main(void)
 
         while ((current = brick_collection_pop(&stack)))
         {
-            brick_collection_add_unique(&visited, current);
+            switch (brick_set_add(&visited, current))
+            {
+                case ADD_RESULT_ADDED: break;
+                case ADD_RESULT_NOT_ADDED: continue;
+
+                case ADD_RESULT_OUT_OF_MEMORY:
+                    fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+
+                    return 1;
+            }
 
             for (Brick* child = current->children.items;
                 child < current->children.items + current->children.count;
                 child++)
             {
-                if (brick_collection_is_superset(&visited, &(*child)->parents))
-                {   
+                if (brick_set_is_superset(&visited, &(*child)->parents))
+                {
                     brick_collection_add(&stack, *child);
                 }
             }
         }
 
         total += visited.count;
+
+        brick_set_clear(&visited);
     }
 
     printf("22b %d %lf\n", total, (double)(clock() - start) / CLOCKS_PER_SEC);

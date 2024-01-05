@@ -12,7 +12,6 @@
 #define BRICK_PARENTS_CAPACITY 10
 #define BUFFER_SIZE 32
 #define DELIMITERS ",~"
-#define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
 
 struct Point
 {
@@ -156,7 +155,7 @@ int main(void)
 
         if (!brick(current, &p, &q))
         {
-            fprintf(stderr, EXCEPTION_OUT_OF_MEMORY);
+            fprintf(stderr, "Error: Out of memory.\n");
 
             return 1;
         }

@@ -524,6 +524,7 @@ void set_clear(Set instance)
     }
 
     instance->firstBucket = NULL;
+    instance->count = 0;
 }
 
 static bool scan(
