@@ -38,7 +38,6 @@ struct Vertex
 // To represent a flow network 
 class Graph 
 { 
-    int V;    // No. of vertices 
     vector<Vertex> ver; 
     vector<Edge> edge; 
    
@@ -67,8 +66,6 @@ public:
    
 Graph::Graph(int V) 
 { 
-    this->V = V; 
-   
     // all vertices are initialized with 0 height 
     // and 0 excess flow 
     for (int i = 0; i < V; i++) 

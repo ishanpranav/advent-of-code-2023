@@ -47,9 +47,9 @@ is impractical, use numeric suffixes instead.
 | :----: | :------------------------------------------------------------------------------------------- |
 |  `a`   | arbitrary object, area                                                                       |
 |  `b`   | blue color component, boundary points in Pick\'s Theorem                                     |
-|  `d`   | vertex degree                                                                                |
+|  `e`   | arbitrary edge                                                                               |
 |  `dx`  | change in an arbitrary dimension                                                             |
-|  `g`   | green color component                                                                        |
+|  `g`   | green color component, arbitrary graph                                                       |
 |  `hi`  | larger pointer, point above, upper buffer                                                    |
 |  `i`   | abitrary counter, matrix index in an arbitrary dimension, interior points in Pick\'s Theorem |
 |  `k`   | term number, arbitrary constant                                                              |
