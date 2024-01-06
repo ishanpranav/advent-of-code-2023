@@ -9,13 +9,6 @@
 #include <time.h>
 #define BODY_3_COLLECTION_CAPACITY 512
 
-enum Solution
-{
-    SOLUTION_OK,
-    SOLUTION_NONE,
-    SOLUTION_INFINITE
-};
-
 struct Body3
 {
     long long x;
@@ -32,7 +25,6 @@ struct Body3Collection
     int count;
 };
 
-typedef enum Solution Solution;
 typedef struct Body3* Body3;
 typedef struct Body3Collection* Body3Collection;
 
@@ -58,7 +50,7 @@ void math_swap_row(long double matrix[6][7], int i, int j)
     }
 }
 
-int math_forward_elimination(long double matrix[6][7])
+bool math_forward_elimination(long double matrix[6][7])
 {
     for (int k = 0; k < 6; k++)
     {
@@ -76,7 +68,7 @@ int math_forward_elimination(long double matrix[6][7])
 
         if (!matrix[k][maxI])
         {
-            return k;
+            return false;
         }
 
         if (maxI != k)
@@ -97,7 +89,7 @@ int math_forward_elimination(long double matrix[6][7])
         }
     }
 
-    return -1;
+    return true;
 }
 
 void math_back_substitution(long double matrix[6][7], long double x[6])
@@ -115,25 +107,16 @@ void math_back_substitution(long double matrix[6][7], long double x[6])
     }
 }
 
-Solution math_gaussian_elimination(long double matrix[6][7], long double x[6])
+bool math_gaussian_elimination(long double matrix[6][7], long double x[6])
 {
-    int singular_flag = math_forward_elimination(matrix);
-
-    if (singular_flag != -1)
+    if (!math_forward_elimination(matrix))
     {
-        if (matrix[singular_flag][6])
-        {
-            return SOLUTION_NONE;
-        }
-        else
-        {
-            return SOLUTION_INFINITE;
-        }
+        return false;
     }
 
     math_back_substitution(matrix, x);
 
-    return SOLUTION_OK;
+    return true;
 }
 
 static long long scan(Body3Collection bodies)
@@ -172,7 +155,7 @@ static long long scan(Body3Collection bodies)
         };
         long double x[6] = { 0 };
 
-        if (math_gaussian_elimination(matrix, x) == SOLUTION_OK)
+        if (math_gaussian_elimination(matrix, x))
         {
             return x[0] + x[1] + x[2];
         }
