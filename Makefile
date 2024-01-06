@@ -26,9 +26,8 @@ all: \
 	day20a day20b \
 	day21a \
 	day22a day22b \
-	day23a day23b \
 	day24a day24b \
-	day25a day25b
+	day25z
 	
 day01a: src/day01a.c
 	$(CC) $(CFLAGS) $< -o $@.o
@@ -156,22 +155,13 @@ day22a: src/day22a.c
 day22b: src/day22b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
-day23a: src/day23a.c
-	$(CC) $(CFLAGS) $< -o $@.o
-
-day23b: src/day23b.c
-	$(CC) $(CFLAGS) $< -o $@.o
-
 day24a: src/day24a.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
 day24b: src/day24b.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
-day25a: src/day25a.c
-	$(CC) $(CFLAGS) $< -o $@.o
-
-day25b: src/day25b.c
+day25z: src/day25z.c
 	$(CC) $(CFLAGS) $< -o $@.o
 
 clean:

@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#define BODY_3_COLLECTION_CAPACITY 512
+#define BODY3_COLLECTION_CAPACITY 512
 
 struct Body3
 {
@@ -21,7 +21,7 @@ struct Body3
 
 struct Body3Collection
 {
-    struct Body3 items[BODY_3_COLLECTION_CAPACITY];
+    struct Body3 items[BODY3_COLLECTION_CAPACITY];
     int count;
 };
 
@@ -39,7 +39,7 @@ void body3_collection_add(Body3Collection instance, Body3 item)
     instance->count++;
 }
 
-bool math_forward_elimination(long double matrix[6][7])
+bool math_gaussian_elimination(long double matrix[6][7], long double x[6])
 {
     for (int k = 0; k < 6; k++)
     {
@@ -82,11 +82,6 @@ bool math_forward_elimination(long double matrix[6][7])
         }
     }
 
-    return true;
-}
-
-void math_back_substitution(long double matrix[6][7], long double x[6])
-{
     for (int i = 5; i >= 0; i--)
     {
         x[i] = matrix[i][6];
@@ -98,17 +93,7 @@ void math_back_substitution(long double matrix[6][7], long double x[6])
 
         x[i] = x[i] / matrix[i][i];
     }
-}
-
-bool math_gaussian_elimination(long double matrix[6][7], long double x[6])
-{
-    if (!math_forward_elimination(matrix))
-    {
-        return false;
-    }
-
-    math_back_substitution(matrix, x);
-
+    
     return true;
 }
 

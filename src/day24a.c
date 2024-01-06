@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-#define BODY_3_COLLECTION_CAPACITY 512
+#define BODY3_COLLECTION_CAPACITY 512
 
 struct Body3
 {
@@ -19,7 +19,7 @@ struct Body3
 
 struct Body3Collection
 {
-    struct Body3 items[BODY_3_COLLECTION_CAPACITY];
+    struct Body3 items[BODY3_COLLECTION_CAPACITY];
     int count;
 };
 

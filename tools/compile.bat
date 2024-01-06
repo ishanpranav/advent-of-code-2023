@@ -35,9 +35,12 @@ For /l %%i In (11,1,20) Do (
 Echo %cc% %cflags% ..\src/day21a.c -o ..\day21a.exe
 %cc% %cflags% ..\src/day21a.c -o ..\day21a.exe
 
-For /l %%i In (22,1,25) Do (
+For /l %%i In (22,1,24) Do (
   Echo %cc% %cflags% ..\src/day%%ia.c -o ..\day%%ia.exe
   %cc% %cflags% ..\src/day%%ia.c -o ..\day%%ia.exe
   Echo %cc% %cflags% ..\src/day%%ib.c -o ..\day%%ib.exe
   %cc% %cflags% ..\src/day%%ib.c -o ..\day%%ib.exe
 )
+
+Echo %cc% %cflags% ..\src/day25z.c -o ..\day25z.exe
+%cc% %cflags% ..\src/day25z.c -o ..\day25z.exe

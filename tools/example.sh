@@ -35,3 +35,6 @@ do
     cat ../data/${i}1.txt | ./../day${i}a.o
     cat ../data/${i}1.txt | ./../day${i}b.o
 done
+
+cat ../data/241.txt | ./../day24a.o
+cat ../data/251.txt | ./../day25z.o

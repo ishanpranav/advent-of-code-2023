@@ -54,9 +54,8 @@ time between 0.00005 seconds and 0.00050 seconds.
 | 20  |        [Pulse Propagation](src/day20b.c)        | Graph theory, Number theory, Dictionaries, Sets, Circuit design |        Product        |  0.01  | [Euclidean algorithm](https://en.wikipedia.org/wiki/Euclidean_algorithm), map-based graph, hash set, length-prefixed string                                                |
 | 21  |          [Step Counter](src/day21a.c)           |               Graph theory, Sets, Priority queues               |         Count         | 0.001  | [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search), hash set, [circular buffer](https://en.wikipedia.org/wiki/Circular_buffer), matrix-based graph |
 | 22  |           [Sand Slabs](src/day22b.c)            |    Geometry, Graph theory, Sorting algorithms, Stacks, Sets     |         Count         |  0.01  | Object-based graph, hash set                                                                                                                                               |
-| 23  |                        .                        |                                .                                |           .           |   .    | .                                                                                                                                                                          |
 | 24  |     [Never Tell Me The Odds](src/day24b.c)      |                     Physics, Linear algebra                     |          Sum          |  0.01  | [Line–line intersection](https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection), [Gaussian elimination](https://en.wikipedia.org/wiki/Gaussian_elimination)         |
-| 25  |                        .                        |                                .                                |           .           |   .    | .                                                                                                                                                                          |
+| 25  |           [Snowverload](src/day25b.c)           |                                .                                |           .           |   .    | .                                                                                                                                                                          |
 
 ## Constraints
 
@@ -70,9 +69,6 @@ I am working within the following constraints to ensure high code quality.
   external dependencies beyond the C standard library (`libc`) and the C
   mathematics library (`libm`). The first and second problems for a given day
   must be implemented separately.
-- The solution must produce the correct result for the [examples](data/), not
-  just the personalized puzzle input. This means that the efficient solutions to
-  Day 10(b) and Day 21(b) are unfeasible.
 - Bounds checking is not required for data structures whose capacity is defined
   by a macro.
 - The return values of all C standard library functions must be checked, except
@@ -80,3 +76,11 @@ I am working within the following constraints to ensure high code quality.
   - `fprintf`
   - `memcpy`
   - `printf`
+
+## Omissions
+
+- The solution must produce the correct result for the [examples](data/), not
+  just the personalized puzzle input. This means that the efficient solutions to
+  Day 10(b) and Day 21(b) are unfeasible. I have omitted both.
+- By design, there is no efficient solution to Day 24(a) and (b). I have
+  omitted both.

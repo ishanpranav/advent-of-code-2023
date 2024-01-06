@@ -33,3 +33,6 @@ For /l %%i In (22,1,22) Do (
     ..\day%%ia.exe < ..\data\%%i1.txt
     ..\day%%ib.exe < ..\data\%%i1.txt
 )
+
+..\day24b.exe < ..\data\241.txt
+..\day25z.exe < ..\data\251.txt
