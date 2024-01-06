@@ -47,6 +47,7 @@ is impractical, use numeric suffixes instead.
 | :----: | :------------------------------------------------------------------------------------------- |
 |  `a`   | arbitrary object, area                                                                       |
 |  `b`   | blue color component, boundary points in Pick\'s Theorem                                     |
+|  `d`   | vertex degree                                                                                |
 |  `dx`  | change in an arbitrary dimension                                                             |
 |  `g`   | green color component                                                                        |
 |  `hi`  | larger pointer, point above, upper buffer                                                    |
@@ -62,6 +63,7 @@ is impractical, use numeric suffixes instead.
 |  `p`   | arbitrary pointer, arbitrary point                                                           |
 |  `q`   | arbitrary rational number                                                                    |
 |  `r`   | red color component, arbitrary real number                                                   |
+|  `u`   | arbitrary vertex                                                                             |
 |  `x`   | vector in an arbitrary dimension, position in an arbitrary dimension                         |
 
 ## Type definitions

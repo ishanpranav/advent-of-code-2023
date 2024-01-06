@@ -10,18 +10,14 @@
 #define BUFFER_SIZE 32
 #define DIRECTIONS_CAPACITY 512
 #define LIST_CAPACITY 1296
-
-enum Vertex
-{
-    VERTEX_OFFSET = -1342,
-    VERTEX_LAST = 46655 + VERTEX_OFFSET,
-    VERTEX_NONE = VERTEX_LAST + 1
-};
+#define VERTEX_OFFSET -1342
+#define VERTEX_LAST 45313
+#define VERTEX_NONE 45314
 
 struct VertexPair
 {
-    enum Vertex left;
-    enum Vertex right;
+    long left;
+    long right;
 };
 
 struct Graph
@@ -31,12 +27,11 @@ struct Graph
 
 struct VertexList
 {
-    enum Vertex items[LIST_CAPACITY];
+    long items[LIST_CAPACITY];
     int count;
 };
 
 typedef char* String;
-typedef enum Vertex Vertex;
 typedef struct Graph* Graph;
 typedef struct VertexList* VertexList;
 
@@ -58,7 +53,7 @@ long long math_lcm(long long a, long long b)
     return (a / math_gcd(a, b)) * b;
 }
 
-void graph_add(Graph instance, Vertex vertex, Vertex left, Vertex right)
+void graph_add(Graph instance, long vertex, long left, long right)
 {
     instance->vertices[vertex].left = left;
     instance->vertices[vertex].right = right;
@@ -69,19 +64,19 @@ void vertex_list(VertexList instance)
     instance->count = 0;
 }
 
-void vertex_list_add(VertexList instance, Vertex item)
+void vertex_list_add(VertexList instance, long item)
 {
     instance->items[instance->count] = item;
     instance->count++;
 }
 
-static bool parse(char buffer[], char window[], Vertex* result)
+static bool parse(char buffer[], char window[], long* result)
 {
     memcpy(window, buffer, 3);
 
     window[3] = '\0';
 
-    Vertex vertex = strtol(window, NULL, 36) + VERTEX_OFFSET;
+    long vertex = strtol(window, NULL, 36) + VERTEX_OFFSET;
 
     if (vertex < 0)
     {
@@ -105,9 +100,9 @@ static bool read(FILE* stream, Graph graph, VertexList starts)
     while (fgets(buffer, sizeof buffer, stream))
     {
         char window[4];
-        Vertex vertex;
-        Vertex left;
-        Vertex right;
+        long vertex;
+        long left;
+        long right;
 
         if (strlen(buffer) < 16 ||
             !parse(buffer, window, &vertex) ||
@@ -128,7 +123,7 @@ static bool read(FILE* stream, Graph graph, VertexList starts)
     return true;
 }
 
-static int scan(Graph instance, Vertex start, String directions)
+static int scan(Graph instance, long start, String directions)
 {
     int result = 0;
     String direction = directions;
@@ -142,11 +137,13 @@ static int scan(Graph instance, Vertex start, String directions)
                 direction++;
                 result++;
                 break;
+
             case 'R':
                 start = instance->vertices[start].right;
                 direction++;
                 result++;
                 break;
+
             default:
                 direction = directions;
                 break;
@@ -181,10 +178,9 @@ int main(void)
         return 1;
     }
 
-    Vertex* first = starts.items;
-    long long lcm = scan(graph, *first, directions);
+    long long lcm = scan(graph, starts.items[0], directions);
 
-    for (Vertex* p = first + 1; p < first + starts.count; p++)
+    for (long* p = starts.items + 1; p < starts.items + starts.count; p++)
     {
         lcm = math_lcm(lcm, scan(graph, *p, directions));
     }
