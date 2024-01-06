@@ -2,7 +2,6 @@
 
 // Never Tell Me The Odds Part 1
 
-#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
@@ -13,9 +12,9 @@ struct Body3
     long long x;
     long long y;
     long long z;
-    long long dx;
-    long long dy;
-    long long dz;
+    int dx;
+    int dy;
+    int dz;
 };
 
 struct Body3Collection
@@ -41,18 +40,18 @@ typedef struct Body3Collection* Body3Collection;
 typedef struct Point2* Point2;
 typedef struct Line2* Line2;
 
-void body_3_collection(Body3Collection instance)
+void body3_collection(Body3Collection instance)
 {
     instance->count = 0;
 }
 
-void body_3_collection_add(Body3Collection instance, Body3 item)
+void body3_collection_add(Body3Collection instance, Body3 item)
 {
     instance->items[instance->count] = *item;
     instance->count++;
 }
 
-bool line_2_point_intersection(Line2 l, Line2 m, Point2 result)
+bool line2_point_intersection(Line2 l, Line2 m, Point2 result)
 {
     long double ldx = l->p.x - l->q.x;
     long double ldy = l->p.y - l->q.y;
@@ -64,7 +63,7 @@ bool line_2_point_intersection(Line2 l, Line2 m, Point2 result)
     long double y = r * mdy - s * ldy;
     long double b = ldx * mdy - mdx * ldy;
 
-    if (fpclassify(b) == FP_ZERO)
+    if (!b)
     {
         return false;
     }
@@ -81,9 +80,9 @@ int main(void)
     struct Body3Collection bodies;
     clock_t start = clock();
 
-    body_3_collection(&bodies);
+    body3_collection(&bodies);
 
-    while (scanf("%lld, %lld, %lld @ %lld, %lld, %lld\n",
+    while (scanf("%lld, %lld, %lld @ %d, %d, %d\n",
         &body.x,
         &body.y,
         &body.z,
@@ -91,7 +90,7 @@ int main(void)
         &body.dy,
         &body.dz) > 0)
     {
-        body_3_collection_add(&bodies, &body);
+        body3_collection_add(&bodies, &body);
     }
 
     int total = 0;
@@ -103,8 +102,8 @@ int main(void)
             struct Line2 l;
             struct Line2 m;
             struct Point2 p;
-            long long ldx = bodies.items[i].dx;
-            long long mdx = bodies.items[j].dx;
+            int ldx = bodies.items[i].dx;
+            int mdx = bodies.items[j].dx;
 
             l.p.x = bodies.items[i].x;
             l.p.y = bodies.items[i].y;
@@ -115,7 +114,7 @@ int main(void)
             m.q.x = m.p.x + mdx;
             m.q.y = m.p.y + bodies.items[j].dy;
 
-            if (line_2_point_intersection(&l, &m, &p) &&
+            if (line2_point_intersection(&l, &m, &p) &&
                 p.x >= 2e14 && p.x <= 4e14 && p.y >= 2e14 && p.y <= 4e14 &&
                 ((p.x > l.p.x && ldx > 0) || (p.x < l.p.x && ldx < 0)) &&
                 ((p.x > m.p.x && mdx > 0) || (p.x < m.p.x && mdx < 0)))
