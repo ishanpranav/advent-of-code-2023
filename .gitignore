@@ -4,3 +4,4 @@ alt*.txt
 *.o
 .vscode/
 .antlr/
+ref/day25zv.py
