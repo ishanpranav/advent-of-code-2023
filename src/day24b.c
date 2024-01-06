@@ -1,6 +1,6 @@
 // Licensed under the MIT License.
 
-// Never Tell Me The Odds Part 1
+// Never Tell Me The Odds Part 2
 
 #include <math.h>
 #include <stdbool.h>
@@ -202,5 +202,5 @@ int main(void)
 
     long long sum = scan(&bodies);
 
-    printf("24a %lld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("24b %lld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
 }
