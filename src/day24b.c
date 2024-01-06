@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #define BODY_3_COLLECTION_CAPACITY 512
 
@@ -39,17 +40,6 @@ void body3_collection_add(Body3Collection instance, Body3 item)
     instance->count++;
 }
 
-void math_swap_row(long double matrix[6][7], int i, int j)
-{
-    for (int k = 0; k <= 6; k++)
-    {
-        long double swap = matrix[i][k];
-
-        matrix[i][k] = matrix[j][k];
-        matrix[j][k] = swap;
-    }
-}
-
 bool math_forward_elimination(long double matrix[6][7])
 {
     for (int k = 0; k < 6; k++)
@@ -73,14 +63,18 @@ bool math_forward_elimination(long double matrix[6][7])
 
         if (maxI != k)
         {
-            math_swap_row(matrix, k, maxI);
+            long double swap[7];
+
+            memcpy(swap, matrix[k], sizeof swap);
+            memcpy(matrix[k], matrix[maxI], sizeof swap);
+            memcpy(matrix[maxI], swap, sizeof swap);
         }
 
         for (int i = k + 1; i < 6; i++)
         {
             long double r = matrix[i][k] / matrix[k][k];
 
-            for (int j = k + 1; j <= 6; j++)
+            for (int j = k + 1; j < 7; j++)
             {
                 matrix[i][j] -= r * matrix[k][j];
             }
@@ -153,7 +147,7 @@ static long long scan(Body3Collection bodies)
                 (b.y * b.dz - b.z * b.dy) - (c.y * c.dz - c.z * c.dy)
             }
         };
-        long double x[6] = { 0 };
+        long double x[6];
 
         if (math_gaussian_elimination(matrix, x))
         {
