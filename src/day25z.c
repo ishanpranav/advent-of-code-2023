@@ -161,29 +161,24 @@ void graph_begin(Graph instance, GraphIterator iterator)
 
 bool graph_end(GraphIterator iterator)
 {
-    if (!iterator->currentVertex)
-    {
-        return true;
-    }
-
-    Vertex u = iterator->currentVertex->nextVertex;
-
-    if (!u)
-    {
-        return !iterator->currentBucket->nextBucket;
-    }
-
-    return false;
+    return !iterator->currentVertex && !iterator->currentBucket;
 }
 
 void graph_next(GraphIterator iterator)
 {
-    iterator->currentVertex = iterator->currentVertex->nextVertex;
+    if (iterator->currentVertex)
+    {
+        iterator->currentVertex = iterator->currentVertex->nextVertex;
+    }
 
     if (!iterator->currentVertex)
     {
         iterator->currentBucket = iterator->currentBucket->nextBucket;
-        iterator->currentVertex = iterator->currentBucket->firstVertex;
+
+        if (iterator->currentBucket)
+        {
+            iterator->currentVertex = iterator->currentBucket->firstVertex;
+        }
     }
 }
 
@@ -351,9 +346,7 @@ long scan(Graph graph)
     struct MinCut result;
     struct GraphIterator u;
 
-    graph_begin(graph, &u);
-
-    while (!graph_end(&u))
+    for (graph_begin(graph, &u); !graph_end(&u); graph_next(&u))
     {
         struct GraphIterator v = u;
 
@@ -373,8 +366,6 @@ long scan(Graph graph)
 
             graph_next(&v);
         }
-
-        graph_next(&u);
     }
 
     return -1;

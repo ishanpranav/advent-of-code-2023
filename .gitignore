@@ -1,6 +1,5 @@
 a.out
 *.exe
-alt*.txt
 *.o
 .vscode/
 .antlr/
