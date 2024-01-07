@@ -21,7 +21,17 @@ cat ../data/101.txt | ./../day10a.o
 cat ../data/102.txt | ./../day10a.o
 cat ../data/111.txt | ./../day11a.o
 
-for i in {12..19};
+for i in {12..16};
+do
+    cat ../data/${i}1.txt | ./../day${i}a.o
+    cat ../data/${i}1.txt | ./../day${i}b.o
+done
+
+cat ../data/171.txt | ./../day17a.o
+cat ../data/171.txt | ./../day17b.o
+cat ../data/172.txt | ./../day17b.o
+
+for i in {18..19};
 do
     cat ../data/${i}1.txt | ./../day${i}a.o
     cat ../data/${i}1.txt | ./../day${i}b.o
@@ -36,5 +46,5 @@ do
     cat ../data/${i}1.txt | ./../day${i}b.o
 done
 
-cat ../data/241.txt | ./../day24a.o
+cat ../data/241.txt | ./../day24b.o
 cat ../data/251.txt | ./../day25z.o

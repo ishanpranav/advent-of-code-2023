@@ -21,7 +21,16 @@ For /l %%i In (9,1,9) Do (
 ..\day10a.exe < ..\data\102.txt
 ..\day11a.exe < ..\data\111.txt
 
-For /l %%i In (12,1,19) Do (
+For /l %%i In (12,1,16) Do (
+    ..\day%%ia.exe < ..\data\%%i1.txt
+    ..\day%%ib.exe < ..\data\%%i1.txt
+)
+
+..\day17a.exe < ..\data\171.txt
+..\day17b.exe < ..\data\171.txt
+..\day17b.exe < ..\data\172.txt
+
+For /l %%i In (18,1,19) Do (
     ..\day%%ia.exe < ..\data\%%i1.txt
     ..\day%%ib.exe < ..\data\%%i1.txt
 )

@@ -274,7 +274,7 @@ int main(void)
         }
     }
 
-    printf("15a %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("15b %ld %lf\n", sum, (double)(clock() - start) / CLOCKS_PER_SEC);
     ordered_dictionary_clear(&dictionary);
 
     return 0;
