@@ -82,5 +82,5 @@ I am working within the following constraints to ensure high code quality.
 - The solution must produce the correct result for the [examples](data/), not
   just the personalized puzzle input. This means that the efficient solutions to
   Day 10(b) and Day 21(b) are unfeasible. I have omitted both.
-- By design, there is no efficient solution to Day 24(a) and (b). I have
+- By design, there is no efficient solution to Day 23(a) and (b). I have
   omitted both.
