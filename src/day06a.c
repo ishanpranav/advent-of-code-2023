@@ -63,19 +63,19 @@ int main(void)
         points[i].distance = atoi(token);
     }
 
-    long product = 1;
+    long result = 1;
 
     for (int i = 0; i < pointCount; i++)
     {
         int t = points[i].time;
         int dx = points[i].distance;
 
-        product *= ceil((t + sqrt(t * t - 4 * dx)) / 2)
+        result *= ceil((t + sqrt(t * t - 4 * dx)) / 2)
             - floor((t - sqrt(t * t - 4 * dx)) / 2)
             - 1;
     }
 
-    printf("06a %ld %lf\n", product, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("06a %ld %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
 
     return 0;
 }

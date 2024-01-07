@@ -11,10 +11,10 @@
 #define BUFFER_SIZE 64
 #define DELIMITERS " \n"
 #define EXCEPTION_OUT_OF_MEMORY "Error: Out of memory.\n"
-#define GRAPH_BUCKETS 53
+#define GRAPH_BUCKETS 3079
 #define KEY_SIZE 3
 #define VERTEX_MAX_DEGREE 16
-#define VERTEX_QUEUE_CAPACITY 30000
+#define VERTEX_QUEUE_CAPACITY 512
 
 struct Vertex;
 
@@ -52,6 +52,12 @@ struct Graph
     struct GraphBucket buckets[GRAPH_BUCKETS];
 };
 
+struct GraphIterator
+{
+    struct Vertex* currentVertex;
+    struct GraphBucket* currentBucket;
+};
+
 struct MinCut
 {
     int value;
@@ -65,7 +71,28 @@ typedef struct Edge* Edge;
 typedef struct VertexQueue* VertexQueue;
 typedef struct GraphBucket* GraphBucket;
 typedef struct Graph* Graph;
+typedef struct GraphIterator* GraphIterator;
 typedef struct MinCut* MinCut;
+
+void vertex_add_edge(Vertex instance, Vertex target, int capacity)
+{
+    instance->edges[instance->degree].target = target;
+    instance->edges[instance->degree].capacity = capacity;
+    instance->degree++;
+}
+
+int* vertex_capacity(Vertex instance, Vertex target)
+{
+    for (Edge e = instance->edges; e < instance->edges + instance->degree; e++)
+    {
+        if (e->target == target)
+        {
+            return &e->capacity;
+        }
+    }
+
+    return NULL;
+}
 
 void vertex_queue(VertexQueue instance)
 {
@@ -129,6 +156,48 @@ void graph(Graph instance)
     }
 }
 
+void graph_begin(Graph instance, GraphIterator iterator)
+{
+    iterator->currentBucket = instance->firstBucket;
+
+    if (iterator->currentBucket)
+    {
+        iterator->currentVertex = iterator->currentBucket->firstVertex;
+    }
+    else
+    {
+        iterator->currentVertex = NULL;
+    }
+}
+
+bool graph_end(GraphIterator iterator)
+{
+    if (!iterator->currentVertex)
+    {
+        return true;
+    }
+
+    Vertex u = iterator->currentVertex->nextVertex;
+
+    if (!u)
+    {
+        return !iterator->currentBucket->nextBucket;
+    }
+
+    return false;
+}
+
+void graph_next(GraphIterator iterator)
+{
+    iterator->currentVertex = iterator->currentVertex->nextVertex;
+
+    if (!iterator->currentVertex)
+    {
+        iterator->currentBucket = iterator->currentBucket->nextBucket;
+        iterator->currentVertex = iterator->currentBucket->firstVertex;
+    }
+}
+
 static unsigned int graph_hash(char key[])
 {
     unsigned int hash = 0;
@@ -139,26 +208,6 @@ static unsigned int graph_hash(char key[])
     }
 
     return hash % GRAPH_BUCKETS;
-}
-
-void vertex_add_edge(Vertex instance, Vertex target, int capacity)
-{
-    instance->edges[instance->degree].target = target;
-    instance->edges[instance->degree].capacity = capacity;
-    instance->degree++;
-}
-
-int* vertex_capacity(Vertex instance, Vertex target)
-{
-    for (Edge e = instance->edges; e < instance->edges + instance->degree; e++)
-    {
-        if (e->target == target)
-        {
-            return &e->capacity;
-        }
-    }
-
-    return NULL;
 }
 
 Vertex graph_vertex(Graph instance, char key[])
@@ -192,7 +241,6 @@ Vertex graph_vertex(Graph instance, char key[])
     memcpy(u->key, key, KEY_SIZE);
 
     u->source = NULL;
-    u->nextVertex = NULL;
     u->degree = 0;
     *p = u;
 
@@ -201,14 +249,11 @@ Vertex graph_vertex(Graph instance, char key[])
 
 bool graph_search(Graph instance, Vertex source, Vertex target)
 {
-    for (GraphBucket bucket = instance->firstBucket;
-        bucket;
-        bucket = bucket->nextBucket)
+    struct GraphIterator iter;
+
+    for (graph_begin(instance, &iter); !graph_end(&iter); graph_next(&iter))
     {
-        for (Vertex u = bucket->firstVertex; u; u = u->nextVertex)
-        {
-            u->source = NULL;
-        }
+        iter.currentVertex->source = NULL;
     }
 
     source->source = source;
@@ -243,16 +288,15 @@ void graph_min_cut(Graph instance, Vertex source, Vertex target, MinCut result)
     result->reachable = 0;
     result->nonReachable = 0;
 
-    for (GraphBucket bucket = instance->firstBucket;
-        bucket;
-        bucket = bucket->nextBucket)
+    struct GraphIterator iter;
+
+    for (graph_begin(instance, &iter); !graph_end(&iter); graph_next(&iter))
     {
-        for (Vertex u = bucket->firstVertex; u; u = u->nextVertex)
+        Vertex u = iter.currentVertex;
+
+        for (Edge e = u->edges; e < u->edges + u->degree; e++)
         {
-            for (Edge e = u->edges; e < u->edges + u->degree; e++)
-            {
-                e->capacity = 1;
-            }
+            e->capacity = 1;
         }
     }
 
@@ -262,43 +306,30 @@ void graph_min_cut(Graph instance, Vertex source, Vertex target, MinCut result)
 
         for (Vertex u = target; u != source; u = u->source)
         {
-            int reverse = *vertex_capacity(u->source, u);
+            int* capacity = vertex_capacity(u->source, u);
 
-            if (reverse < flow)
+            if (*capacity < flow)
             {
-                flow = reverse;
+                flow = *capacity;
             }
+
+            *capacity -= flow;
+
+            *vertex_capacity(u, u->source) += flow;
         }
 
         result->value += flow;
-
-        Vertex v;
-
-        for (Vertex u = target; u != source; u = v)
-        {
-            v = u->source;
-
-            int* cp = vertex_capacity(v, u);
-            *cp -= flow;
-            cp = vertex_capacity(u, v);
-            *cp += flow;
-        }
     }
 
-    for (GraphBucket bucket = instance->firstBucket;
-        bucket;
-        bucket = bucket->nextBucket)
+    for (graph_begin(instance, &iter); !graph_end(&iter); graph_next(&iter))
     {
-        for (Vertex u = bucket->firstVertex; u; u = u->nextVertex)
+        if (iter.currentVertex->source)
         {
-            if (u->source)
-            {
-                result->reachable++;
-            }
-            else
-            {
-                result->nonReachable++;
-            }
+            result->reachable++;
+        }
+        else
+        {
+            result->nonReachable++;
         }
     }
 }
@@ -329,29 +360,35 @@ void graph_clear(Graph instance)
 long scan(Graph graph)
 {
     struct MinCut result;
-    Vertex vcx[10000];
-    int sp = 0;
-    for (GraphBucket b = graph->firstBucket;b;b = b->nextBucket)
-        for (Vertex u = b->firstVertex; u; u = u->nextVertex)
+    struct GraphIterator u;
+
+    graph_begin(graph, &u);
+
+    while (!graph_end(&u))
+    {
+        struct GraphIterator v = u;
+
+        if (!graph_end(&v))
         {
-            vcx[sp] = u;
-            sp++;
+            graph_next(&v);
         }
 
-    for (int i = 0; i < sp - 1; i++)
-    {
-        for (int j = i + 1; j < sp; j++)
+        while (!graph_end(&v))
         {
-            graph_min_cut(graph, vcx[i], vcx[j], &result);
+            graph_min_cut(graph, u.currentVertex, v.currentVertex, &result);
 
             if (result.value == 3)
             {
                 return result.reachable * result.nonReachable;
             }
+
+            graph_next(&v);
         }
+
+        graph_next(&u);
     }
 
-    return 0;
+    return -1;
 }
 
 int main(void)
@@ -402,9 +439,9 @@ int main(void)
         }
     }
 
-    long product = scan(&g);
+    long result = scan(&g);
 
-    printf("25z %ld %lf\n", product, (double)(clock() - start) / CLOCKS_PER_SEC);
+    printf("25z %ld %lf\n", result, (double)(clock() - start) / CLOCKS_PER_SEC);
     graph_clear(&g);
 
     return 0;
