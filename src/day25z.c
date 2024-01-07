@@ -145,17 +145,6 @@ Vertex vertex_queue_dequeue(VertexQueue instance)
     return result;
 }
 
-void graph(Graph instance)
-{
-    instance->firstBucket = NULL;
-
-    for (int i = 0; i < GRAPH_BUCKETS; i++)
-    {
-        instance->buckets[i].firstVertex = NULL;
-        instance->buckets[i].nextBucket = NULL;
-    }
-}
-
 void graph_begin(Graph instance, GraphIterator iterator)
 {
     iterator->currentBucket = instance->firstBucket;
@@ -396,8 +385,6 @@ int main(void)
     char buffer[BUFFER_SIZE];
     struct Graph g = { 0 };
     clock_t start = clock();
-
-    graph(&g);
 
     while (fgets(buffer, sizeof buffer, stdin))
     {
