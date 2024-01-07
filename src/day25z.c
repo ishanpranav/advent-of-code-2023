@@ -166,6 +166,11 @@ bool graph_end(GraphIterator iterator)
 
 void graph_next(GraphIterator iterator)
 {
+    if (graph_end(iterator))
+    {
+        return;
+    }
+
     if (iterator->currentVertex)
     {
         iterator->currentVertex = iterator->currentVertex->nextVertex;
@@ -224,7 +229,7 @@ Vertex graph_vertex(Graph instance, char key[])
 
     memcpy(u->key, key, KEY_SIZE);
 
-    u->source = NULL;
+    u->nextVertex = NULL;
     u->degree = 0;
     *p = u;
 
@@ -298,7 +303,6 @@ void graph_min_cut(Graph instance, Vertex source, Vertex target, MinCut result)
             }
 
             *capacity -= flow;
-
             *vertex_capacity(u, u->source) += flow;
         }
 
@@ -350,12 +354,7 @@ long scan(Graph graph)
     {
         struct GraphIterator v = u;
 
-        if (!graph_end(&v))
-        {
-            graph_next(&v);
-        }
-
-        while (!graph_end(&v))
+        for (graph_next(&v); !graph_end(&v); graph_next(&v))
         {
             graph_min_cut(graph, u.currentVertex, v.currentVertex, &result);
 
@@ -363,8 +362,6 @@ long scan(Graph graph)
             {
                 return result.reachable * result.nonReachable;
             }
-
-            graph_next(&v);
         }
     }
 
